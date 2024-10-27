@@ -170,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
           duration: const Duration(milliseconds: 150),
           child: FloatingActionButton(
             heroTag: 'home_fab',
+            shape: const CircleBorder(), // 添加这一行，使按钮变成圆形
             onPressed: () {
               if (_selectedIndex == 0) {
                 Navigator.push(
