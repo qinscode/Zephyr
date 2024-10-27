@@ -17,7 +17,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
   final _searchService = SearchService();
-  List<SearchService.SearchResult> _searchResults = [];
+  List<SearchResult> _searchResults = [];
   bool _isSearching = false;
 
   @override
@@ -59,7 +59,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  void _openSearchResult(SearchService.SearchResult result) {
+  void _openSearchResult(SearchResult result) {
     if (result.type == SearchService.SearchResultType.note) {
       Navigator.push(
         context,
