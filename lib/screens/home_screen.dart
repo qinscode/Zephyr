@@ -37,42 +37,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          final int currentIndex = _screens.indexOf(child as Widget);
-          final bool isForward = currentIndex > _selectedIndex;
-          
-          final Offset beginOffset = isForward 
-              ? const Offset(1.0, 0.0)
-              : const Offset(-1.0, 0.0);
-
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: beginOffset,
-              end: Offset.zero,
-            ).animate(CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeInOut,
-            )),
-            child: FadeTransition(
-              opacity: animation,
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: _onPageChanged,
-                children: _screens,
-              ),
-            ),
-          );
-        },
-        child: _screens[_selectedIndex],
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        children: _screens,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
           setState(() {
             _selectedIndex = index;
-            // 添加页面动画切换
             _pageController.animateToPage(
               index,
               duration: const Duration(milliseconds: 300),

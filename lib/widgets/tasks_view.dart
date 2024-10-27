@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/task.dart';
 import '../screens/settings_screen.dart';
 import '../models/tasks_model.dart';
+import 'base_view.dart';
 
 class TasksView extends StatelessWidget {
   const TasksView({super.key});
@@ -13,33 +15,23 @@ class TasksView extends StatelessWidget {
       builder: (context, tasksModel, child) {
         final tasks = tasksModel.tasks;
 
-        return Scaffold(
-          backgroundColor: Colors.white,
-          body: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                floating: true,
-                backgroundColor: Colors.white,
-                elevation: 0,
-                centerTitle: false,
-                title: const Text('Tasks'),
-                actions: [
-                  IconButton(
-                    icon: const Icon(CupertinoIcons.settings),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SettingsScreen(),
-                        ),
-                      );
-                    },
+        return BaseView(
+          title: 'Tasks',
+          actions: [
+            IconButton(
+              icon: const Icon(CupertinoIcons.settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
                   ),
-                ],
-              ),
-              // 直接是任务列表内容
-              if (tasks.isEmpty)
-                SliverFillRemaining(
+                );
+              },
+            ),
+          ],
+          body: tasks.isEmpty
+              ? SliverFillRemaining(
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -68,39 +60,35 @@ class TasksView extends StatelessWidget {
                     ),
                   ),
                 )
-              else
-                SliverList(
+              : SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final task = tasks[index];
-                      return CheckboxListTile(
-                        value: task.isCompleted,
-                        onChanged: (value) {
-                          tasksModel.toggleTask(task.id);
-                        },
-                        title: Text(
-                          task.title,
-                          style: TextStyle(
-                            decoration: task.isCompleted
-                                ? TextDecoration.lineThrough
-                                : null,
-                          ),
-                        ),
-                        secondary: Icon(
-                          task.isCompleted
-                              ? CupertinoIcons.checkmark_circle_fill
-                              : CupertinoIcons.circle,
-                          color: task.isCompleted ? Colors.green : Colors.grey,
-                        ),
-                      );
-                    },
+                    (context, index) => _buildTaskItem(context, tasks[index], tasksModel),
                     childCount: tasks.length,
                   ),
                 ),
-            ],
-          ),
         );
       },
+    );
+  }
+
+  Widget _buildTaskItem(BuildContext context, Task task, TasksModel tasksModel) {
+    return CheckboxListTile(
+      value: task.isCompleted,
+      onChanged: (value) {
+        tasksModel.toggleTask(task.id);
+      },
+      title: Text(
+        task.title,
+        style: TextStyle(
+          decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+        ),
+      ),
+      secondary: Icon(
+        task.isCompleted
+            ? CupertinoIcons.checkmark_circle_fill
+            : CupertinoIcons.circle,
+        color: task.isCompleted ? Colors.green : Colors.grey,
+      ),
     );
   }
 }
