@@ -2,11 +2,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 import '../models/note.dart';
 import '../models/notes_model.dart';
 import '../models/folder_model.dart';
 import '../models/trash_model.dart';
 import '../screens/note_editor_screen.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:intl/intl.dart';
 
 class NotesView extends StatelessWidget {
   const NotesView({super.key});
@@ -44,7 +47,7 @@ class NotesView extends StatelessWidget {
                   ),
                 ),
               ),
-              // 当前文件夹名称
+              // 当前文件名称
               if (selectedFolderId != null)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -76,17 +79,14 @@ class NotesView extends StatelessWidget {
                           ),
                         ),
                       )
-                    : SliverGrid(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          childAspectRatio: 0.85,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => _buildNoteCard(context, notes[index]),
-                          childCount: notes.length,
-                        ),
+                    : SliverMasonryGrid.extent(
+                        maxCrossAxisExtent: 200,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        itemBuilder: (context, index) {
+                          return _buildNoteCard(context, notes[index]);
+                        },
+                        childCount: notes.length,
                       ),
               ),
             ],
@@ -128,6 +128,26 @@ class NotesView extends StatelessWidget {
   }
 
   Widget _buildNoteCard(BuildContext context, Note note) {
+    // 处理标题和内容
+    String displayTitle = '';
+    String displayContent = '';
+    
+    if (note.title.isNotEmpty) {
+      displayTitle = note.title;
+      displayContent = note.content.isNotEmpty ? note.content : 'No text';
+    } else if (note.content.isNotEmpty) {
+      // 如果没有标题，使用内容的第一行作为标题
+      final lines = note.content.split('\n');
+      displayTitle = lines[0];
+      displayContent = lines.length > 1 ? lines.sublist(1).join('\n') : 'No text';
+    } else {
+      displayTitle = 'Untitled';
+      displayContent = 'No text';
+    }
+
+    // 格式化时间
+    String formattedTime = _formatDateTime(note.modifiedAt);
+
     return GestureDetector(
       onTap: () => _openNote(context, note),
       onLongPress: () => _showNoteOptions(context, note),
@@ -136,29 +156,36 @@ class NotesView extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              if (note.title.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    note.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+              // 标题
+              Text(
+                displayTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
-              Expanded(
-                child: Text(
-                  note.content,
-                  maxLines: 6,
-                  overflow: TextOverflow.fade,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[800],
-                  ),
+              ),
+              const SizedBox(height: 8),
+              // 内容
+              Text(
+                displayContent,
+                maxLines: 8,
+                overflow: TextOverflow.fade,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[800],
+                ),
+              ),
+              const SizedBox(height: 8),
+              // 时间
+              Text(
+                formattedTime,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
                 ),
               ),
             ],
@@ -282,5 +309,22 @@ class NotesView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // 添加时间格式化方法
+  String _formatDateTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+    
+    if (difference.inDays == 0) {
+      // 今天 - 显示具体时间
+      return DateFormat('HH:mm').format(dateTime);
+    } else if (difference.inDays == 1) {
+      // 昨天 - 显示 "Yesterday HH:mm"
+      return 'Yesterday ${DateFormat('HH:mm').format(dateTime)}';
+    } else {
+      // 更早 - 显示完整日期
+      return DateFormat('yyyy-MM-dd').format(dateTime);
+    }
   }
 }
