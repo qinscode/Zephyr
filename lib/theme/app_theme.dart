@@ -1,236 +1,103 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../models/folder_model.dart';
 
-class FoldersScreen extends StatefulWidget {
-  const FoldersScreen({super.key});
+class AppTheme {
+  // 定义主题颜色
+  static const Color backgroundColor = Color(0xFFFFFBE6);  // 浅黄色背景
+  static const Color surfaceColor = Color(0xFFFFFBE6);    // 修改为与背景相同的颜色
+  static const Color primaryColor = Colors.blue;
+  static const Color textColor = Colors.black;
+  static const Color secondaryTextColor = Colors.grey;
 
-  @override
-  State<FoldersScreen> createState() => _FoldersScreenState();
-}
+  // 定义主题数据
+  static ThemeData get lightTheme {
+    return ThemeData(
+      // 基础背景色设置
+      scaffoldBackgroundColor: backgroundColor,
+      canvasColor: backgroundColor,
+      dialogBackgroundColor: backgroundColor,
+      cardColor: Colors.white,  // 卡片保持白色背景
 
-class _FoldersScreenState extends State<FoldersScreen> {
-  final _folderNameController = TextEditingController();
-
-  @override
-  void dispose() {
-    _folderNameController.dispose();
-    super.dispose();
-  }
-
-  void _showCreateFolderDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('New folder'),
-        content: TextField(
-          controller: _folderNameController,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Folder name',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _folderNameController.clear();
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (_folderNameController.text.isNotEmpty) {
-                final folderModel = Provider.of<FolderModel>(
-                    context,
-                    listen: false
-                );
-                folderModel.createFolder(_folderNameController.text);
-                Navigator.pop(context);
-                _folderNameController.clear();
-              }
-            },
-            child: const Text('Create'),
-          ),
-        ],
+      // 颜色方案
+      colorScheme: const ColorScheme.light(
+        background: backgroundColor,
+        surface: surfaceColor,
+        onSurface: textColor,
+        primary: primaryColor,
+        onPrimary: surfaceColor,
       ),
-    );
-  }
 
-  void _showDeleteFolderDialog(Folder folder) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete folder?'),
-        content: Text(
-          'Are you sure you want to delete "${folder.name}"? '
-              'All notes in this folder will be moved to Uncategorized.',
+      // AppBar 主题
+      appBarTheme: const AppBarTheme(
+        backgroundColor: surfaceColor,  // 使用统一的背景色
+        elevation: 0,
+        iconTheme: IconThemeData(color: textColor),
+        titleTextStyle: TextStyle(
+          color: textColor,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              final folderModel = Provider.of<FolderModel>(
-                  context,
-                  listen: false
-              );
-              folderModel.deleteFolder(folder.id);
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
       ),
-    );
-  }
 
-  void _showRenameFolderDialog(Folder folder) {
-    _folderNameController.text = folder.name;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Rename folder'),
-        content: TextField(
-          controller: _folderNameController,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Folder name',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _folderNameController.clear();
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (_folderNameController.text.isNotEmpty) {
-                final folderModel = Provider.of<FolderModel>(
-                    context,
-                    listen: false
-                );
-                folderModel.renameFolder(folder.id, _folderNameController.text);
-                Navigator.pop(context);
-                _folderNameController.clear();
-              }
-            },
-            child: const Text('Rename'),
-          ),
-        ],
+      // 底部导航栏主题
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: surfaceColor,  // 使用统一的背景色
+        elevation: 0,
       ),
-    );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<FolderModel>(
-      builder: (context, folderModel, child) {
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: const Text('Folders'),
-            actions: const [
-              IconButton(
-                icon: Icon(Icons.delete_outline),
-                onPressed: null,
-              ),
-            ],
-          ),
-          body: ListView(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.folder_outlined, color: Colors.orange),
-                title: const Text('All'),
-                trailing: Text(
-                  folderModel.totalNoteCount.toString(),
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-                selected: folderModel.selectedFolderId == null,
-                onTap: () {
-                  folderModel.selectFolder(null);
-                  Navigator.pop(context);
-                },
-              ),
-              const Divider(height: 1),
-              ...folderModel.folders.map((folder) {
-                return ListTile(
-                  leading: const Icon(Icons.folder_outlined),
-                  title: Text(folder.name),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        folder.noteCount.toString(),
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                      PopupMenuButton(
-                        icon: const Icon(Icons.more_vert),
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 'rename',
-                            child: Text('Rename'),
-                          ),
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
-                        onSelected: (value) {
-                          if (value == 'rename') {
-                            _showRenameFolderDialog(folder);
-                          } else if (value == 'delete') {
-                            _showDeleteFolderDialog(folder);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                  selected: folderModel.selectedFolderId == folder.id,
-                  onTap: () {
-                    folderModel.selectFolder(folder.id);
-                    Navigator.pop(context);
-                  },
-                );
-              }),
-              ListTile(
-                leading: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.orange[400],
-                  ),
-                  child: const Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-                title: const Text('New folder'),
-                onTap: _showCreateFolderDialog,
-              ),
-            ],
-          ),
-        );
-      },
+      // 弹窗主题
+      dialogTheme: const DialogTheme(
+        backgroundColor: Colors.white,  // 弹窗保持白色背景
+      ),
+
+      // 卡片主题
+      cardTheme: const CardTheme(
+        color: Colors.white,  // 卡片保持白色背景
+        elevation: 1,
+      ),
+
+      // 弹出菜单主题
+      popupMenuTheme: const PopupMenuThemeData(
+        color: Colors.white,  // 弹出菜单保持白色背景
+      ),
+
+      // 底部Sheet主题
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Colors.white,  // 底部Sheet保持白色背景
+      ),
+
+      // 导航栏主题
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surfaceColor,  // 使用统一的背景色
+        elevation: 0,
+        labelTextStyle: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return const TextStyle(
+              color: primaryColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            );
+          }
+          return const TextStyle(
+            color: secondaryTextColor,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          );
+        }),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        height: 65,
+        iconTheme: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return const IconThemeData(
+              size: 25,
+              color: primaryColor,
+            );
+          }
+          return const IconThemeData(
+            size: 25,
+            color: secondaryTextColor,
+          );
+        }),
+      ),
     );
   }
 }
