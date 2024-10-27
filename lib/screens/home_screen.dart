@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  final PageController _pageController = PageController();
 
   final List<Widget> _screens = const [
     NotesView(),
@@ -22,19 +23,29 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          // 修改这里的逻辑
           final int currentIndex = _screens.indexOf(child as Widget);
           final bool isForward = currentIndex > _selectedIndex;
           
-          // 当前页面的偏移方向应该和前一个状态相反
           final Offset beginOffset = isForward 
-              ? const Offset(1.0, 0.0)  // 从右边进入
-              : const Offset(-1.0, 0.0); // 从左边进入
+              ? const Offset(1.0, 0.0)
+              : const Offset(-1.0, 0.0);
 
           return SlideTransition(
             position: Tween<Offset>(
@@ -46,7 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
             )),
             child: FadeTransition(
               opacity: animation,
-              child: child,
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                children: _screens,
+              ),
             ),
           );
         },
@@ -57,6 +72,12 @@ class _HomeScreenState extends State<HomeScreen> {
         onDestinationSelected: (index) {
           setState(() {
             _selectedIndex = index;
+            // 添加页面动画切换
+            _pageController.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
           });
         },
         destinations: const [
