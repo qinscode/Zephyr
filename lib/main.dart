@@ -136,6 +136,38 @@ class MyApp extends StatelessWidget {
               bottomSheetTheme: const BottomSheetThemeData(
                 backgroundColor: Colors.white,
               ),
+              
+              // 导航栏主题
+              navigationBarTheme: NavigationBarThemeData(
+                labelTextStyle: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.selected)) {
+                    return const TextStyle(
+                      color: Colors.blue,
+                      fontSize: 12,  // 增加字体大小
+                      fontWeight: FontWeight.w700,  // 加粗字体
+                    );
+                  }
+                  return const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12        ,  // 增加字体大小
+                    fontWeight: FontWeight.w600,  // 未选中时也稍微加粗
+                  );
+                }),
+                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                height: 65,  // 设置导航栏高度
+                iconTheme: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.selected)) {
+                    return const IconThemeData(
+                      size: 25,  // 增加图标大小
+                      color: Colors.blue,
+                    );
+                  }
+                  return const IconThemeData(
+                    size: 25,  // 增加图标大小
+                    color: Colors.grey,
+                  );
+                }),
+              ),
             ),
             darkTheme: ThemeData(
               // 复制上面相同的配置

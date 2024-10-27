@@ -109,7 +109,6 @@ test-output/
 
 # macOS related files
 *.crash
-*.xcworkspace
 *.xcodeproj
 *.xcuserdata/
 *.plist
@@ -120,8 +119,6 @@ test-output/
 *.perspectivev3
 *.xccheckout
 
-# JetBrains Rider related
-.idea/
 
 # Flutter web related
 web/manifest.json

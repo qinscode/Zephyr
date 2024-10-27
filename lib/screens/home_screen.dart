@@ -7,11 +7,11 @@ import '../models/note.dart';
 import '../models/notes_model.dart';
 import '../models/task.dart';
 import '../models/tasks_model.dart';
-import '../theme/app_theme.dart';
 import '../widgets/notes_view.dart';
 import '../widgets/tasks_view.dart';
 import '../screens/note_editor_screen.dart';
 import '../screens/task_editor_screen.dart';
+import '../screens/folders_screen.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
-  bool _isAnimating = false;  // 添加这个变量来控制动画状态
+  bool _isAnimating = false;
 
   final List<Widget> _screens = const [
     NotesView(),
@@ -39,9 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onPageChanged(int index) {
     setState(() {
-      _isAnimating = true;  // 开始动画
+      _isAnimating = true;
       _selectedIndex = index;
-      // 延迟一小段时间后结束动画
       Future.delayed(const Duration(milliseconds: 150), () {
         if (mounted) {
           setState(() {
@@ -135,6 +134,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        indicatorColor: Colors.transparent,
+        height: 65,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         onDestinationSelected: (index) {
           setState(() {
             _selectedIndex = index;
