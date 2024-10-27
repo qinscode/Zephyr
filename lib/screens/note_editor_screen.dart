@@ -334,26 +334,29 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: GestureDetector(
                 onTap: _showFolderSelector,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(CupertinoIcons.folder, size: 18),
-                      const SizedBox(width: 4),
-                      Consumer<FolderModel>(
-                        builder: (context, folderModel, child) {
-                          final folderName = _currentFolderId != null
-                              ? folderModel.getFolderName(_currentFolderId!)
-                              : 'Uncategorized';
-                          return Text(folderName);
-                        },
-                      ),
-                    ],
+                child: Align( // 添加 Align 组件
+                  alignment: Alignment.centerLeft, // 设置左对齐
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min, // 保持这个属性
+                      children: [
+                        const Icon(CupertinoIcons.folder, size: 18),
+                        const SizedBox(width: 4),
+                        Consumer<FolderModel>(
+                          builder: (context, folderModel, child) {
+                            final folderName = _currentFolderId != null
+                                ? folderModel.getFolderName(_currentFolderId!)
+                                : 'Uncategorized';
+                            return Text(folderName);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
