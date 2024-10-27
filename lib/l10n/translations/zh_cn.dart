@@ -22,13 +22,15 @@ const zhCN = TranslationKeys(
     'deleteFolder': '删除文件夹',
     'deleteFolderConfirm': '确定要删除此文件夹吗？所有笔记将移至未分类。',
   },
-  tasks: const {
+  tasks: {
     'title': '任务',
     'noTasks': '暂无任务',
     'addSubtask': "按'回车'创建子任务",
     'setReminder': '设置提醒',
+    'completed': '已完成',
+    'inProgress': '进行中',
   },
-  actions: const {
+  actions: {
     'create': '创建',
     'rename': '重命名',
     'delete': '删除',
@@ -37,19 +39,54 @@ const zhCN = TranslationKeys(
     'done': '完成',
     'share': '分享',
     'moveToTrash': '移到回收站',
-    'exitConfirm': '确定要退出吗？',
-    'exit': '退出',
+    'restore': '恢复',
+    'deletePermanently': '永久删除',
   },
-  settings: const {
+  settings: {
     'title': '设置',
     'style': '样式',
     'fontSize': '字体大小',
     'sort': '排序',
     'layout': '布局',
     'darkMode': '深色模式',
+    'quickFeatures': '快捷功能',
+    'quickNotes': '快速笔记',
+    'reminders': '提醒',
+    'highPriorityReminders': '高优先级提醒',
+    'highPriorityRemindersDesc': '在静音或勿扰模式下也播放提醒音',
+    'other': '其他',
+    'privacyPolicy': '隐私政策',
+    'dataSharing': '笔记第三方数据共享声明',
+    'permissions': '权限详情',
   },
-  time: const {
+  time: {
     'today': '今天',
     'yesterday': '昨天',
+    'tomorrow': '明天',
+  },
+  language: {
+    'title': '语言',
+    'selectLanguage': '选择语言',
+    'english': 'English',
+    'chinese': '中文',
+  },
+  alerts: {
+    'exitConfirm': '确定要退出吗？',
+    'exit': '退出',
+    'deleteConfirm': '确定要删除吗？',
+    'emptyTrashConfirm': '清空回收站？所有项目将被永久删除。',
+  },
+  share: {
+    'shareNote': '分享笔记',
+    'shareAsText': '分享为文本',
+    'shareAsImage': '分享为图片',
+    'exportAsMarkdown': '导出为 Markdown',
+  },
+  editor: {
+    'list': '列表',
+    'image': '图片',
+    'draw': '绘画',
+    'checkList': '清单',
+    'format': '格式',
   },
 );
