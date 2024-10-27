@@ -58,7 +58,7 @@ class NotesView extends StatelessWidget {
                   ),
                 ],
               ),
-              // Search bar
+              // 搜索栏
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
