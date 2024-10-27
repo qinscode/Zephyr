@@ -1,0 +1,55 @@
+import 'translation_keys.dart';  // 添加这行导入
+
+const zhCN = TranslationKeys(
+  notes: {
+    'title': '笔记',
+    'noNotes': '暂无笔记',
+    'startTyping': '开始输入',
+    'untitled': '未命名',
+    'noText': '无内容',
+    'searchNotes': '搜索笔记',
+    'characters': '字符',
+  },
+  folders: {
+    'title': '文件夹',
+    'newFolder': '新建文件夹',
+    'folderName': '文件夹名称',
+    'all': '全部',
+    'uncategorized': '未分类',
+    'moveToFolder': '移动到文件夹',
+    'createFolder': '创建文件夹',
+    'renameFolder': '重命名文件夹',
+    'deleteFolder': '删除文件夹',
+    'deleteFolderConfirm': '确定要删除此文件夹吗？所有笔记将移至未分类。',
+  },
+  tasks: const {
+    'title': '任务',
+    'noTasks': '暂无任务',
+    'addSubtask': "按'回车'创建子任务",
+    'setReminder': '设置提醒',
+  },
+  actions: const {
+    'create': '创建',
+    'rename': '重命名',
+    'delete': '删除',
+    'cancel': '取消',
+    'save': '保存',
+    'done': '完成',
+    'share': '分享',
+    'moveToTrash': '移到回收站',
+    'exitConfirm': '确定要退出吗？',
+    'exit': '退出',
+  },
+  settings: const {
+    'title': '设置',
+    'style': '样式',
+    'fontSize': '字体大小',
+    'sort': '排序',
+    'layout': '布局',
+    'darkMode': '深色模式',
+  },
+  time: const {
+    'today': '今天',
+    'yesterday': '昨天',
+  },
+);
