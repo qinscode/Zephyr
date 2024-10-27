@@ -50,17 +50,27 @@ class SettingsScreen extends StatelessWidget {
               ),
 
               // 快捷功能
-              _SectionHeader(title: l10n.getSettingsValue('quickFeatures', 'title')),
+              _SectionHeader(title: l10n.settingsMap['quickFeatures'] as String),
               ListTile(
-                title: Text(l10n.getSettingsValue('quickNotes', 'title')),
+                title: Text(
+                  l10n.settingsMap['quickNotes'] as String,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,  // 加粗标题
+                  ),
+                ),
                 trailing: const Icon(CupertinoIcons.right_chevron),
               ),
 
               // 提醒设置
-              _SectionHeader(title: l10n.getSettingsValue('reminders', 'title')),
+              _SectionHeader(title: l10n.settingsMap['reminders'] as String),
               SwitchListTile(
-                title: Text(l10n.getSettingsValue('highPriorityReminders', 'title')),
-                subtitle: Text(l10n.getSettingsValue('highPriorityReminders', 'desc')),
+                title: Text(
+                  l10n.settingsMap['highPriorityReminders'] as String,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,  // 加粗标题
+                  ),
+                ),
+                subtitle: Text(l10n.settingsMap['highPriorityRemindersDesc'] as String),
                 value: settings.highPriorityReminders,
                 onChanged: (value) {
                   settings.setHighPriorityReminders(value);
@@ -68,17 +78,32 @@ class SettingsScreen extends StatelessWidget {
               ),
 
               // 其他设置
-              _SectionHeader(title: l10n.getSettingsValue('other', 'title')),
+              _SectionHeader(title: l10n.settingsMap['other'] as String),
               ListTile(
-                title: Text(l10n.getSettingsValue('privacyPolicy', 'title')),
+                title: Text(
+                  l10n.settingsMap['privacyPolicy'] as String,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,  // 加粗标题
+                  ),
+                ),
                 trailing: const Icon(CupertinoIcons.right_chevron),
               ),
               ListTile(
-                title: Text(l10n.getSettingsValue('dataSharing', 'title')),
+                title: Text(
+                  l10n.settingsMap['dataSharing'] as String,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,  // 加粗标题
+                  ),
+                ),
                 trailing: const Icon(CupertinoIcons.right_chevron),
               ),
               ListTile(
-                title: Text(l10n.getSettingsValue('permissions', 'title')),
+                title: Text(
+                  l10n.settingsMap['permissions'] as String,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,  // 加粗标题
+                  ),
+                ),
                 trailing: const Icon(CupertinoIcons.right_chevron),
               ),
             ],
@@ -274,14 +299,23 @@ class _SettingsItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(title),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,  // 加粗标题
+        ),
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             value,
-            style: TextStyle(color: Colors.grey[600]),
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,  // 增大选项值的字体大小
+            ),
           ),
+          const SizedBox(width: 4),  // 添加一点间距
           const Icon(CupertinoIcons.right_chevron),
         ],
       ),
