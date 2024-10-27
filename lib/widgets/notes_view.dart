@@ -2,7 +2,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
 import '../models/note.dart';
 import '../models/notes_model.dart';
 import '../models/folder_model.dart';
@@ -33,12 +32,12 @@ class NotesView extends StatelessWidget {
                   child: SearchBar(
                     hintText: 'Search notes',
                     leading: const Icon(CupertinoIcons.search),
-                    backgroundColor: WidgetStateProperty.all(Colors.grey[100]),
-                    elevation: WidgetStateProperty.all(0),
-                    padding: WidgetStateProperty.all(
+                    backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.surfaceVariant), // 使用主题中定义的搜索框颜色
+                    elevation: MaterialStateProperty.all(0),
+                    padding: MaterialStateProperty.all(
                       const EdgeInsets.symmetric(horizontal: 16.0),
                     ),
-                    shape: WidgetStateProperty.all(
+                    shape: MaterialStateProperty.all(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: BorderSide.none,

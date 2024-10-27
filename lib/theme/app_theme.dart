@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // 定义主题颜色
-  static const Color backgroundColor = Color(0xFFFFFBE6);  // 浅黄色背景
-  static const Color surfaceColor = Color(0xFFFFFBE6);    // 修改为与背景相同的颜色
+  static const Color backgroundColor = Color(0xFFF7F7F7);  // 浅灰色背景
+  static const Color surfaceColor = Color(0xFFF7F7F7);    // 与背景相同的颜色
+  static const Color searchBarColor = Color(0xFFEEEEEE);  // 添加搜索框背景色，更深的灰色
   static const Color primaryColor = Colors.blue;
   static const Color textColor = Colors.black;
   static const Color secondaryTextColor = Colors.grey;
@@ -19,16 +20,16 @@ class AppTheme {
 
       // 颜色方案
       colorScheme: const ColorScheme.light(
-        background: backgroundColor,
-        surface: surfaceColor,
+        surface: surfaceColor,  // 使用 surface 替代 background
         onSurface: textColor,
         primary: primaryColor,
         onPrimary: surfaceColor,
+        surfaceVariant: searchBarColor,
       ),
 
       // AppBar 主题
       appBarTheme: const AppBarTheme(
-        backgroundColor: surfaceColor,  // 使用统一的背景色
+        backgroundColor: surfaceColor,
         elevation: 0,
         iconTheme: IconThemeData(color: textColor),
         titleTextStyle: TextStyle(
@@ -40,37 +41,42 @@ class AppTheme {
 
       // 底部导航栏主题
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: surfaceColor,  // 使用统一的背景色
+        backgroundColor: surfaceColor,
         elevation: 0,
       ),
 
       // 弹窗主题
       dialogTheme: const DialogTheme(
-        backgroundColor: Colors.white,  // 弹窗保持白色背景
+        backgroundColor: Colors.white,
       ),
 
       // 卡片主题
       cardTheme: const CardTheme(
-        color: Colors.white,  // 卡片保持白色背景
-        elevation: 1,
+        color: Colors.white,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+          side: BorderSide.none,
+        ),
       ),
 
       // 弹出菜单主题
       popupMenuTheme: const PopupMenuThemeData(
-        color: Colors.white,  // 弹出菜单保持白色背景
+        color: Colors.white,
       ),
 
       // 底部Sheet主题
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Colors.white,  // 底部Sheet保持白色背景
+        backgroundColor: Colors.white,
       ),
 
       // 导航栏主题
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: surfaceColor,  // 使用统一的背景色
+        backgroundColor: surfaceColor,
         elevation: 0,
-        labelTextStyle: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {  // 使用 WidgetStateProperty
+          if (states.contains(WidgetState.selected)) {  // 使用 WidgetState
             return const TextStyle(
               color: primaryColor,
               fontSize: 12,
@@ -85,8 +91,8 @@ class AppTheme {
         }),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         height: 65,
-        iconTheme: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        iconTheme: WidgetStateProperty.resolveWith((states) {  // 使用 WidgetStateProperty
+          if (states.contains(WidgetState.selected)) {  // 使用 WidgetState
             return const IconThemeData(
               size: 25,
               color: primaryColor,
@@ -97,6 +103,15 @@ class AppTheme {
             color: secondaryTextColor,
           );
         }),
+      ),
+
+      // 搜索栏主题
+      searchBarTheme: SearchBarThemeData(
+        backgroundColor: WidgetStateProperty.all(searchBarColor),  // 使用 WidgetStateProperty
+        elevation: WidgetStateProperty.all(0),
+        shadowColor: WidgetStateProperty.all(Colors.transparent),
+        surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
       ),
     );
   }
