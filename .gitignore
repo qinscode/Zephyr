@@ -128,3 +128,5 @@ web/manifest.json
 
 # Linux related
 linux/flutter/ephemeral/
+
+macos/Flutter/GeneratedPluginRegistrant.swift
