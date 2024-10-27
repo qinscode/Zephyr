@@ -1,4 +1,4 @@
-import 'translation_keys.dart';  // 添加这行导入
+import 'translation_keys.dart';
 
 const zhCN = TranslationKeys(
   notes: {

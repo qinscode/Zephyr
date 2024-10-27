@@ -40,12 +40,10 @@ class SettingsScreen extends StatelessWidget {
               ),
               
               // 语言设置
-              _SectionHeader(title: l10n.language['title']!),
+              _SectionHeader(title: l10n.language['title'] ?? 'Language'),
               _SettingsItem(
-                title: l10n.language['title']!,
-                value: settings.locale.languageCode == 'en' 
-                    ? l10n.language['english']! 
-                    : l10n.language['chinese']!,
+                title: l10n.language['title'] ?? 'Language',
+                value: _getLanguageName(settings.locale, l10n),  // 使用辅助方法获取语言名称
                 onTap: () => _showLanguageDialog(context, settings),
               ),
 
@@ -120,33 +118,23 @@ class SettingsScreen extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(l10n.language['selectLanguage']!),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<Locale>(
-                title: Text(l10n.language['english']!),
-                value: const Locale('en', 'US'),
-                groupValue: settings.locale,
-                onChanged: (value) {
-                  if (value != null) {
-                    settings.setLocale(value);
-                    Navigator.pop(context);
-                  }
-                },
-              ),
-              RadioListTile<Locale>(
-                title: Text(l10n.language['chinese']!),
-                value: const Locale('zh', 'CN'),
-                groupValue: settings.locale,
-                onChanged: (value) {
-                  if (value != null) {
-                    settings.setLocale(value);
-                    Navigator.pop(context);
-                  }
-                },
-              ),
-            ],
+          title: Text(l10n.language['selectLanguage'] ?? 'Select Language'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildLanguageOption(context, l10n, settings, 'en', 'US', 'english'),
+                _buildLanguageOption(context, l10n, settings, 'zh', 'CN', 'chinese'),
+                _buildLanguageOption(context, l10n, settings, 'zh', 'TW', 'traditionalChinese'),
+                _buildLanguageOption(context, l10n, settings, 'es', 'ES', 'spanish'),
+                _buildLanguageOption(context, l10n, settings, 'ja', 'JP', 'japanese'),
+                _buildLanguageOption(context, l10n, settings, 'ko', 'KR', 'korean'),
+                _buildLanguageOption(context, l10n, settings, 'th', 'TH', 'thai'),
+                _buildLanguageOption(context, l10n, settings, 'fr', 'FR', 'french'),
+                _buildLanguageOption(context, l10n, settings, 'ru', 'RU', 'russian'),
+                _buildLanguageOption(context, l10n, settings, 'pt', 'BR', 'portuguese'),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -155,6 +143,29 @@ class SettingsScreen extends StatelessWidget {
             ),
           ],
         );
+      },
+    );
+  }
+
+  // 添加一个辅助方法来构建语言选项
+  Widget _buildLanguageOption(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsModel settings,
+    String languageCode,
+    String countryCode,
+    String languageKey,
+  ) {
+    final locale = Locale(languageCode, countryCode);
+    return RadioListTile<Locale>(
+      title: Text(l10n.language[languageKey] ?? languageKey),
+      value: locale,
+      groupValue: settings.locale,
+      onChanged: (value) {
+        if (value != null) {
+          settings.setLocale(value);
+          Navigator.pop(context);
+        }
       },
     );
   }
@@ -262,6 +273,34 @@ class SettingsScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  // 添加一个辅助方法来获取语言名称
+  String _getLanguageName(Locale locale, AppLocalizations l10n) {
+    switch (locale.languageCode) {
+      case 'en':
+        return l10n.language['english'] ?? 'English';
+      case 'zh':
+        return locale.countryCode == 'TW' 
+            ? l10n.language['traditionalChinese'] ?? '繁體中文'
+            : l10n.language['chinese'] ?? '中文';
+      case 'es':
+        return l10n.language['spanish'] ?? 'Español';
+      case 'ja':
+        return l10n.language['japanese'] ?? '日本語';
+      case 'ko':
+        return l10n.language['korean'] ?? '한국어';
+      case 'th':
+        return l10n.language['thai'] ?? 'ไทย';
+      case 'fr':
+        return l10n.language['french'] ?? 'Français';
+      case 'ru':
+        return l10n.language['russian'] ?? 'Русский';
+      case 'pt':
+        return l10n.language['portuguese'] ?? 'Português';
+      default:
+        return 'English';
+    }
   }
 }
 

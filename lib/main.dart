@@ -184,6 +184,14 @@ class MyApp extends StatelessWidget {
             supportedLocales: const [
               Locale('en', 'US'),
               Locale('zh', 'CN'),
+              Locale('zh', 'TW'),
+              Locale('es', 'ES'),
+              Locale('ja', 'JP'),
+              Locale('ko', 'KR'),
+              Locale('th', 'TH'),
+              Locale('fr', 'FR'),
+              Locale('ru', 'RU'),  // 添加俄语
+              Locale('pt', 'BR'),  // 添加葡萄牙语（巴西）
             ],
           );
         },
@@ -322,3 +330,4 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
     return widget.child;
   }
 }
+
