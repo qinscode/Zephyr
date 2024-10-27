@@ -111,12 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: SearchBar(
                       hintText: 'Search notes',
                       leading: const Icon(CupertinoIcons.search),
-                      backgroundColor: MaterialStateProperty.all(Colors.grey[100]),
-                      elevation: MaterialStateProperty.all(0),
-                      padding: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(Colors.grey[100]),
+                      elevation: WidgetStateProperty.all(0),
+                      padding: WidgetStateProperty.all(
                         const EdgeInsets.symmetric(horizontal: 16.0),
                       ),
-                      shape: MaterialStateProperty.all(
+                      shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide.none,
