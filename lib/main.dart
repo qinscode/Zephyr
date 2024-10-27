@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 // Models
 import 'models/notes_model.dart';
@@ -229,10 +230,11 @@ class MyApp extends StatelessWidget {
                 child: child!,
               );
             },
+            // 添加本地化支持
             localizationsDelegates: const [
-              // 添加本地化支持
-              DefaultMaterialLocalizations.delegate,
-              DefaultWidgetsLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [
               Locale('en', 'US'),
