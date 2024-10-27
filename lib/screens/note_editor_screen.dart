@@ -379,8 +379,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       fontSize: 24,
                       fontWeight: FontWeight.w500,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Title',
+                      hintStyle: TextStyle(  // 添加 hintStyle
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[400],  // 设置为浅灰色
+                      ),
                       border: InputBorder.none,
                     ),
                     onSubmitted: (_) {
@@ -405,8 +410,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       fontSize: 16,
                       height: 1.5,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Start typing',
+                      hintStyle: TextStyle(  // 添加 hintStyle
+                        fontSize: 16,
+                        height: 1.5,
+                        color: Colors.grey[400],  // 设置为浅灰色
+                      ),
                       border: InputBorder.none,
                     ),
                   ),
