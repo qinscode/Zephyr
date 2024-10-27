@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'theme/app_theme.dart';
 
 // Models
@@ -172,8 +173,10 @@ class MyApp extends StatelessWidget {
                 child: child!,
               );
             },
-            // 添加本地化支持
+            // 修改本地化配置
+            locale: settings.locale,  // 使用设置中的语言
             localizationsDelegates: const [
+              AppLocalizationsDelegate(),
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
