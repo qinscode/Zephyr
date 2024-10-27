@@ -1,40 +1,45 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../screens/note_editor_screen.dart';
-import '../../screens/task_editor_screen.dart';
-import '../../services/search_service.dart';
 import '../../models/notes_model.dart';
 import '../../models/tasks_model.dart';
+import '../../models/folder_model.dart';
+import '../../services/search_service.dart';
+import '../note_card_gesture_detector.dart';
+import '../../screens/note_editor_screen.dart';
+import '../../screens/task_editor_screen.dart';
+import 'filter_bottom_sheet.dart';
 
-// TODO: REFACTOR
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  const SearchScreen({Key? key}) : super(key: key);
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  _SearchScreenState createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final _searchController = TextEditingController();
-  final _searchService = SearchService();
+  final TextEditingController _searchController = TextEditingController();
+  final SearchService _searchService = SearchService();
   List<SearchResult> _searchResults = [];
   bool _isSearching = false;
+  late SearchFilter _filter;
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
+    _filter = SearchFilter();
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
 
   void _onSearchChanged() {
-    final query = _searchController.text;
-    if (query.isEmpty) {
+    if (_searchController.text.isEmpty) {
       setState(() {
         _searchResults = [];
         _isSearching = false;
@@ -42,25 +47,55 @@ class _SearchScreenState extends State<SearchScreen> {
       return;
     }
 
-    setState(() {
-      _isSearching = true;
-    });
+    setState(() => _isSearching = true);
+    _performSearch();
+  }
 
+  void _performSearch() {
     final notesModel = Provider.of<NotesModel>(context, listen: false);
     final tasksModel = Provider.of<TasksModel>(context, listen: false);
 
-    final noteResults = _searchService.searchNotes(notesModel.notes, query);
-    final taskResults = _searchService.searchTasks(tasksModel.tasks, query);
+    final results = _searchService.advancedSearch(
+      notes: notesModel.notes,
+      tasks: tasksModel.tasks,
+      query: _searchController.text,
+      startDate: _filter.startDate,
+      endDate: _filter.endDate,
+      folders: _filter.folders,
+      includeNotes: _filter.includeNotes,
+      includeTasks: _filter.includeTasks,
+      includeCompleted: _filter.includeCompleted,
+      sortBy: _filter.sortBy,
+    );
 
     setState(() {
-      _searchResults = [...noteResults, ...taskResults]
-        ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      _searchResults = results;
       _isSearching = false;
     });
   }
 
+  void _showFilterBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => FilterBottomSheet(
+        initialFilter: _filter,
+        availableFolders: Provider.of<FolderModel>(context, listen: false)
+            .folders
+            .map((f) => f.name)
+            .toList(),
+        onFilterChanged: (newFilter) {
+          setState(() {
+            _filter = newFilter;
+          });
+          _performSearch();
+        },
+      ),
+    );
+  }
+
   void _openSearchResult(SearchResult result) {
-    if (result.type == SearchService.SearchResultType.note) {
+    if (result.type == SearchResultType.note) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -83,20 +118,21 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         title: TextField(
           controller: _searchController,
-          autofocus: true,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'Search notes and tasks',
             border: InputBorder.none,
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () => _searchController.clear(),
+            ),
           ),
+          autofocus: true,
         ),
         actions: [
-          if (_searchController.text.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () {
-                _searchController.clear();
-              },
-            ),
+          IconButton(
+            icon: const Icon(Icons.tune),
+            onPressed: _showFilterBottomSheet,
+          ),
         ],
       ),
       body: _buildSearchResults(),
@@ -111,28 +147,21 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     if (_searchController.text.isEmpty) {
-      return const Center(
-        child: Text('Start typing to search'),
-      );
+      return const Center(child: Text('Start typing to search'));
     }
 
     if (_searchResults.isEmpty) {
       return Center(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search_off_outlined,
+            const Icon(
+              Icons.search,
               size: 48,
-              color: Colors.grey[400],
+              color: Colors.grey,
             ),
             const SizedBox(height: 16),
-            Text(
-              'No results found for "${_searchController.text}"',
-              style: TextStyle(
-                color: Colors.grey[600],
-              ),
-            ),
+            Text('No results found for "${_searchController.text}"'),
           ],
         ),
       );
@@ -142,23 +171,22 @@ class _SearchScreenState extends State<SearchScreen> {
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         final result = _searchResults[index];
-        return ListTile(
-          leading: Icon(
-            result.type == SearchService.SearchResultType.note
-                ? Icons.note_outlined
-                : Icons.check_circle_outline,
-          ),
-          title: Text(
-            result.title.isEmpty ? 'Untitled' : result.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          subtitle: Text(
-            result.snippet,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
+        return NoteCardGestureDetector(
           onTap: () => _openSearchResult(result),
+          onLongPress: () {}, // TODO: Implement long press action if needed
+          child: ListTile(
+            leading: Icon(
+              result.type == SearchResultType.note
+                  ? Icons.note_outlined
+                  : Icons.check_circle_outline,
+            ),
+            title: Text(result.title),
+            subtitle: Text(
+              result.snippet,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         );
       },
     );
