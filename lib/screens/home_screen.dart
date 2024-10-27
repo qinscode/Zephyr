@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor, // 使用主题背景色
         elevation: 0,
         centerTitle: false,
         title: Text(_selectedIndex == 0 ? 'Notes' : 'Tasks'),
@@ -106,14 +106,14 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Divider(  // 添加分隔线
+          const Divider(
             height: 1,
             thickness: 0.2,
             color: Colors.grey,
           ),
           NavigationBar(
             selectedIndex: _selectedIndex,
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor, // 使用主题背景色
             elevation: 0,
             indicatorColor: Colors.transparent,
             height: 65,
@@ -399,7 +399,7 @@ class TasksContentView extends StatelessWidget {
 
         return SliverList(
           delegate: SliverChildBuilderDelegate(
-                (context, index) => _buildTaskItem(context, tasks[index], tasksModel),
+            (context, index) => _buildTaskItem(context, tasks[index], tasksModel),
             childCount: tasks.length,
           ),
         );
