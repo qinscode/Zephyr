@@ -91,7 +91,7 @@ class MyApp extends StatelessWidget {
               return MediaQuery(
                 // 设置文字缩放比例
                 data: MediaQuery.of(context).copyWith(
-                  textScaleFactor: settings.textScaleFactor,
+                  textScaler: TextScaler.linear(settings.textScaleFactor),
                 ),
                 child: child!,
               );
