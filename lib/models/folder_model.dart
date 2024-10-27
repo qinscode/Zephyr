@@ -139,9 +139,14 @@ class FolderModel extends ChangeNotifier {
 
   // 选择文件夹
   void selectFolder(String? id) {
-    print('FolderModel.selectFolder called with id: $id'); // 打印方法调用
-    _selectedFolderId = id;
-    print('_selectedFolderId set to: $_selectedFolderId'); // 打印设置后的值
+    print('FolderModel.selectFolder called with id: $id');
+    if (id == 'hide') {
+      // 特殊状态：隐藏标签栏
+      _selectedFolderId = 'hide';
+    } else {
+      _selectedFolderId = id;
+    }
+    print('_selectedFolderId set to: $_selectedFolderId');
     notifyListeners();
   }
 
