@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'theme/app_theme.dart';
 
 // Models
 import 'models/notes_model.dart';
@@ -18,9 +19,6 @@ import 'services/search_service.dart';
 
 // Screens
 import 'screens/home_screen.dart';
-
-// Theme
-// import 'theme/app_theme.dart';
 
 
 // TODO: REFACTOR
@@ -83,92 +81,7 @@ class MyApp extends StatelessWidget {
         builder: (context, settings, _) {
           return MaterialApp(
             title: 'Notes App',
-            theme: ThemeData(
-              // 基础背景色设置
-              scaffoldBackgroundColor: Colors.white,
-              canvasColor: Colors.white,
-              dialogBackgroundColor: Colors.white,
-              cardColor: Colors.white,
-              
-              // 颜色方案
-              colorScheme: const ColorScheme.light(
-                surface: Colors.white,
-                onSurface: Colors.black,
-                primary: Colors.blue,
-                onPrimary: Colors.white,
-              ),
-              
-              // AppBar 主题
-              appBarTheme: const AppBarTheme(
-                backgroundColor: Colors.white,
-                elevation: 0,
-                iconTheme: IconThemeData(color: Colors.black),
-                titleTextStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              
-              // 底部导航栏主题
-              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                backgroundColor: Colors.white,
-                elevation: 0,
-              ),
-              
-              // 弹窗主题
-              dialogTheme: const DialogTheme(
-                backgroundColor: Colors.white,
-              ),
-              
-              // 卡片主题
-              cardTheme: const CardTheme(
-                color: Colors.white,
-                elevation: 1,
-              ),
-              
-              // 弹出菜单主题
-              popupMenuTheme: const PopupMenuThemeData(
-                color: Colors.white,
-              ),
-              
-              // 底部Sheet主题
-              bottomSheetTheme: const BottomSheetThemeData(
-                backgroundColor: Colors.white,
-              ),
-              
-              // 导航栏主题
-              navigationBarTheme: NavigationBarThemeData(
-                labelTextStyle: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return const TextStyle(
-                      color: Colors.blue,
-                      fontSize: 12,  // 增加字体大小
-                      fontWeight: FontWeight.w700,  // 加粗字体
-                    );
-                  }
-                  return const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12        ,  // 增加字体大小
-                    fontWeight: FontWeight.w600,  // 未选中时也稍微加粗
-                  );
-                }),
-                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-                height: 65,  // 设置导航栏高度
-                iconTheme: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return const IconThemeData(
-                      size: 25,  // 增加图标大小
-                      color: Colors.blue,
-                    );
-                  }
-                  return const IconThemeData(
-                    size: 25,  // 增加图标大小
-                    color: Colors.grey,
-                  );
-                }),
-              ),
-            ),
+            theme: AppTheme.lightTheme,  // 使用我们定义的主题
             darkTheme: ThemeData(
               // 复制上面相同的配置
               scaffoldBackgroundColor: Colors.white,
@@ -214,6 +127,37 @@ class MyApp extends StatelessWidget {
               
               bottomSheetTheme: const BottomSheetThemeData(
                 backgroundColor: Colors.white,
+              ),
+              
+              navigationBarTheme: NavigationBarThemeData(
+                labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return const TextStyle(
+                      color: Colors.blue,
+                      fontSize: 12,  // 增加字体大小
+                      fontWeight: FontWeight.w700,  // 加粗字体
+                    );
+                  }
+                  return const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12        ,  // 增加字体大小
+                    fontWeight: FontWeight.w600,  // 未选中时也稍微加粗
+                  );
+                }),
+                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                height: 65,  // 设置导航栏高度
+                iconTheme: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return const IconThemeData(
+                      size: 25,  // 增加图标大小
+                      color: Colors.blue,
+                    );
+                  }
+                  return const IconThemeData(
+                    size: 25,  // 增加图标大小
+                    color: Colors.grey,
+                  );
+                }),
               ),
             ),
             themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
