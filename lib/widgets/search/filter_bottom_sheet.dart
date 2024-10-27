@@ -94,7 +94,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             children: [
               Expanded(
                 child: TextButton.icon(
-                  icon: const Icon(Icons.calendar_today),
+                  icon: const Icon(CupertinoIcons.calendar),
                   label: Text(
                     _filter.startDate != null
                         ? _formatDate(_filter.startDate!)
@@ -106,7 +106,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               const Text('to'),
               Expanded(
                 child: TextButton.icon(
-                  icon: const Icon(Icons.calendar_today),
+                  icon: const Icon(CupertinoIcons.calendar),
                   label: Text(
                     _filter.endDate != null
                         ? _formatDate(_filter.endDate!)

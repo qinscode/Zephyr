@@ -17,7 +17,7 @@ class TrashScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(CupertinoIcons.back),
               onPressed: () => Navigator.pop(context),
             ),
             title: const Text('Trash'),
@@ -98,7 +98,7 @@ class TrashScreen extends StatelessWidget {
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 16),
                         child: const Icon(
-                          Icons.delete_forever,
+                          CupertinoIcons.delete,
                           color: Colors.white,
                         ),
                       ),

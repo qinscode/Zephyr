@@ -177,8 +177,8 @@ class _SearchScreenState extends State<SearchScreen> {
           child: ListTile(
             leading: Icon(
               result.type == SearchResultType.note
-                  ? Icons.note_outlined
-                  : Icons.check_circle_outline,
+                  ? CupertinoIcons.doc_text
+                  : CupertinoIcons.checkmark_circle,
             ),
             title: Text(result.title),
             subtitle: Text(

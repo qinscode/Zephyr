@@ -125,8 +125,11 @@ class BackButtonInterceptor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        
         // 获取当前路由信息
         final currentRoute = ModalRoute.of(context);
         if (currentRoute?.isFirst ?? false) {
@@ -148,9 +151,10 @@ class BackButtonInterceptor extends StatelessWidget {
               ],
             ),
           );
-          return shouldExit ?? false;
+          if (shouldExit ?? false) {
+            Navigator.of(context).pop();
+          }
         }
-        return true;
       },
       child: child,
     );
@@ -195,7 +199,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
-                  Icons.error_outline,
+                  CupertinoIcons.exclamationmark_triangle,
                   color: Colors.red,
                   size: 48,
                 ),

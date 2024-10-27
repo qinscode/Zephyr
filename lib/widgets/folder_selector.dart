@@ -1,5 +1,6 @@
 // lib/widgets/folder_selector.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../models/folder_model.dart';
 
@@ -25,7 +26,7 @@ class FolderSelector extends StatelessWidget {
               children: [
                 // Uncategorized option
                 ListTile(
-                  leading: const Icon(Icons.folder_outlined),
+                  leading: const Icon(CupertinoIcons.folder),
                   title: const Text('Uncategorized'),
                   selected: currentFolderId == null,
                   onTap: () {
@@ -35,7 +36,7 @@ class FolderSelector extends StatelessWidget {
                 // Existing folders
                 ...folderModel.folders.map(
                       (folder) => ListTile(
-                    leading: const Icon(Icons.folder_outlined),
+                    leading: const Icon(CupertinoIcons.folder),
                     title: Text(folder.name),
                     selected: folder.id == currentFolderId,
                     onTap: () {
@@ -55,7 +56,7 @@ class FolderSelector extends StatelessWidget {
                       color: Theme.of(context).primaryColor.withOpacity(0.1),
                     ),
                     child: Icon(
-                      Icons.add,
+                      CupertinoIcons.add,
                       size: 16,
                       color: Theme.of(context).primaryColor,
                     ),
@@ -186,7 +187,7 @@ class FolderSelectorButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
-                  Icons.folder_outlined,
+                  CupertinoIcons.folder,
                   size: 18,
                 ),
                 const SizedBox(width: 8),
@@ -196,7 +197,7 @@ class FolderSelectorButton extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 const Icon(
-                  Icons.arrow_drop_down,
+                  CupertinoIcons.chevron_down,
                   size: 18,
                 ),
               ],

@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/folder_model.dart';
-import '../widgets/folder_selector.dart';
 
 class FoldersScreen extends StatefulWidget {
   const FoldersScreen({super.key});
