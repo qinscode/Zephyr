@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/settings_model.dart';
+import 'package:flutter/cupertino.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -10,7 +11,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(CupertinoIcons.back),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Notes'),
@@ -38,7 +39,7 @@ class SettingsScreen extends StatelessWidget {
               const _SectionHeader(title: 'Quick features'),
               const ListTile(
                 title: Text('Quick notes'),
-                trailing: Icon(Icons.chevron_right),
+                trailing: Icon(CupertinoIcons.right_chevron),
               ),
               const _SectionHeader(title: 'Reminders'),
               SwitchListTile(
@@ -54,15 +55,15 @@ class SettingsScreen extends StatelessWidget {
               const _SectionHeader(title: 'OTHER'),
               const ListTile(
                 title: Text('Privacy Policy'),
-                trailing: Icon(Icons.chevron_right),
+                trailing: Icon(CupertinoIcons.right_chevron),
               ),
               const ListTile(
                 title: Text('Notes Third Party Data Sharing Statement'),
-                trailing: Icon(Icons.chevron_right),
+                trailing: Icon(CupertinoIcons.right_chevron),
               ),
               const ListTile(
                 title: Text('Permissions details'),
-                trailing: Icon(Icons.chevron_right),
+                trailing: Icon(CupertinoIcons.right_chevron),
               ),
             ],
           );
@@ -195,7 +196,7 @@ class _SettingsItem extends StatelessWidget {
             value,
             style: TextStyle(color: Colors.grey[600]),
           ),
-          const Icon(Icons.chevron_right),
+          const Icon(CupertinoIcons.right_chevron),
         ],
       ),
       onTap: onTap,
