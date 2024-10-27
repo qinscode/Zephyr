@@ -5,6 +5,7 @@ import '../models/task.dart';
 import '../screens/settings_screen.dart';
 import '../models/tasks_model.dart';
 import 'base_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TasksView extends StatelessWidget {
   const TasksView({super.key});
@@ -15,26 +16,14 @@ class TasksView extends StatelessWidget {
       builder: (context, tasksModel, child) {
         final tasks = tasksModel.tasks;
 
-        return BaseView(
-          title: 'Tasks',
-          actions: [
-            IconButton(
-              icon: const Icon(CupertinoIcons.settings),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-          body: tasks.isEmpty
-              ? SliverFillRemaining(
+        return Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              if (tasks.isEmpty)
+                SliverFillRemaining(
                   child: Center(
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
                           width: 80,
@@ -60,12 +49,19 @@ class TasksView extends StatelessWidget {
                     ),
                   ),
                 )
-              : SliverList(
+              else
+                SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) => _buildTaskItem(context, tasks[index], tasksModel),
+                    (context, index) => _buildTaskItem(
+                      context,
+                      tasks[index],
+                      tasksModel,
+                    ),
                     childCount: tasks.length,
                   ),
                 ),
+            ],
+          ),
         );
       },
     );
@@ -83,10 +79,10 @@ class TasksView extends StatelessWidget {
           decoration: task.isCompleted ? TextDecoration.lineThrough : null,
         ),
       ),
-      secondary: Icon(
+      secondary: FaIcon(
         task.isCompleted
-            ? CupertinoIcons.checkmark_circle_fill
-            : CupertinoIcons.circle,
+            ? FontAwesomeIcons.circleCheck
+            : FontAwesomeIcons.circle,
         color: task.isCompleted ? Colors.green : Colors.grey,
       ),
     );

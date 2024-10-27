@@ -12,6 +12,7 @@ import '../widgets/tasks_view.dart';
 import '../screens/note_editor_screen.dart';
 import '../screens/task_editor_screen.dart';
 import '../screens/folders_screen.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: _selectedIndex == 0
             ? [
           IconButton(
-            icon: const Icon(CupertinoIcons.folder),
+            icon: const FaIcon(FontAwesomeIcons.folder),
             onPressed: () {
               Navigator.push(
                 context,
@@ -73,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(CupertinoIcons.settings),
+            icon: const FaIcon(FontAwesomeIcons.gear),
             onPressed: () {
               Navigator.push(
                 context,
@@ -86,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ]
             : [
           IconButton(
-            icon: const Icon(CupertinoIcons.settings),
+            icon: const FaIcon(FontAwesomeIcons.gear),
             onPressed: () {
               Navigator.push(
                 context,
@@ -101,36 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: PageView(
         controller: _pageController,
         onPageChanged: _onPageChanged,
-        children: _screens.map((screen) {
-          return CustomScrollView(
-            slivers: [
-              if (screen is NotesView)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SearchBar(
-                      hintText: 'Search notes',
-                      leading: const Icon(CupertinoIcons.search),
-                      backgroundColor: WidgetStateProperty.all(Colors.grey[100]),
-                      elevation: WidgetStateProperty.all(0),
-                      padding: WidgetStateProperty.all(
-                        const EdgeInsets.symmetric(horizontal: 16.0),
-                      ),
-                      shape: WidgetStateProperty.all(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              screen is NotesView
-                  ? const NotesContentView()
-                  : const TasksContentView(),
-            ],
-          );
-        }).toList(),
+        children: _screens,
       ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
@@ -159,13 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             destinations: const [
               NavigationDestination(
-                icon: Icon(CupertinoIcons.doc_text),
-                selectedIcon: Icon(CupertinoIcons.doc_text_fill),
+                icon: FaIcon(FontAwesomeIcons.noteSticky),
+                selectedIcon: FaIcon(FontAwesomeIcons.solidNoteSticky),
                 label: 'Notes',
               ),
               NavigationDestination(
-                icon: Icon(CupertinoIcons.checkmark_circle),
-                selectedIcon: Icon(CupertinoIcons.checkmark_circle_fill),
+                icon: FaIcon(FontAwesomeIcons.circle),
+                selectedIcon: FaIcon(FontAwesomeIcons.circleCheck),
                 label: 'Tasks',
               ),
             ],
@@ -198,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
             },
-            child: const Icon(CupertinoIcons.add),
+            child: const FaIcon(FontAwesomeIcons.plus),
           ),
         ),
       ),
@@ -408,7 +380,7 @@ class TasksContentView extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    CupertinoIcons.checkmark_circle,
+                    FontAwesomeIcons.circleCheck,
                     size: 48,
                     color: Colors.grey,
                   ),
@@ -448,10 +420,10 @@ class TasksContentView extends StatelessWidget {
           decoration: task.isCompleted ? TextDecoration.lineThrough : null,
         ),
       ),
-      secondary: Icon(
+      secondary: FaIcon(
         task.isCompleted
-            ? CupertinoIcons.checkmark_circle_fill
-            : CupertinoIcons.circle,
+            ? FontAwesomeIcons.circleCheck
+            : FontAwesomeIcons.circle,
         color: task.isCompleted ? Colors.green : Colors.grey,
       ),
     );

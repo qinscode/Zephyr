@@ -18,14 +18,36 @@ class BaseView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        title: Text(title),
-        actions: actions,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // AppBar
+            Container(
+              height: kToolbarHeight,
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  ...actions,
+                ],
+              ),
+            ),
+            // Content
+            Expanded(child: body),
+          ],
+        ),
       ),
-      body: body,  // 这里不再使用 CustomScrollView
       floatingActionButton: floatingActionButton,
     );
   }

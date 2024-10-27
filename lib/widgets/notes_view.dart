@@ -23,83 +23,76 @@ class NotesView extends StatelessWidget {
             ? notesModel.notes
             : notesModel.getNotesByFolder(selectedFolderId);
 
-        return BaseView(
-          title: 'Notes',
-          actions: [
-            IconButton(
-              icon: const Icon(CupertinoIcons.folder),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FoldersScreen(),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(CupertinoIcons.settings),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-          body: SliverList(
-            delegate: SliverChildListDelegate([
+        return Scaffold(
+          body: CustomScrollView(
+            slivers: [
               // 搜索栏
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SearchBar(
-                  hintText: 'Search notes',
-                  leading: const Icon(CupertinoIcons.search),
-                  backgroundColor: MaterialStateProperty.all(Colors.grey[100]),
-                  elevation: MaterialStateProperty.all(0),
-                  padding: MaterialStateProperty.all(
-                    const EdgeInsets.symmetric(horizontal: 16.0),
-                  ),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide.none,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SearchBar(
+                    hintText: 'Search notes',
+                    leading: const Icon(CupertinoIcons.search),
+                    backgroundColor: MaterialStateProperty.all(Colors.grey[100]),
+                    elevation: MaterialStateProperty.all(0),
+                    padding: MaterialStateProperty.all(
+                      const EdgeInsets.symmetric(horizontal: 16.0),
+                    ),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
               ),
               // 当前文件夹名称
               if (selectedFolderId != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    folderModel.folders
-                        .firstWhere((f) => f.id == selectedFolderId)
-                        .name,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      folderModel.folders
+                          .firstWhere((f) => f.id == selectedFolderId)
+                          .name,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
               // 笔记网格
-              _buildNotesGrid(notes),
-            ]),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NoteEditorScreen(
-                    initialFolderId: selectedFolderId,
-                  ),
-                ),
-              );
-            },
-            child: const Icon(CupertinoIcons.add),
+              SliverPadding(
+                padding: const EdgeInsets.all(16.0),
+                sliver: notes.isEmpty
+                    ? SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(
+                          child: Text(
+                            'No notes yet',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      )
+                    : SliverGrid(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          childAspectRatio: 0.85,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => _buildNoteCard(context, notes[index]),
+                          childCount: notes.length,
+                        ),
+                      ),
+              ),
+            ],
           ),
         );
       },
