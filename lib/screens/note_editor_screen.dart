@@ -298,7 +298,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.white, // 确保背景色始终为白色
+          surfaceTintColor: Colors.transparent, // 添加这一行，移除 Material 3 的色调
           elevation: 0,
           leading: IconButton(
             icon: const Icon(CupertinoIcons.back),
