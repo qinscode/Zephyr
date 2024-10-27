@@ -134,6 +134,8 @@ class BackButtonInterceptor extends StatelessWidget {
         // 获取当前路由信息
         final currentRoute = ModalRoute.of(context);
         if (currentRoute?.isFirst ?? false) {
+          // 在异步操作前捕获 context
+          final navigator = Navigator.of(context);
           // 如果是首页，显示退出确认对话框
           final shouldExit = await showDialog<bool>(
             context: context,
@@ -153,7 +155,8 @@ class BackButtonInterceptor extends StatelessWidget {
             ),
           );
           if (shouldExit ?? false) {
-            Navigator.of(context).pop();
+            // 使用之前捕获的 navigator
+            navigator.pop();
           }
         }
       },
