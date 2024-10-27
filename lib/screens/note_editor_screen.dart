@@ -12,6 +12,7 @@ import '../models/notes_model.dart';
 import '../models/folder_model.dart';
 import '../models/trash_model.dart';
 import '../widgets/folder_selector.dart';
+import '../l10n/app_localizations.dart';
 
 class NoteEditorScreen extends StatefulWidget {
   final Note? note;
@@ -81,8 +82,12 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   void _updateCharacterCount() {
+    // 移除未完成的输入法组合文本
+    final titleText = _titleController.text.replaceAll(RegExp(r'[\uFE00-\uFE0F]'), '');
+    final contentText = _contentController.text.replaceAll(RegExp(r'[\uFE00-\uFE0F]'), '');
+    
     setState(() {
-      _characterCount = _titleController.text.length + _contentController.text.length;
+      _characterCount = titleText.characters.length + contentText.characters.length;
     });
   }
 
@@ -380,17 +385,18 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Title',
-                      hintStyle: TextStyle(  // 添加 hintStyle
+                      hintText: AppLocalizations.of(context).title,
+                      hintStyle: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey[400],  // 设置为浅灰色
+                        color: Colors.grey[400],
                       ),
                       border: InputBorder.none,
                     ),
                     onSubmitted: (_) {
                       _contentFocusNode.requestFocus();
                     },
+                    onChanged: (_) => _updateCharacterCount(),  // 使用 onChanged 而不是 addListener
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -411,14 +417,15 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       height: 1.5,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Start typing',
-                      hintStyle: TextStyle(  // 添加 hintStyle
+                      hintText: AppLocalizations.of(context).startTyping,
+                      hintStyle: TextStyle(
                         fontSize: 16,
                         height: 1.5,
-                        color: Colors.grey[400],  // 设置为浅灰色
+                        color: Colors.grey[400],
                       ),
                       border: InputBorder.none,
                     ),
+                    onChanged: (_) => _updateCharacterCount(),  // 使用 onChanged 而不是 addListener
                   ),
                 ],
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/settings_model.dart';
 import 'package:flutter/cupertino.dart';
+import '../l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -14,7 +15,7 @@ class SettingsScreen extends StatelessWidget {
           icon: const Icon(CupertinoIcons.back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Notes'),
+        title: Text(AppLocalizations.of(context).settings),
       ),
       body: Consumer<SettingsModel>(
         builder: (context, settings, child) {
@@ -22,20 +23,29 @@ class SettingsScreen extends StatelessWidget {
             children: [
               const _SectionHeader(title: 'Style'),
               _SettingsItem(
-                title: 'Font size',
+                title: AppLocalizations.of(context).fontSize,
                 value: settings.fontSize.name,
                 onTap: () => _showFontSizeDialog(context, settings),
               ),
               _SettingsItem(
-                title: 'Sort',
+                title: AppLocalizations.of(context).sort,
                 value: settings.sortBy.name,
                 onTap: () => _showSortDialog(context, settings),
               ),
               _SettingsItem(
-                title: 'Layout',
+                title: AppLocalizations.of(context).layout,
                 value: settings.layout.name,
                 onTap: () => _showLayoutDialog(context, settings),
               ),
+              
+              // 添加语言设置部分
+              const _SectionHeader(title: 'Language'),
+              _SettingsItem(
+                title: 'Language',
+                value: settings.locale.languageCode == 'en' ? 'English' : '中文',
+                onTap: () => _showLanguageDialog(context, settings),
+              ),
+
               const _SectionHeader(title: 'Quick features'),
               const ListTile(
                 title: Text('Quick notes'),
@@ -69,6 +79,51 @@ class SettingsScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  // 添加语言选择对话框
+  void _showLanguageDialog(BuildContext context, SettingsModel settings) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select Language'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<Locale>(
+                title: const Text('English'),
+                value: const Locale('en', 'US'),
+                groupValue: settings.locale,
+                onChanged: (value) {
+                  if (value != null) {
+                    settings.setLocale(value);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              RadioListTile<Locale>(
+                title: const Text('中文'),
+                value: const Locale('zh', 'CN'),
+                groupValue: settings.locale,
+                onChanged: (value) {
+                  if (value != null) {
+                    settings.setLocale(value);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context).cancel),
+            ),
+          ],
+        );
+      },
     );
   }
 
