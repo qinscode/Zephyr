@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../models/task.dart';
 import '../models/tasks_model.dart';
+import 'package:flutter/cupertino.dart';
 
 class TaskEditorScreen extends StatefulWidget {
   final Task? task;
@@ -125,7 +126,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.access_time),
+              leading: const Icon(CupertinoIcons.time),
               title: const Text('Set reminder'),
               onTap: () async {
                 Navigator.pop(context);
@@ -152,7 +153,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(CupertinoIcons.xmark),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -251,7 +252,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close, size: 16),
+                          icon: const Icon(CupertinoIcons.xmark, size: 16),
                           onPressed: () => _removeSubtask(subtask.id),
                           color: Colors.grey,
                         ),
@@ -261,7 +262,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                 }),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.access_time),
+                  leading: const Icon(CupertinoIcons.time),
                   title: const Text('Set reminder'),
                   onTap: _showSetReminderSheet,
                 ),

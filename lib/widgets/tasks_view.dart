@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +19,7 @@ class TasksView extends StatelessWidget {
               title: Text('Tasks'),
               actions: [
                 IconButton(
-                  icon: Icon(Icons.settings_outlined),
+                  icon: Icon(CupertinoIcons.settings),
                   onPressed: null,
                 ),
               ],
@@ -37,7 +38,7 @@ class TasksView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(
-                          Icons.check_box_outlined,
+                          CupertinoIcons.checkmark_circle,
                           size: 40,
                           color: Colors.orange.shade300,
                         ),
@@ -56,7 +57,7 @@ class TasksView extends StatelessWidget {
             else
               SliverList(
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) {
+                  (context, index) {
                     final task = tasks[index];
                     return CheckboxListTile(
                       value: task.isCompleted,
@@ -70,6 +71,12 @@ class TasksView extends StatelessWidget {
                               ? TextDecoration.lineThrough
                               : null,
                         ),
+                      ),
+                      secondary: Icon(
+                        task.isCompleted
+                            ? CupertinoIcons.checkmark_circle_fill
+                            : CupertinoIcons.circle,
+                        color: task.isCompleted ? Colors.green : Colors.grey,
                       ),
                     );
                   },
