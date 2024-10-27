@@ -24,7 +24,7 @@ class AppTheme {
         onSurface: textColor,
         primary: primaryColor,
         onPrimary: surfaceColor,
-        surfaceVariant: searchBarColor,
+        surfaceContainerHighest: searchBarColor,
       ),
 
       // AppBar 主题

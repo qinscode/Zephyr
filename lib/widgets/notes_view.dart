@@ -1,4 +1,3 @@
-// lib/widgets/notes_view.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,12 +31,12 @@ class NotesView extends StatelessWidget {
                   child: SearchBar(
                     hintText: 'Search notes',
                     leading: const Icon(CupertinoIcons.search),
-                    backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.surfaceVariant), // 使用主题中定义的搜索框颜色
-                    elevation: MaterialStateProperty.all(0),
-                    padding: MaterialStateProperty.all(
+                    backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.surfaceContainerHighest), // 使用主题中定义的搜索框颜色
+                    elevation: WidgetStateProperty.all(0),
+                    padding: WidgetStateProperty.all(
                       const EdgeInsets.symmetric(horizontal: 16.0),
                     ),
-                    shape: MaterialStateProperty.all(
+                    shape: WidgetStateProperty.all(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: BorderSide.none,
@@ -95,36 +94,36 @@ class NotesView extends StatelessWidget {
     );
   }
 
-  Widget _buildNotesGrid(List<Note> notes) {
-    if (notes.isEmpty) {
-      return Center(
-        child: Text(
-          'No notes yet',
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 16,
-          ),
-        ),
-      );
-    }
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.85,
-      ),
-      itemCount: notes.length,
-      itemBuilder: (context, index) {
-        final note = notes[index];
-        return _buildNoteCard(context, note);
-      },
-    );
-  }
+  // Widget _buildNotesGrid(List<Note> notes) {
+  //   if (notes.isEmpty) {
+  //     return Center(
+  //       child: Text(
+  //         'No notes yet',
+  //         style: TextStyle(
+  //           color: Colors.grey[600],
+  //           fontSize: 16,
+  //         ),
+  //       ),
+  //     );
+  //   }
+  //
+  //   return GridView.builder(
+  //     shrinkWrap: true,
+  //     physics: const NeverScrollableScrollPhysics(),
+  //     padding: const EdgeInsets.all(16.0),
+  //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+  //       crossAxisCount: 2,
+  //       crossAxisSpacing: 8,
+  //       mainAxisSpacing: 8,
+  //       childAspectRatio: 0.85,
+  //     ),
+  //     itemCount: notes.length,
+  //     itemBuilder: (context, index) {
+  //       final note = notes[index];
+  //       return _buildNoteCard(context, note);
+  //     },
+  //   );
+  // }
 
   Widget _buildNoteCard(BuildContext context, Note note) {
     // 处理标题和内容

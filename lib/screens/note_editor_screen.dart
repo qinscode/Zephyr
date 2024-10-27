@@ -288,12 +288,17 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        
         if (_isEdited) {
           await _saveNote();
         }
-        return true;
+        if (mounted) {
+          Navigator.pop(context);
+        }
       },
       child: Scaffold(
         backgroundColor: Colors.white,
