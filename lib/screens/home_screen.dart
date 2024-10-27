@@ -12,6 +12,7 @@ import '../screens/note_editor_screen.dart';
 import '../screens/task_editor_screen.dart';
 import '../screens/folders_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../l10n/app_localizations.dart';  // 添加这行
 
 
 class HomeScreen extends StatefulWidget {
@@ -53,12 +54,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor, // 使用主题背景色
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: false,
-        title: Text(_selectedIndex == 0 ? 'Notes' : 'Tasks'),
+        title: Text(_selectedIndex == 0 ? l10n.notes : l10n.tasks),  // 使用本地化文本
         actions: _selectedIndex == 0
             ? [
           IconButton(
@@ -113,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           NavigationBar(
             selectedIndex: _selectedIndex,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor, // 使用主题背景色
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             indicatorColor: Colors.transparent,
             height: 65,
@@ -128,16 +130,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               });
             },
-            destinations: const [
+            destinations: [
               NavigationDestination(
-                icon: FaIcon(FontAwesomeIcons.noteSticky),
-                selectedIcon: FaIcon(FontAwesomeIcons.solidNoteSticky),
-                label: 'Notes',
+                icon: const FaIcon(FontAwesomeIcons.noteSticky),
+                selectedIcon: const FaIcon(FontAwesomeIcons.solidNoteSticky),
+                label: l10n.notes,  // 使用本地化文本
               ),
               NavigationDestination(
-                icon: FaIcon(FontAwesomeIcons.circle),
-                selectedIcon: FaIcon(FontAwesomeIcons.circleCheck),
-                label: 'Tasks',
+                icon: const FaIcon(FontAwesomeIcons.circle),
+                selectedIcon: const FaIcon(FontAwesomeIcons.circleCheck),
+                label: l10n.tasks,  // 使用本地化文本
               ),
             ],
           ),
@@ -182,6 +184,7 @@ class NotesContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer2<NotesModel, FolderModel>(
       builder: (context, notesModel, folderModel, child) {
         final selectedFolderId = folderModel.selectedFolderId;
@@ -368,6 +371,7 @@ class TasksContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<TasksModel>(
       builder: (context, tasksModel, child) {
         final tasks = tasksModel.tasks;
