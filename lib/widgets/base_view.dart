@@ -18,19 +18,14 @@ class BaseView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            floating: true,
-            backgroundColor: Colors.white,
-            elevation: 0,
-            centerTitle: false,
-            title: Text(title),
-            actions: actions,
-          ),
-          body,
-        ],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+        title: Text(title),
+        actions: actions,
       ),
+      body: body,  // 这里不再使用 CustomScrollView
       floatingActionButton: floatingActionButton,
     );
   }

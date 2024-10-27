@@ -1,5 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:notes_app/screens/settings_screen.dart';
+import 'package:provider/provider.dart';
+import '../models/folder_model.dart';
+import '../models/note.dart';
+import '../models/notes_model.dart';
+import '../models/task.dart';
+import '../models/tasks_model.dart';
+import '../theme/app_theme.dart';
 import '../widgets/notes_view.dart';
 import '../widgets/tasks_view.dart';
 import '../screens/note_editor_screen.dart';
@@ -37,10 +45,83 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+        title: Text(_selectedIndex == 0 ? 'Notes' : 'Tasks'),
+        actions: _selectedIndex == 0 
+          ? [
+              IconButton(
+                icon: const Icon(CupertinoIcons.folder),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FoldersScreen(),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(CupertinoIcons.settings),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+            ]
+          : [
+              IconButton(
+                icon: const Icon(CupertinoIcons.settings),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+      ),
       body: PageView(
         controller: _pageController,
         onPageChanged: _onPageChanged,
-        children: _screens,
+        children: _screens.map((screen) {
+          return CustomScrollView(
+            slivers: [
+              if (screen is NotesView)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SearchBar(
+                      hintText: 'Search notes',
+                      leading: const Icon(CupertinoIcons.search),
+                      backgroundColor: MaterialStateProperty.all(Colors.grey[100]),
+                      elevation: MaterialStateProperty.all(0),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 16.0),
+                      ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              screen is NotesView
+                  ? const NotesContentView()
+                  : const TasksContentView(),
+            ],
+          );
+        }).toList(),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
@@ -87,6 +168,189 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         child: const Icon(CupertinoIcons.add),
+      ),
+    );
+  }
+}
+
+class NotesContentView extends StatelessWidget {
+  const NotesContentView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer2<NotesModel, FolderModel>(
+      builder: (context, notesModel, folderModel, child) {
+        final selectedFolderId = folderModel.selectedFolderId;
+        final notes = selectedFolderId == null
+            ? notesModel.notes
+            : notesModel.getNotesByFolder(selectedFolderId);
+
+        return SliverList(
+          delegate: SliverChildListDelegate([
+            // 当前文件夹名称
+            if (selectedFolderId != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  folderModel.folders
+                      .firstWhere((f) => f.id == selectedFolderId)
+                      .name,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            // 笔记网格
+            _buildNotesGrid(notes),
+          ]),
+        );
+      },
+    );
+  }
+
+  Widget _buildNotesGrid(List<Note> notes) {
+    if (notes.isEmpty) {
+      return Center(
+        child: Text(
+          'No notes yet',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: notes.length,
+      itemBuilder: (context, index) {
+        final note = notes[index];
+        return _buildNoteCard(context, note);
+      },
+    );
+  }
+
+  Widget _buildNoteCard(BuildContext context, Note note) {
+    return GestureDetector(
+      onTap: () => _openNote(context, note),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (note.title.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    note.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: Text(
+                  note.content,
+                  maxLines: 6,
+                  overflow: TextOverflow.fade,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openNote(BuildContext context, Note note) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NoteEditorScreen(note: note),
+      ),
+    );
+  }
+}
+
+class TasksContentView extends StatelessWidget {
+  const TasksContentView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<TasksModel>(
+      builder: (context, tasksModel, child) {
+        final tasks = tasksModel.tasks;
+
+        if (tasks.isEmpty) {
+          return const SliverFillRemaining(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    CupertinoIcons.checkmark_circle,
+                    size: 48,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'No tasks here yet',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => _buildTaskItem(context, tasks[index], tasksModel),
+            childCount: tasks.length,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTaskItem(BuildContext context, Task task, TasksModel tasksModel) {
+    return CheckboxListTile(
+      value: task.isCompleted,
+      onChanged: (value) {
+        tasksModel.toggleTask(task.id);
+      },
+      title: Text(
+        task.title,
+        style: TextStyle(
+          decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+        ),
+      ),
+      secondary: Icon(
+        task.isCompleted
+            ? CupertinoIcons.checkmark_circle_fill
+            : CupertinoIcons.circle,
+        color: task.isCompleted ? Colors.green : Colors.grey,
       ),
     );
   }
