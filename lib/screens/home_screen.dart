@@ -214,26 +214,86 @@ class NotesContentView extends StatelessWidget {
     return Consumer2<NotesModel, FolderModel>(
       builder: (context, notesModel, folderModel, child) {
         final selectedFolderId = folderModel.selectedFolderId;
+        print('Current selectedFolderId: $selectedFolderId');
+        print('Has folders: ${folderModel.folders.isNotEmpty}');
+
         final notes = selectedFolderId == null
             ? notesModel.notes
             : notesModel.getNotesByFolder(selectedFolderId);
 
         return SliverList(
           delegate: SliverChildListDelegate([
-            // 当前文件夹名称
-            if (selectedFolderId != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  folderModel.folders
-                      .firstWhere((f) => f.id == selectedFolderId)
-                      .name,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 16,
-                  ),
+            // 文件夹选择器
+            if (folderModel.folders.isNotEmpty)  // 只要有文件夹就显示标签栏
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  children: [
+                    // "All" 标签
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: FilterChip(
+                        label: const Text(
+                          'All',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        selected: selectedFolderId == null,
+                        onSelected: (selected) {
+                          print('All chip selected: $selected');
+                          if (!selected) {  // 只在取消选择时设置为 null
+                            folderModel.selectFolder(null);
+                          }
+                          print('After selecting All, selectedFolderId: ${folderModel.selectedFolderId}');
+                        },
+                        labelStyle: TextStyle(
+                          color: selectedFolderId == null ? Colors.white : Colors.grey[800],
+                          fontWeight: FontWeight.w500,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        backgroundColor: Colors.grey[100],
+                        selectedColor: Colors.blue,
+                        showCheckmark: false,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                    // 文件夹标签
+                    ...folderModel.folders.map((folder) {
+                      final isSelected = selectedFolderId == folder.id;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: FilterChip(
+                          label: Text(
+                            folder.name,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            print('Folder ${folder.name} selected: $selected');
+                            if (selected) {
+                              folderModel.selectFolder(folder.id);
+                            } else {
+                              folderModel.selectFolder(null);  // 取消选择时设置为 null
+                            }
+                            print('After selecting folder, selectedFolderId: ${folderModel.selectedFolderId}');
+                          },
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.grey[800],
+                            fontWeight: FontWeight.w500,
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                          backgroundColor: Colors.grey[100],
+                          selectedColor: Colors.blue,
+                          showCheckmark: false,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      );
+                    }).toList(),
+                  ],
                 ),
               ),
+            if (folderModel.folders.isNotEmpty)
+              const SizedBox(height: 8),
             // 笔记网格
             _buildNotesGrid(notes),
           ]),
@@ -290,8 +350,9 @@ class NotesContentView extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 17,  // 增加字体大小
+                      fontWeight: FontWeight.w700,  // 加粗字体
+                      color: Colors.black,  // 确保标题颜色为黑色
                     ),
                   ),
                 ),
