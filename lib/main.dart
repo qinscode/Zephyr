@@ -1,7 +1,6 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
 // Models
@@ -28,9 +27,8 @@ void main() async {
   // 确保Flutter绑定初始化
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 初始化共享首选项
-  final prefs = await SharedPreferences.getInstance();
-  final storageService = StorageService(prefs);
+  // 初始化存储服务
+  final storageService = await StorageService.initialize();
 
   // 设置系统UI样式
   SystemChrome.setSystemUIOverlayStyle(
@@ -69,7 +67,7 @@ class MyApp extends StatelessWidget {
           create: (_) => FolderModel(storageService),
         ),
         ChangeNotifierProvider(
-          create: (_) => SettingsModel(storageService),
+          create: (_) => SettingsModel(),
         ),
         ChangeNotifierProvider(
           create: (_) => TrashModel(storageService),
@@ -83,16 +81,16 @@ class MyApp extends StatelessWidget {
         builder: (context, settings, _) {
           return MaterialApp(
             title: 'Notes App',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: settings.themeMode,
+            theme: ThemeData.light(),
+            darkTheme: ThemeData.dark(),
+            themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             debugShowCheckedModeBanner: false,
             home: const HomeScreen(),
             builder: (context, child) {
               return MediaQuery(
                 // 设置文字缩放比例
                 data: MediaQuery.of(context).copyWith(
-                  textScaleFactor: settings.fontSize.scale,
+                  textScaleFactor: settings.textScaleFactor,
                 ),
                 child: child!,
               );
@@ -121,9 +119,9 @@ class BackButtonInterceptor extends StatelessWidget {
   final Widget child;
 
   const BackButtonInterceptor({
-    super.key,
+    Key? key,
     required this.child,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -164,9 +162,9 @@ class ErrorBoundary extends StatefulWidget {
   final Widget child;
 
   const ErrorBoundary({
-    super.key,
+    Key? key,
     required this.child,
-  });
+  }) : super(key: key);
 
   @override
   State<ErrorBoundary> createState() => _ErrorBoundaryState();
