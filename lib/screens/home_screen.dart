@@ -217,14 +217,18 @@ class NotesContentView extends StatelessWidget {
         print('Current selectedFolderId: $selectedFolderId');
         print('Has folders: ${folderModel.folders.isNotEmpty}');
 
-        final notes = selectedFolderId == null
+        // 修改这里的逻辑：当 selectedFolderId 为 'hide' 或 null 时显示所有笔记
+        final notes = (selectedFolderId == null || selectedFolderId == 'hide')
             ? notesModel.notes
             : notesModel.getNotesByFolder(selectedFolderId);
+
+        // 修改显示条件：只在 selectedFolderId 不是 'hide' 时显示标签栏
+        final bool showTabs = folderModel.folders.isNotEmpty && selectedFolderId != 'hide';
 
         return SliverList(
           delegate: SliverChildListDelegate([
             // 文件夹选择器
-            if (folderModel.folders.isNotEmpty)  // 只要有文件夹就显示标签栏
+            if (showTabs)
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -241,7 +245,11 @@ class NotesContentView extends StatelessWidget {
                         selected: selectedFolderId == null,
                         onSelected: (selected) {
                           print('All chip selected: $selected');
-                          if (!selected) {  // 只在取消选择时设置为 null
+                          if (selectedFolderId == null && !selected) {
+                            // 当前是 All 且是反选操作，隐藏标签栏
+                            folderModel.selectFolder('hide');
+                          } else {
+                            // 其他情况，正常切换到 All
                             folderModel.selectFolder(null);
                           }
                           print('After selecting All, selectedFolderId: ${folderModel.selectedFolderId}');
@@ -323,7 +331,7 @@ class NotesContentView extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
-        childAspectRatio: 0.85,
+        mainAxisExtent: 160, // 设置最大高度
       ),
       itemCount: notes.length,
       itemBuilder: (context, index) {
@@ -334,6 +342,21 @@ class NotesContentView extends StatelessWidget {
   }
 
   Widget _buildNoteCard(BuildContext context, Note note) {
+    // 计算内容的行数
+    final textSpan = TextSpan(
+      text: note.content,
+      style: TextStyle(
+        fontSize: 14,
+        color: Colors.grey[800],
+      ),
+    );
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+      maxLines: 5,
+    );
+    textPainter.layout(maxWidth: (MediaQuery.of(context).size.width - 64) / 2); // 考虑padding和grid间距
+
     return GestureDetector(
       onTap: () => _openNote(context, note),
       child: Card(
@@ -341,6 +364,7 @@ class NotesContentView extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min, // 让Column根据内容自适应高度
             children: [
               if (note.title.isNotEmpty)
                 Padding(
@@ -350,21 +374,20 @@ class NotesContentView extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 17,  // 增加字体大小
-                      fontWeight: FontWeight.w700,  // 加粗字体
-                      color: Colors.black,  // 确保标题颜色为黑色
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
                     ),
                   ),
                 ),
-              Expanded(
-                child: Text(
-                  note.content,
-                  maxLines: 6,
-                  overflow: TextOverflow.fade,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[800],
-                  ),
+              Text(
+                note.content,
+                maxLines: 5,
+                overflow: TextOverflow.fade,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[800],
+                  height: 1.4, // 添加行高
                 ),
               ),
             ],
