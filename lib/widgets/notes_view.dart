@@ -1,4 +1,5 @@
 // lib/widgets/notes_view.dart
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/note.dart';
@@ -33,7 +34,7 @@ class NotesView extends StatelessWidget {
                 actions: [
                   // Folder button
                   IconButton(
-                    icon: const Icon(Icons.folder_outlined),
+                    icon: const Icon(CupertinoIcons.folder),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -45,7 +46,7 @@ class NotesView extends StatelessWidget {
                   ),
                   // Settings button
                   IconButton(
-                    icon: const Icon(Icons.settings_outlined),
+                    icon: const Icon(CupertinoIcons.settings),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -63,7 +64,7 @@ class NotesView extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: SearchBar(
                     hintText: 'Search notes',
-                    leading: const Icon(Icons.search),
+                    leading: const Icon(CupertinoIcons.search),
                     padding: MaterialStateProperty.all(
                       const EdgeInsets.symmetric(horizontal: 16.0),
                     ),
@@ -179,7 +180,7 @@ class NotesView extends StatelessWidget {
                 ),
               );
             },
-            child: const Icon(Icons.add),
+            child: const Icon(CupertinoIcons.add),
           ),
         );
       },
@@ -195,7 +196,7 @@ class NotesView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.folder_outlined),
+                leading: const Icon(CupertinoIcons.folder),
                 title: const Text('Move to folder'),
                 onTap: () {
                   Navigator.pop(context);
@@ -203,7 +204,7 @@ class NotesView extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.share_outlined),
+                leading: const Icon(CupertinoIcons.share),
                 title: const Text('Share'),
                 onTap: () {
                   Navigator.pop(context);
@@ -211,7 +212,7 @@ class NotesView extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.delete_outline),
+                leading: const Icon(CupertinoIcons.delete),
                 title: const Text('Move to trash'),
                 onTap: () {
                   final notesModel = Provider.of<NotesModel>(
@@ -251,7 +252,7 @@ class NotesView extends StatelessWidget {
               shrinkWrap: true,
               children: [
                 ListTile(
-                  leading: const Icon(Icons.folder_outlined),
+                  leading: const Icon(CupertinoIcons.folder),
                   title: const Text('Uncategorized'),
                   onTap: () {
                     final notesModel = Provider.of<NotesModel>(
@@ -264,7 +265,7 @@ class NotesView extends StatelessWidget {
                 ),
                 ...folderModel.folders.map(
                       (folder) => ListTile(
-                    leading: const Icon(Icons.folder_outlined),
+                    leading: const Icon(CupertinoIcons.folder),
                     title: Text(folder.name),
                     onTap: () {
                       final notesModel = Provider.of<NotesModel>(
@@ -290,4 +291,3 @@ class NotesView extends StatelessWidget {
     );
   }
 }
-

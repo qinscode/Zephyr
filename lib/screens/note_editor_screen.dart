@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../models/note.dart';
 import '../models/notes_model.dart';
@@ -181,7 +182,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.share_outlined),
+              leading: const Icon(CupertinoIcons.share),
               title: const Text('Share note'),
               onTap: () {
                 Navigator.pop(context);
@@ -189,7 +190,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.folder_outlined),
+              leading: const Icon(CupertinoIcons.folder),
               title: const Text('Move to folder'),
               onTap: () {
                 Navigator.pop(context);
@@ -197,7 +198,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.delete_outline),
+              leading: const Icon(CupertinoIcons.delete),
               title: const Text('Move to trash'),
               onTap: () {
                 Navigator.pop(context);
@@ -300,7 +301,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(CupertinoIcons.back),
             onPressed: () {
               if (_isEdited) {
                 _saveNote();
@@ -312,16 +313,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           actions: [
             if (_undoHistory.length > 1)
               IconButton(
-                icon: const Icon(Icons.undo),
+                icon: const Icon(CupertinoIcons.arrow_counterclockwise),
                 onPressed: _undo,
               ),
             if (_redoHistory.isNotEmpty)
               IconButton(
-                icon: const Icon(Icons.redo),
+                icon: const Icon(CupertinoIcons.arrow_clockwise),
                 onPressed: _redo,
               ),
             IconButton(
-              icon: const Icon(Icons.more_vert),
+              icon: const Icon(CupertinoIcons.ellipsis_vertical),
               onPressed: _showOptionsMenu,
             ),
           ],
@@ -342,7 +343,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.folder_outlined, size: 18),
+                      const Icon(CupertinoIcons.folder, size: 18),
                       const SizedBox(width: 4),
                       Consumer<FolderModel>(
                         builder: (context, folderModel, child) {
@@ -417,35 +418,35 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.format_list_bulleted),
+                      icon: const Icon(CupertinoIcons.list_bullet),
                       onPressed: () {
                         // 实现列表格式化
                       },
                       color: Colors.grey[700],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.image_outlined),
+                      icon: const Icon(CupertinoIcons.photo),
                       onPressed: () {
                         // 实现图片插入
                       },
                       color: Colors.grey[700],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.draw_outlined),
+                      icon: const Icon(CupertinoIcons.pencil),
                       onPressed: () {
                         // 实现绘画功能
                       },
                       color: Colors.grey[700],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.check_box_outlined),
+                      icon: const Icon(CupertinoIcons.checkmark_square),
                       onPressed: () {
                         // 实现任务列表
                       },
                       color: Colors.grey[700],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.text_fields),
+                      icon: const Icon(CupertinoIcons.textformat),
                       onPressed: () {
                         // 实现文本格式化
                       },

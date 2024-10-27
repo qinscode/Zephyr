@@ -1,4 +1,5 @@
 // lib/screens/folders_screen.dart
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/folder_model.dart';
@@ -183,7 +184,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
             backgroundColor: Colors.white,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(CupertinoIcons.back),
               onPressed: () => Navigator.pop(context),
             ),
             title: const Text('Folders'),
@@ -193,7 +194,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
               ListView(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.folder_outlined, color: Colors.orange),
+                    leading: const Icon(CupertinoIcons.folder, color: Colors.orange),
                     title: const Text('All'),
                     trailing: Text(
                       folderModel.totalNoteCount.toString(),
@@ -208,7 +209,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
                   if (folderModel.folders.isNotEmpty) const Divider(height: 1),
                   ...folderModel.folders.map((folder) {
                     return ListTile(
-                      leading: const Icon(Icons.folder_outlined),
+                      leading: const Icon(CupertinoIcons.folder),
                       title: Text(folder.name),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -219,7 +220,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
                           ),
                           const SizedBox(width: 8),
                           PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert),
+                            icon: const Icon(CupertinoIcons.ellipsis_vertical),
                             itemBuilder: (context) => [
                               const PopupMenuItem(
                                 value: 'rename',
@@ -270,7 +271,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: _showCreateFolderDialog,
-            child: const Icon(Icons.add),
+            child: const Icon(CupertinoIcons.add),
           ),
         );
       },
