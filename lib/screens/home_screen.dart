@@ -24,7 +24,34 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          // 修改这里的逻辑
+          final int currentIndex = _screens.indexOf(child as Widget);
+          final bool isForward = currentIndex > _selectedIndex;
+          
+          // 当前页面的偏移方向应该和前一个状态相反
+          final Offset beginOffset = isForward 
+              ? const Offset(1.0, 0.0)  // 从右边进入
+              : const Offset(-1.0, 0.0); // 从左边进入
+
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: beginOffset,
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeInOut,
+            )),
+            child: FadeTransition(
+              opacity: animation,
+              child: child,
+            ),
+          );
+        },
+        child: _screens[_selectedIndex],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
