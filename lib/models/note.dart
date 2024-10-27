@@ -1,110 +1,256 @@
 // lib/models/note.dart
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
 class Note {
   final String id;
   final String title;
   final String content;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime modifiedAt;
+  final String? folderId;
+  final Map<String, dynamic>? metadata;
+  final DateTime? deletedAt;
+  final List<String> tags;
   final bool isPinned;
-  final bool isFinished;
-  final String type; // 'idea', 'task', 'shopping', etc.
-  final List<String> labels;
+  final bool isLocked;
+  final String? color;
 
-  const Note({
+  Note({
     required this.id,
     required this.title,
     required this.content,
     required this.createdAt,
-    required this.updatedAt,
+    required this.modifiedAt,
+    this.folderId,
+    this.metadata,
+    this.deletedAt,
+    this.tags = const [],
     this.isPinned = false,
-    this.isFinished = false,
-    required this.type,
-    this.labels = const [],
+    this.isLocked = false,
+    this.color,
   });
 
-  // 添加复制方法以便于更新笔记
+  // 从JSON创建Note实例
+  factory Note.fromJson(Map<String, dynamic> json) {
+    return Note(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      content: json['content'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      modifiedAt: DateTime.parse(json['modifiedAt'] as String),
+      folderId: json['folderId'] as String?,
+      metadata: json['metadata'] != null
+          ? Map<String, dynamic>.from(json['metadata'] as Map)
+          : null,
+      deletedAt: json['deletedAt'] != null
+          ? DateTime.parse(json['deletedAt'] as String)
+          : null,
+      tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? const [],
+      isPinned: json['isPinned'] as bool? ?? false,
+      isLocked: json['isLocked'] as bool? ?? false,
+      color: json['color'] as String?,
+    );
+  }
+
+  // 将Note实例转换为JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+      'createdAt': createdAt.toIso8601String(),
+      'modifiedAt': modifiedAt.toIso8601String(),
+      'folderId': folderId,
+      'metadata': metadata,
+      'deletedAt': deletedAt?.toIso8601String(),
+      'tags': tags,
+      'isPinned': isPinned,
+      'isLocked': isLocked,
+      'color': color,
+    };
+  }
+
+  // 创建Note的副本并修改指定字段
   Note copyWith({
     String? id,
     String? title,
     String? content,
     DateTime? createdAt,
-    DateTime? updatedAt,
+    DateTime? modifiedAt,
+    String? folderId,
+    Map<String, dynamic>? metadata,
+    DateTime? deletedAt,
+    List<String>? tags,
     bool? isPinned,
-    bool? isFinished,
-    String? type,
-    List<String>? labels,
+    bool? isLocked,
+    String? color,
   }) {
     return Note(
       id: id ?? this.id,
       title: title ?? this.title,
       content: content ?? this.content,
       createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
+      modifiedAt: modifiedAt ?? this.modifiedAt,
+      folderId: folderId ?? this.folderId,
+      metadata: metadata ?? this.metadata,
+      deletedAt: deletedAt ?? this.deletedAt,
+      tags: tags ?? this.tags,
       isPinned: isPinned ?? this.isPinned,
-      isFinished: isFinished ?? this.isFinished,
-      type: type ?? this.type,
-      labels: labels ?? this.labels,
+      isLocked: isLocked ?? this.isLocked,
+      color: color ?? this.color,
     );
   }
 
-  // 添加工厂构造函数用于创建新笔记
-  factory Note.create({
-    required String title,
-    required String content,
-    required String type,
-    bool isPinned = false,
-    List<String> labels = const [],
+  // 获取预览文本
+  String get preview {
+    final cleanContent = content.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (cleanContent.isEmpty) return '';
+    return cleanContent.length > 100
+        ? '${cleanContent.substring(0, 100)}...'
+        : cleanContent;
+  }
+
+  // 获取字数统计
+  int get wordCount {
+    final words = content.trim().split(RegExp(r'\s+'));
+    return words.where((word) => word.isNotEmpty).length;
+  }
+
+  // 获取字符数统计（包括标题）
+  int get characterCount {
+    return title.length + content.length;
+  }
+
+  // 检查笔记是否为空
+  bool get isEmpty {
+    return title.isEmpty && content.trim().isEmpty;
+  }
+
+  // 检查笔记是否在垃圾箱中
+  bool get isDeleted {
+    return deletedAt != null;
+  }
+
+  // 检查笔记是否包含特定标签
+  bool hasTag(String tag) {
+    return tags.contains(tag);
+  }
+
+  // 添加标签
+  Note addTag(String tag) {
+    if (!tags.contains(tag)) {
+      return copyWith(tags: [...tags, tag]);
+    }
+    return this;
+  }
+
+  // 删除标签
+  Note removeTag(String tag) {
+    return copyWith(tags: tags.where((t) => t != tag).toList());
+  }
+
+  // 移动到文件夹
+  Note moveToFolder(String? newFolderId) {
+    return copyWith(
+      folderId: newFolderId,
+      modifiedAt: DateTime.now(),
+    );
+  }
+
+  // 将笔记移到垃圾箱
+  Note moveToTrash() {
+    return copyWith(
+      deletedAt: DateTime.now(),
+      modifiedAt: DateTime.now(),
+    );
+  }
+
+  // 从垃圾箱恢复
+  Note restore() {
+    return copyWith(
+      deletedAt: null,
+      modifiedAt: DateTime.now(),
+    );
+  }
+
+  // 切换置顶状态
+  Note togglePin() {
+    return copyWith(
+      isPinned: !isPinned,
+      modifiedAt: DateTime.now(),
+    );
+  }
+
+  // 切换锁定状态
+  Note toggleLock() {
+    return copyWith(
+      isLocked: !isLocked,
+      modifiedAt: DateTime.now(),
+    );
+  }
+
+  // 更改颜色
+  Note changeColor(String? newColor) {
+    return copyWith(
+      color: newColor,
+      modifiedAt: DateTime.now(),
+    );
+  }
+
+  // 更新内容
+  Note updateContent({
+    String? newTitle,
+    String? newContent,
   }) {
-    final now = DateTime.now();
-    return Note(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: title,
-      content: content,
-      createdAt: now,
-      updatedAt: now,
-      isPinned: isPinned,
-      isFinished: false,
-      type: type,
-      labels: labels,
+    return copyWith(
+      title: newTitle ?? title,
+      content: newContent ?? content,
+      modifiedAt: DateTime.now(),
+    );
+  }
+
+  // 比较两个Note是否相等
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Note &&
+        other.id == id &&
+        other.title == title &&
+        other.content == content &&
+        other.createdAt == createdAt &&
+        other.modifiedAt == modifiedAt &&
+        other.folderId == folderId &&
+        other.deletedAt == deletedAt &&
+        other.isPinned == isPinned &&
+        other.isLocked == isLocked &&
+        other.color == color &&
+        listEquals(other.tags, tags);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      id,
+      title,
+      content,
+      createdAt,
+      modifiedAt,
+      folderId,
+      deletedAt,
+      isPinned,
+      isLocked,
+      color,
+      Object.hashAll(tags),
     );
   }
 }
 
-// 添加笔记类型枚举
-enum NoteType {
-  idea,
-  task,
-  shopping,
-  general
-}
-
-// 扩展方法用于获取笔记类型的显示名称
-extension NoteTypeExtension on NoteType {
-  String get displayName {
-    switch (this) {
-      case NoteType.idea:
-        return 'Idea';
-      case NoteType.task:
-        return 'Task';
-      case NoteType.shopping:
-        return 'Shopping';
-      case NoteType.general:
-        return 'General';
-    }
+// 辅助函数：比较两个列表是否相等
+bool listEquals<T>(List<T>? a, List<T>? b) {
+  if (a == null) return b == null;
+  if (b == null || a.length != b.length) return false;
+  for (int i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) return false;
   }
-
-  IconData get icon {
-    switch (this) {
-      case NoteType.idea:
-        return Icons.lightbulb_outline;
-      case NoteType.task:
-        return Icons.check_box_outline_blank;
-      case NoteType.shopping:
-        return Icons.shopping_bag_outlined;
-      case NoteType.general:
-        return Icons.note_outlined;
-    }
-  }
+  return true;
 }
