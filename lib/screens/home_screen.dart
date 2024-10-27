@@ -24,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
+  bool _isAnimating = false;  // 添加这个变量来控制动画状态
 
   final List<Widget> _screens = const [
     NotesView(),
@@ -38,7 +39,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onPageChanged(int index) {
     setState(() {
+      _isAnimating = true;  // 开始动画
       _selectedIndex = index;
+      // 延迟一小段时间后结束动画
+      Future.delayed(const Duration(milliseconds: 150), () {
+        if (mounted) {
+          setState(() {
+            _isAnimating = false;
+          });
+        }
+      });
     });
   }
 
@@ -148,26 +158,34 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'home_fab',
-        onPressed: () {
-          if (_selectedIndex == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NoteEditorScreen(),
-              ),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const TaskEditorScreen(),
-              ),
-            );
-          }
-        },
-        child: const Icon(CupertinoIcons.add),
+      floatingActionButton: AnimatedOpacity(
+        opacity: _isAnimating ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 150),
+        child: AnimatedScale(
+          scale: _isAnimating ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          child: FloatingActionButton(
+            heroTag: 'home_fab',
+            onPressed: () {
+              if (_selectedIndex == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NoteEditorScreen(),
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TaskEditorScreen(),
+                  ),
+                );
+              }
+            },
+            child: const Icon(CupertinoIcons.add),
+          ),
+        ),
       ),
     );
   }
