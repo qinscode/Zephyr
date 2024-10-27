@@ -132,33 +132,43 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }).toList(),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        indicatorColor: Colors.transparent,
-        height: 65,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-            _pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(CupertinoIcons.doc_text),
-            selectedIcon: Icon(CupertinoIcons.doc_text_fill),
-            label: 'Notes',
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Divider(  // 添加分隔线
+            height: 1,
+            thickness: 0.2,
+            color: Colors.grey,
           ),
-          NavigationDestination(
-            icon: Icon(CupertinoIcons.checkmark_circle),
-            selectedIcon: Icon(CupertinoIcons.checkmark_circle_fill),
-            label: 'Tasks',
+          NavigationBar(
+            selectedIndex: _selectedIndex,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            indicatorColor: Colors.transparent,
+            height: 65,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            onDestinationSelected: (index) {
+              setState(() {
+                _selectedIndex = index;
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              });
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(CupertinoIcons.doc_text),
+                selectedIcon: Icon(CupertinoIcons.doc_text_fill),
+                label: 'Notes',
+              ),
+              NavigationDestination(
+                icon: Icon(CupertinoIcons.checkmark_circle),
+                selectedIcon: Icon(CupertinoIcons.checkmark_circle_fill),
+                label: 'Tasks',
+              ),
+            ],
           ),
         ],
       ),
