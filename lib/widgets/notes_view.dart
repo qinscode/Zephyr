@@ -8,12 +8,14 @@ import '../models/trash_model.dart';
 import '../screens/note_editor_screen.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
+import '../l10n/app_localizations.dart';
 
 class NotesView extends StatelessWidget {
   const NotesView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     return Consumer2<NotesModel, FolderModel>(
       builder: (context, notesModel, folderModel, child) {
         final selectedFolderId = folderModel.selectedFolderId;
@@ -29,9 +31,9 @@ class NotesView extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: SearchBar(
-                    hintText: 'Search notes',
+                    hintText: l10n.searchNotes,  // 使用本地化文本
                     leading: const Icon(CupertinoIcons.search),
-                    backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.surfaceContainerHighest), // 使用主题中定义的搜索框颜色
+                    backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.surfaceContainerHighest),
                     elevation: WidgetStateProperty.all(0),
                     padding: WidgetStateProperty.all(
                       const EdgeInsets.symmetric(horizontal: 16.0),
@@ -69,7 +71,7 @@ class NotesView extends StatelessWidget {
                         hasScrollBody: false,
                         child: Center(
                           child: Text(
-                            'No notes yet',
+                            l10n.noNotes,  // 使用本地化文本
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 16,
@@ -126,21 +128,22 @@ class NotesView extends StatelessWidget {
   // }
 
   Widget _buildNoteCard(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     // 处理标题和内容
     String displayTitle = '';
     String displayContent = '';
     
     if (note.title.isNotEmpty) {
       displayTitle = note.title;
-      displayContent = note.content.isNotEmpty ? note.content : 'No text';
+      displayContent = note.content.isNotEmpty ? note.content : l10n.noText;  // 使用本地化文本
     } else if (note.content.isNotEmpty) {
       // 如果没有标题，使用内容的第一行作为标题
       final lines = note.content.split('\n');
       displayTitle = lines[0];
-      displayContent = lines.length > 1 ? lines.sublist(1).join('\n') : 'No text';
+      displayContent = lines.length > 1 ? lines.sublist(1).join('\n') : l10n.noText;  // 使用本地化文本
     } else {
-      displayTitle = 'Untitled';
-      displayContent = 'No text';
+      displayTitle = l10n.untitled;  // 使用本地化文本
+      displayContent = l10n.noText;  // 使用本地化文本
     }
 
     // 格式化时间
@@ -194,6 +197,7 @@ class NotesView extends StatelessWidget {
   }
 
   void _showNoteOptions(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -203,7 +207,7 @@ class NotesView extends StatelessWidget {
             children: [
               ListTile(
                 leading: const Icon(CupertinoIcons.folder),
-                title: const Text('Move to folder'),
+                title: Text(l10n.moveToFolder),  // 使用本地化文本
                 onTap: () {
                   Navigator.pop(context);
                   _showMoveToFolderDialog(context, note);
@@ -211,7 +215,7 @@ class NotesView extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(CupertinoIcons.share),
-                title: const Text('Share'),
+                title: Text(l10n.share),  // 使用本地化文本
                 onTap: () {
                   Navigator.pop(context);
                   // Implement share functionality
@@ -219,7 +223,7 @@ class NotesView extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(CupertinoIcons.delete),
-                title: const Text('Move to trash'),
+                title: Text(l10n.moveToTrash),  // 使用本地化文本
                 onTap: () {
                   final notesModel = Provider.of<NotesModel>(
                     context,

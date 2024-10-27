@@ -4,12 +4,14 @@ import 'package:provider/provider.dart';
 import '../models/task.dart';
 import '../models/tasks_model.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../l10n/app_localizations.dart';
 
 class TasksView extends StatelessWidget {
   const TasksView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<TasksModel>(
       builder: (context, tasksModel, child) {
         final tasks = tasksModel.tasks;
@@ -38,7 +40,7 @@ class TasksView extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No tasks here yet',
+                          l10n.noTasks,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: Colors.grey,
                           ),
