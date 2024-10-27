@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/folder_model.dart';
+import '../l10n/app_localizations.dart';
 
 class FoldersScreen extends StatefulWidget {
   const FoldersScreen({super.key});
@@ -22,23 +23,24 @@ class _FoldersScreenState extends State<FoldersScreen> {
 
   void _showCreateFolderDialog() {
     final formKey = GlobalKey<FormState>();
+    final l10n = AppLocalizations.of(context);
 
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('New folder'),
+        title: Text(l10n.newFolder),
         content: Form(
           key: formKey,
           child: TextFormField(
             controller: _folderNameController,
             autofocus: true,
-            decoration: const InputDecoration(
-              hintText: 'Folder name',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText: l10n.folderName,
+              border: const OutlineInputBorder(),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter a folder name';
+                return l10n.folderName;
               }
 
               final folderModel = Provider.of<FolderModel>(
@@ -58,7 +60,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
               Navigator.pop(context);
               _folderNameController.clear();
             },
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -72,7 +74,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
                 _folderNameController.clear();
               }
             },
-            child: const Text('Create'),
+            child: Text(l10n.create),
           ),
         ],
       ),
@@ -80,18 +82,16 @@ class _FoldersScreenState extends State<FoldersScreen> {
   }
 
   void _showDeleteFolderDialog(Folder folder) {
+    final l10n = AppLocalizations.of(context);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete folder?'),
-        content: Text(
-          'Are you sure you want to delete "${folder.name}"? '
-              'All notes in this folder will be moved to Uncategorized.',
-        ),
+        title: Text(l10n.deleteFolder),
+        content: Text(l10n.deleteFolderConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -102,9 +102,9 @@ class _FoldersScreenState extends State<FoldersScreen> {
               folderModel.deleteFolder(folder.id);
               Navigator.pop(context);
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              l10n.delete,
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],
@@ -113,25 +113,26 @@ class _FoldersScreenState extends State<FoldersScreen> {
   }
 
   void _showRenameFolderDialog(Folder folder) {
+    final l10n = AppLocalizations.of(context);
     _folderNameController.text = folder.name;
     final formKey = GlobalKey<FormState>();
 
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Rename folder'),
+        title: Text(l10n.renameFolder),
         content: Form(
           key: formKey,
           child: TextFormField(
             controller: _folderNameController,
             autofocus: true,
-            decoration: const InputDecoration(
-              hintText: 'Folder name',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText: l10n.folderName,
+              border: const OutlineInputBorder(),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter a folder name';
+                return l10n.folderName;
               }
 
               final folderModel = Provider.of<FolderModel>(
@@ -152,7 +153,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
               Navigator.pop(context);
               _folderNameController.clear();
             },
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -166,7 +167,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
                 _folderNameController.clear();
               }
             },
-            child: const Text('Rename'),
+            child: Text(l10n.rename),
           ),
         ],
       ),
@@ -175,6 +176,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<FolderModel>(
       builder: (context, folderModel, child) {
         return Scaffold(
@@ -186,7 +188,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
               icon: const Icon(CupertinoIcons.back),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Text('Folders'),
+            title: Text(l10n.folders),
           ),
           body: Stack(
             children: [
@@ -194,7 +196,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
                 children: [
                   ListTile(
                     leading: const Icon(CupertinoIcons.folder, color: Colors.orange),
-                    title: const Text('All'),
+                    title: Text(l10n.all),
                     trailing: Text(
                       folderModel.totalNoteCount.toString(),
                       style: TextStyle(color: Colors.grey[600]),
@@ -221,15 +223,15 @@ class _FoldersScreenState extends State<FoldersScreen> {
                           PopupMenuButton<String>(
                             icon: const Icon(CupertinoIcons.ellipsis_vertical),
                             itemBuilder: (context) => [
-                              const PopupMenuItem(
+                              PopupMenuItem(
                                 value: 'rename',
-                                child: Text('Rename'),
+                                child: Text(l10n.rename),
                               ),
-                              const PopupMenuItem(
+                              PopupMenuItem(
                                 value: 'delete',
                                 child: Text(
-                                  'Delete',
-                                  style: TextStyle(color: Colors.red),
+                                  l10n.delete,
+                                  style: const TextStyle(color: Colors.red),
                                 ),
                               ),
                             ],

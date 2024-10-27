@@ -1,14 +1,15 @@
 class TranslationKeys {
-  final Map<String, String> notes;
-  final Map<String, String> folders;
-  final Map<String, String> tasks;
-  final Map<String, String> actions;
-  final Map<String, String> settings;
-  final Map<String, String> time;
-  final Map<String, String> language;  // 新增语言设置
-  final Map<String, String> alerts;    // 新增提醒对话框
-  final Map<String, String> share;     // 新增分享选项
-  final Map<String, String> editor;    // 新增编辑器选项
+  final Map<String, dynamic> notes;
+  final Map<String, dynamic> folders;
+  final Map<String, dynamic> tasks;
+  final Map<String, dynamic> actions;
+  final Map<String, dynamic> settings;
+  final Map<String, dynamic> time;
+  final Map<String, dynamic> language;
+  final Map<String, dynamic> alerts;
+  final Map<String, dynamic> share;
+  final Map<String, dynamic> editor;
+  final Map<String, dynamic> dateFormat;
 
   const TranslationKeys({
     required this.notes,
@@ -21,5 +22,30 @@ class TranslationKeys {
     required this.alerts,
     required this.share,
     required this.editor,
+    required this.dateFormat,
   });
+
+  // 添加 toJson 方法
+  Map<String, dynamic> toJson() => {
+    'notes': notes,
+    'folders': folders,
+    'tasks': tasks,
+    'actions': actions,
+    'settings': settings,
+    'time': time,
+    'language': language,
+    'alerts': alerts,
+    'share': share,
+    'editor': editor,
+    'dateFormat': dateFormat,
+  };
+
+  // 辅助方法，用于安全地获取嵌套的值
+  String? getNestedValue(Map<String, dynamic> map, String key, String subKey) {
+    final value = map[key];
+    if (value is Map<String, dynamic>) {
+      return value[subKey]?.toString();
+    }
+    return null;
+  }
 }

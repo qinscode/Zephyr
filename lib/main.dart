@@ -206,6 +206,7 @@ class BackButtonInterceptor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) async {
@@ -220,16 +221,16 @@ class BackButtonInterceptor extends StatelessWidget {
           final shouldExit = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Exit App?'),
-              content: const Text('Are you sure you want to exit?'),
+              title: Text(l10n.alerts['exitConfirm']!),  // 使用本地化文本
+              content: Text(l10n.alerts['exit']!),  // 使用本地化文本
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),  // 使用本地化文本
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Exit'),
+                  child: Text(l10n.exit),  // 使用本地化文本
                 ),
               ],
             ),
@@ -274,6 +275,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     if (_error != null) {
       return Material(
         child: Center(
@@ -288,9 +290,9 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
                   size: 48,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Oops! Something went wrong.',
-                  style: TextStyle(
+                Text(
+                  'Oops! Something went wrong.',  // TODO: 添加本地化文本
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -308,7 +310,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
                       _error = null;
                     });
                   },
-                  child: const Text('Try Again'),
+                  child: Text(l10n.actions['tryAgain']!),  // 使用本地化文本
                 ),
               ],
             ),

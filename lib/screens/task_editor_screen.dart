@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../models/task.dart';
 import '../models/tasks_model.dart';
 import 'package:flutter/cupertino.dart';
+import '../l10n/app_localizations.dart';
 
 class TaskEditorScreen extends StatefulWidget {
   final Task? task;
@@ -47,6 +48,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
   }
 
   void _saveTask() {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     if (_titleController.text.isEmpty) {
       Navigator.pop(context);
       return;
@@ -106,6 +108,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
   }
 
   void _showSetReminderSheet() {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -127,7 +130,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
             ),
             ListTile(
               leading: const Icon(CupertinoIcons.time),
-              title: const Text('Set reminder'),
+              title: Text(l10n.setReminder),  // 使用本地化文本
               onTap: () async {
                 Navigator.pop(context);
                 final time = await showTimePicker(
@@ -147,6 +150,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);  // 获取本地化实例
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -159,9 +163,9 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
         actions: [
           TextButton(
             onPressed: _saveTask,
-            child: const Text(
-              'Done',
-              style: TextStyle(
+            child: Text(
+              l10n.done,  // 使用本地化文本
+              style: const TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 16,
               ),
@@ -200,7 +204,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                           focusNode: _titleFocusNode,
                           style: const TextStyle(fontSize: 16),
                           decoration: InputDecoration(
-                            hintText: "Tap 'Enter' to create subtasks",
+                            hintText: l10n.addSubtask,  // 使用本地化文本
                             hintStyle: TextStyle(
                               color: Colors.grey[400],
                               fontSize: 16,
@@ -219,51 +223,11 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                ...List.generate(_subtasks.length, (index) {
-                  final subtask = _subtasks[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 36),
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: Checkbox(
-                            value: subtask.isCompleted,
-                            onChanged: (value) => _toggleSubtask(subtask.id),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            subtask.title,
-                            style: TextStyle(
-                              decoration: subtask.isCompleted
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                              color: subtask.isCompleted
-                                  ? Colors.grey
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(CupertinoIcons.xmark, size: 16),
-                          onPressed: () => _removeSubtask(subtask.id),
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                ..._buildSubtasks(),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(CupertinoIcons.time),
-                  title: const Text('Set reminder'),
+                  title: Text(l10n.setReminder),  // 使用本地化文本
                   onTap: _showSetReminderSheet,
                 ),
               ],
@@ -272,5 +236,49 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildSubtasks() {
+    return List.generate(_subtasks.length, (index) {
+      final subtask = _subtasks[index];
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Row(
+          children: [
+            const SizedBox(width: 36),
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: Checkbox(
+                value: subtask.isCompleted,
+                onChanged: (value) => _toggleSubtask(subtask.id),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                subtask.title,
+                style: TextStyle(
+                  decoration: subtask.isCompleted
+                      ? TextDecoration.lineThrough
+                      : null,
+                  color: subtask.isCompleted
+                      ? Colors.grey
+                      : Colors.black,
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(CupertinoIcons.xmark, size: 16),
+              onPressed: () => _removeSubtask(subtask.id),
+              color: Colors.grey,
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

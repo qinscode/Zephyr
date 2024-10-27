@@ -5,41 +5,33 @@ import 'translations/zh_cn.dart';
 
 class AppLocalizations {
   final Locale locale;
-  late final TranslationKeys _translations;
+  final TranslationKeys _translations;
 
-  AppLocalizations(this.locale) {
-    _translations = _getTranslations(locale);
-  }
+  AppLocalizations(this.locale) : _translations = _getTranslations(locale);
 
   static AppLocalizations of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
   static TranslationKeys _getTranslations(Locale locale) {
-    // 确保总是返回一个有效的翻译，默认返回英文
     switch (locale.languageCode) {
       case 'zh':
         return zhCN;
       case 'en':
       default:
-        return enUS;  // 默认返回英文翻译
+        return enUS;
     }
-  }
-
-  // 添加一个方法来检查语言是否支持
-  static bool isSupported(Locale locale) {
-    return ['en', 'zh'].contains(locale.languageCode);
   }
 
   // Notes
   String get notes => _translations.notes['title']!;
   String get noNotes => _translations.notes['noNotes']!;
   String get title => _translations.notes['title']!;
-  String get startTyping => _translations.notes['startTyping']!;
-  String get untitled => _translations.notes['untitled']!;
   String get noText => _translations.notes['noText']!;
   String get searchNotes => _translations.notes['searchNotes']!;
   String get characters => _translations.notes['characters']!;
+  String get untitled => _translations.notes['untitled']!;
+  String get inputStartTyping => _translations.notes['startTyping']!;
 
   // Folders
   String get folders => _translations.folders['title']!;
@@ -59,7 +51,43 @@ class AppLocalizations {
   String get addSubtask => _translations.tasks['addSubtask']!;
   String get setReminder => _translations.tasks['setReminder']!;
 
-  // Actions
+  // Settings
+  String get settings => _translations.settings['title']!;
+  String get style => _translations.settings['style']!;
+  String get fontSize => _translations.settings['fontSize']!['title']!;
+  String get sort => _translations.settings['sort']!['title']!;
+  String get layout => _translations.settings['layout']!['title']!;
+  Map<String, dynamic> get settingsMap => _translations.settings;
+
+  // Time
+  String get today => _translations.time['today']!;
+  String get yesterday => _translations.time['yesterday']!;
+  Map<String, dynamic> get time => _translations.time;
+
+  // Language
+  Map<String, dynamic> get language => _translations.language;
+
+  // Alerts
+  Map<String, dynamic> get alerts => _translations.alerts;
+  String get exitConfirm => _translations.alerts['exitConfirm']!;
+  String get exit => _translations.alerts['exit']!;
+  String get emptyTrashConfirm => _translations.alerts['emptyTrashConfirm']!;
+  String get searching => _translations.alerts['searching']!;
+  String get startTyping => _translations.alerts['startTyping']!;
+  String get itemsInTrash => _translations.alerts['itemsInTrash']!;
+  String get noItemsInTrash => _translations.alerts['noItemsInTrash']!;
+
+  // Share
+  Map<String, dynamic> get shareMap => _translations.share;
+
+  // Editor
+  Map<String, dynamic> get editor => _translations.editor;
+
+  // Date Format
+  Map<String, dynamic> get dateFormat => _translations.dateFormat;
+
+  // Common Actions
+  Map<String, dynamic> get actions => _translations.actions;
   String get create => _translations.actions['create']!;
   String get rename => _translations.actions['rename']!;
   String get delete => _translations.actions['delete']!;
@@ -68,20 +96,56 @@ class AppLocalizations {
   String get done => _translations.actions['done']!;
   String get share => _translations.actions['share']!;
   String get moveToTrash => _translations.actions['moveToTrash']!;
-  String get exitConfirm => _translations.actions['exitConfirm']!;
-  String get exit => _translations.actions['exit']!;
+  String get restore => _translations.actions['restore']!;
+  String get deletePermanently => _translations.actions['deletePermanently']!;
+  String get tryAgain => _translations.actions['tryAgain']!;
 
-  // Settings
-  String get settings => _translations.settings['title']!;
-  String get style => _translations.settings['style']!;
-  String get fontSize => _translations.settings['fontSize']!;
-  String get sort => _translations.settings['sort']!;
-  String get layout => _translations.settings['layout']!;
-  String get darkMode => _translations.settings['darkMode']!;
+  // Static methods
+  static bool isSupported(Locale locale) {
+    return ['en', 'zh'].contains(locale.languageCode);
+  }
 
-  // Time
-  String get today => _translations.time['today']!;
-  String get yesterday => _translations.time['yesterday']!;
+  // 辅助方法，用于安全地获取嵌套的值
+  String? getNestedValue(String section, String key) {
+    final sectionMap = _translations.toJson()[section];
+    if (sectionMap is Map<String, dynamic>) {
+      final value = sectionMap[key];
+      if (value is Map<String, dynamic>) {
+        return value.toString();
+      }
+      return value?.toString();
+    }
+    return null;
+  }
+
+  // 获取设置中的嵌套值
+  String getSettingsValue(String key, String subKey) {
+    final settingsMap = _translations.settings[key];
+    if (settingsMap is Map<String, dynamic>) {
+      return settingsMap[subKey]?.toString() ?? '';
+    }
+    return '';
+  }
+
+  // 获取分享中的值
+  String getShareValue(String key) {
+    return _translations.share[key]?.toString() ?? '';
+  }
+
+  // 获取字体大小选项
+  String getFontSizeOption(String option) {
+    return _translations.settings['fontSize']![option]?.toString() ?? '';
+  }
+
+  // 获取排序选项
+  String getSortOption(String option) {
+    return _translations.settings['sort']![option]?.toString() ?? '';
+  }
+
+  // 获取布局选项
+  String getLayoutOption(String option) {
+    return _translations.settings['layout']![option]?.toString() ?? '';
+  }
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

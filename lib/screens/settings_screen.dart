@@ -9,71 +9,77 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(CupertinoIcons.back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(AppLocalizations.of(context).settings),
+        title: Text(l10n.settings),
       ),
       body: Consumer<SettingsModel>(
         builder: (context, settings, child) {
           return ListView(
             children: [
-              const _SectionHeader(title: 'Style'),
+              _SectionHeader(title: l10n.style),
               _SettingsItem(
-                title: AppLocalizations.of(context).fontSize,
-                value: settings.fontSize.name,
+                title: l10n.fontSize,
+                value: l10n.getFontSizeOption(settings.fontSize.name),  // 使用辅助方法获取本地化的字体大小名称
                 onTap: () => _showFontSizeDialog(context, settings),
               ),
               _SettingsItem(
-                title: AppLocalizations.of(context).sort,
-                value: settings.sortBy.name,
+                title: l10n.sort,
+                value: l10n.getSortOption(settings.sortBy.name),  // 使用辅助方法获取本地化的排序方式名称
                 onTap: () => _showSortDialog(context, settings),
               ),
               _SettingsItem(
-                title: AppLocalizations.of(context).layout,
-                value: settings.layout.name,
+                title: l10n.layout,
+                value: l10n.getLayoutOption(settings.layout.name),  // 使用辅助方法获取本地化的布局名称
                 onTap: () => _showLayoutDialog(context, settings),
               ),
               
-              // 添加语言设置部分
-              const _SectionHeader(title: 'Language'),
+              // 语言设置
+              _SectionHeader(title: l10n.language['title']!),
               _SettingsItem(
-                title: 'Language',
-                value: settings.locale.languageCode == 'en' ? 'English' : '中文',
+                title: l10n.language['title']!,
+                value: settings.locale.languageCode == 'en' 
+                    ? l10n.language['english']! 
+                    : l10n.language['chinese']!,
                 onTap: () => _showLanguageDialog(context, settings),
               ),
 
-              const _SectionHeader(title: 'Quick features'),
-              const ListTile(
-                title: Text('Quick notes'),
-                trailing: Icon(CupertinoIcons.right_chevron),
+              // 快捷功能
+              _SectionHeader(title: l10n.getSettingsValue('quickFeatures', 'title')),
+              ListTile(
+                title: Text(l10n.getSettingsValue('quickNotes', 'title')),
+                trailing: const Icon(CupertinoIcons.right_chevron),
               ),
-              const _SectionHeader(title: 'Reminders'),
+
+              // 提醒设置
+              _SectionHeader(title: l10n.getSettingsValue('reminders', 'title')),
               SwitchListTile(
-                title: const Text('High-priority reminders'),
-                subtitle: const Text(
-                  'Play sound even when Silent or DND mode is on',
-                ),
+                title: Text(l10n.getSettingsValue('highPriorityReminders', 'title')),
+                subtitle: Text(l10n.getSettingsValue('highPriorityReminders', 'desc')),
                 value: settings.highPriorityReminders,
                 onChanged: (value) {
                   settings.setHighPriorityReminders(value);
                 },
               ),
-              const _SectionHeader(title: 'OTHER'),
-              const ListTile(
-                title: Text('Privacy Policy'),
-                trailing: Icon(CupertinoIcons.right_chevron),
+
+              // 其他设置
+              _SectionHeader(title: l10n.getSettingsValue('other', 'title')),
+              ListTile(
+                title: Text(l10n.getSettingsValue('privacyPolicy', 'title')),
+                trailing: const Icon(CupertinoIcons.right_chevron),
               ),
-              const ListTile(
-                title: Text('Notes Third Party Data Sharing Statement'),
-                trailing: Icon(CupertinoIcons.right_chevron),
+              ListTile(
+                title: Text(l10n.getSettingsValue('dataSharing', 'title')),
+                trailing: const Icon(CupertinoIcons.right_chevron),
               ),
-              const ListTile(
-                title: Text('Permissions details'),
-                trailing: Icon(CupertinoIcons.right_chevron),
+              ListTile(
+                title: Text(l10n.getSettingsValue('permissions', 'title')),
+                trailing: const Icon(CupertinoIcons.right_chevron),
               ),
             ],
           );
@@ -82,18 +88,19 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // 添加语言选择对话框
+  // 语言选择对话框
   void _showLanguageDialog(BuildContext context, SettingsModel settings) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Select Language'),
+          title: Text(l10n.language['selectLanguage']!),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile<Locale>(
-                title: const Text('English'),
+                title: Text(l10n.language['english']!),
                 value: const Locale('en', 'US'),
                 groupValue: settings.locale,
                 onChanged: (value) {
@@ -104,7 +111,7 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
               RadioListTile<Locale>(
-                title: const Text('中文'),
+                title: Text(l10n.language['chinese']!),
                 value: const Locale('zh', 'CN'),
                 groupValue: settings.locale,
                 onChanged: (value) {
@@ -119,7 +126,7 @@ class SettingsScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context).cancel),
+              child: Text(l10n.cancel),
             ),
           ],
         );
@@ -128,16 +135,17 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showFontSizeDialog(BuildContext context, SettingsModel settings) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Font size'),
+          title: Text(l10n.getSettingsValue('fontSize', 'title')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: FontSize.values.map((size) {
               return RadioListTile<FontSize>(
-                title: Text(size.name),
+                title: Text(l10n.getSettingsValue('fontSize', size.name)),
                 value: size,
                 groupValue: settings.fontSize,
                 onChanged: (value) {
@@ -149,22 +157,32 @@ class SettingsScreen extends StatelessWidget {
               );
             }).toList(),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
+          ],
         );
       },
     );
   }
 
   void _showSortDialog(BuildContext context, SettingsModel settings) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Sort'),
+          title: Text(l10n.getSettingsValue('sort', 'title')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: SortBy.values.map((sort) {
+              String sortName = sort == SortBy.byCreationDate 
+                  ? 'byCreationDate' 
+                  : 'byModificationDate';
               return RadioListTile<SortBy>(
-                title: Text(sort.name),
+                title: Text(l10n.getSettingsValue('sort', sortName)),
                 value: sort,
                 groupValue: settings.sortBy,
                 onChanged: (value) {
@@ -176,22 +194,29 @@ class SettingsScreen extends StatelessWidget {
               );
             }).toList(),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
+          ],
         );
       },
     );
   }
 
   void _showLayoutDialog(BuildContext context, SettingsModel settings) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Layout'),
+          title: Text(l10n.getSettingsValue('layout', 'title')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: NoteLayout.values.map((layout) {
               return RadioListTile<NoteLayout>(
-                title: Text(layout.name),
+                title: Text(l10n.getSettingsValue('layout', layout.name)),
                 value: layout,
                 groupValue: settings.layout,
                 onChanged: (value) {
@@ -203,6 +228,12 @@ class SettingsScreen extends StatelessWidget {
               );
             }).toList(),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
+          ],
         );
       },
     );

@@ -179,6 +179,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   void _showOptionsMenu() {
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -188,7 +189,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           children: [
             ListTile(
               leading: const Icon(CupertinoIcons.share),
-              title: const Text('Share note'),
+              title: Text(l10n.getShareValue('shareNote')),  // 使用辅助方法
               onTap: () {
                 Navigator.pop(context);
                 _showShareOptions();
@@ -196,7 +197,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             ),
             ListTile(
               leading: const Icon(CupertinoIcons.folder),
-              title: const Text('Move to folder'),
+              title: Text(l10n.moveToFolder),
               onTap: () {
                 Navigator.pop(context);
                 _showFolderSelector();
@@ -204,7 +205,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             ),
             ListTile(
               leading: const Icon(CupertinoIcons.delete),
-              title: const Text('Move to trash'),
+              title: Text(l10n.moveToTrash),
               onTap: () {
                 Navigator.pop(context);
                 _moveToTrash();
@@ -217,6 +218,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   void _showShareOptions() {
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
@@ -224,35 +226,35 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: const Text('Share note'),
+              title: Text(l10n.getShareValue('shareNote')),  // 使用辅助方法
               onTap: () {
                 Navigator.pop(context);
                 // 实现分享功能
               },
             ),
             ListTile(
-              title: const Text('Share note as text'),
+              title: Text(l10n.getShareValue('shareAsText')),  // 使用辅助方法
               onTap: () {
                 Navigator.pop(context);
                 // 实现文本分享功能
               },
             ),
             ListTile(
-              title: const Text('Share note as picture'),
+              title: Text(l10n.getShareValue('shareAsImage')),  // 使用辅助方法
               onTap: () {
                 Navigator.pop(context);
                 // 实现图片分享功能
               },
             ),
             ListTile(
-              title: const Text('Export as Markdown'),
+              title: Text(l10n.getShareValue('exportAsMarkdown')),  // 使用辅助方法
               onTap: () {
                 Navigator.pop(context);
                 // 实现 Markdown 导出功能
               },
             ),
             ListTile(
-              title: const Text('Cancel'),
+              title: Text(l10n.cancel),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -401,7 +403,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
-                      '${DateFormat('MMMM d h:mm a').format(_lastModified)} | $_characterCount characters',
+                      AppLocalizations.of(context).dateFormat['charactersCount']!.replaceAll('{}', _characterCount.toString()) +
+                      ' | ' +
+                      DateFormat(AppLocalizations.of(context).dateFormat['fullDateTime']!).format(_lastModified),
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,
@@ -417,7 +421,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       height: 1.5,
                     ),
                     decoration: InputDecoration(
-                      hintText: AppLocalizations.of(context).startTyping,
+                      hintText: AppLocalizations.of(context).inputStartTyping,  // 使用正确的 getter 名称
                       hintStyle: TextStyle(
                         fontSize: 16,
                         height: 1.5,
@@ -425,7 +429,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       ),
                       border: InputBorder.none,
                     ),
-                    onChanged: (_) => _updateCharacterCount(),  // 使用 onChanged 而不是 addListener
+                    onChanged: (_) => _updateCharacterCount(),
                   ),
                 ],
               ),
@@ -443,40 +447,55 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    IconButton(
-                      icon: const Icon(CupertinoIcons.list_bullet),
-                      onPressed: () {
-                        // 实现列表格式化
-                      },
-                      color: Colors.grey[700],
+                    Tooltip(
+                      message: AppLocalizations.of(context).editor['list']!,  // 使用本地化文本
+                      child: IconButton(
+                        icon: const Icon(CupertinoIcons.list_bullet),
+                        onPressed: () {
+                          // 实现列表格式化
+                        },
+                        color: Colors.grey[700],
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(CupertinoIcons.photo),
-                      onPressed: () {
-                        // 实现图片插入
-                      },
-                      color: Colors.grey[700],
+                    Tooltip(
+                      message: AppLocalizations.of(context).editor['image']!,  // 使用本地化文本
+                      child: IconButton(
+                        icon: const Icon(CupertinoIcons.photo),
+                        onPressed: () {
+                          // 实现图片插入
+                        },
+                        color: Colors.grey[700],
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(CupertinoIcons.pencil),
-                      onPressed: () {
-                        // 实现绘画功能
-                      },
-                      color: Colors.grey[700],
+                    Tooltip(
+                      message: AppLocalizations.of(context).editor['draw']!,  // 使用本地化文本
+                      child: IconButton(
+                        icon: const Icon(CupertinoIcons.pencil),
+                        onPressed: () {
+                          // 实现绘画功能
+                        },
+                        color: Colors.grey[700],
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(CupertinoIcons.checkmark_square),
-                      onPressed: () {
-                        // 实现任务列表
-                      },
-                      color: Colors.grey[700],
+                    Tooltip(
+                      message: AppLocalizations.of(context).editor['checkList']!,  // 使用本地化文本
+                      child: IconButton(
+                        icon: const Icon(CupertinoIcons.checkmark_square),
+                        onPressed: () {
+                          // 实现任务列表
+                        },
+                        color: Colors.grey[700],
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(CupertinoIcons.textformat),
-                      onPressed: () {
-                        // 实现文本格式化
-                      },
-                      color: Colors.grey[700],
+                    Tooltip(
+                      message: AppLocalizations.of(context).editor['format']!,  // 使用本地化文本
+                      child: IconButton(
+                        icon: const Icon(CupertinoIcons.textformat),
+                        onPressed: () {
+                          // 实现文本格式化
+                        },
+                        color: Colors.grey[700],
+                      ),
                     ),
                   ],
                 ),

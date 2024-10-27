@@ -1,6 +1,7 @@
 // lib/widgets/search/filter_bottom_sheet.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 class SearchFilter {
   final DateTime? startDate;
@@ -69,25 +70,26 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Center(
+          Center(
             child: Text(
-              'Filter',
-              style: TextStyle(
+              l10n.settings,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Date Range',
-            style: TextStyle(
+          Text(
+            l10n.time['title']!,
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -99,19 +101,19 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   label: Text(
                     _filter.startDate != null
                         ? _formatDate(_filter.startDate!)
-                        : 'Start Date',
+                        : l10n.time['startDate']!,
                   ),
                   onPressed: () => _selectDate(true),
                 ),
               ),
-              const Text('to'),
+              Text(l10n.time['to']!),
               Expanded(
                 child: TextButton.icon(
                   icon: const Icon(CupertinoIcons.calendar),
                   label: Text(
                     _filter.endDate != null
                         ? _formatDate(_filter.endDate!)
-                        : 'End Date',
+                        : l10n.time['endDate']!,
                   ),
                   onPressed: () => _selectDate(false),
                 ),
@@ -119,14 +121,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             ],
           ),
           const Divider(),
-          const Text(
-            'Include',
-            style: TextStyle(
+          Text(
+            l10n.getSettingsValue('include', 'title'),
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),
           ),
           CheckboxListTile(
-            title: const Text('Notes'),
+            title: Text(l10n.notes),
             value: _filter.includeNotes,
             onChanged: (value) {
               setState(() {
@@ -136,7 +138,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             },
           ),
           CheckboxListTile(
-            title: const Text('Tasks'),
+            title: Text(l10n.tasks),
             value: _filter.includeTasks,
             onChanged: (value) {
               setState(() {
@@ -147,7 +149,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           ),
           if (_filter.includeTasks)
             CheckboxListTile(
-              title: const Text('Completed Tasks'),
+              title: Text(l10n.getSettingsValue('tasks', 'completed')),
               value: _filter.includeCompleted,
               onChanged: (value) {
                 setState(() {
@@ -157,9 +159,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               },
             ),
           const Divider(),
-          const Text(
-            'Folders',
-            style: TextStyle(
+          Text(
+            l10n.folders,
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -186,14 +188,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             }).toList(),
           ),
           const Divider(),
-          const Text(
-            'Sort By',
-            style: TextStyle(
+          Text(
+            l10n.sort,
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),
           ),
           RadioListTile<String>(
-            title: const Text('Date (Newest first)'),
+            title: Text(l10n.getSettingsValue('sort', 'byDate')),
             value: 'date',
             groupValue: _filter.sortBy,
             onChanged: (value) {
@@ -204,7 +206,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             },
           ),
           RadioListTile<String>(
-            title: const Text('Title'),
+            title: Text(l10n.getSettingsValue('sort', 'byTitle')),
             value: 'title',
             groupValue: _filter.sortBy,
             onChanged: (value) {

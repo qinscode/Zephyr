@@ -9,6 +9,7 @@ import '../note_card_gesture_detector.dart';
 import '../../screens/note_editor_screen.dart';
 import '../../screens/task_editor_screen.dart';
 import 'filter_bottom_sheet.dart';
+import '../../l10n/app_localizations.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -114,12 +115,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: TextField(
           controller: _searchController,
           decoration: InputDecoration(
-            hintText: 'Search notes and tasks',
+            hintText: l10n.searchNotes,
             border: InputBorder.none,
             suffixIcon: IconButton(
               icon: const Icon(CupertinoIcons.clear),
@@ -140,6 +142,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchResults() {
+    final l10n = AppLocalizations.of(context);
     if (_isSearching) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -147,7 +150,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     if (_searchController.text.isEmpty) {
-      return const Center(child: Text('Start typing to search'));
+      return Center(child: Text(l10n.startTyping));
     }
 
     if (_searchResults.isEmpty) {

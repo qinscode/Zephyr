@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../models/trash_model.dart';
+import '../l10n/app_localizations.dart';
 
 class TrashScreen extends StatelessWidget {
   const TrashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<TrashModel>(
       builder: (context, trashModel, child) {
         return Scaffold(
@@ -20,7 +22,7 @@ class TrashScreen extends StatelessWidget {
               icon: const Icon(CupertinoIcons.back),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Text('Trash'),
+            title: Text(l10n.moveToTrash),
             actions: [
               if (trashModel.trashedItems.isNotEmpty)
                 TextButton(
@@ -28,32 +30,30 @@ class TrashScreen extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('Empty trash?'),
-                        content: const Text(
-                            'All items in trash will be permanently deleted.'
-                        ),
+                        title: Text(l10n.moveToTrash),
+                        content: Text(l10n.emptyTrashConfirm),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
+                            child: Text(l10n.cancel),
                           ),
                           TextButton(
                             onPressed: () {
                               trashModel.emptyTrash();
                               Navigator.pop(context);
                             },
-                            child: const Text(
-                              'Empty',
-                              style: TextStyle(color: Colors.red),
+                            child: Text(
+                              l10n.delete,
+                              style: const TextStyle(color: Colors.red),
                             ),
                           ),
                         ],
                       ),
                     );
                   },
-                  child: const Text(
-                    'Empty',
-                    style: TextStyle(color: Colors.red),
+                  child: Text(
+                    l10n.delete,
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
             ],
@@ -63,12 +63,12 @@ class TrashScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 color: const Color(0xFFFFF9E6),
-                child: const Row(
+                child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         'Items in the trash are kept for 30 days before being permanently deleted',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.orange,
                         ),
                       ),
@@ -78,72 +78,72 @@ class TrashScreen extends StatelessWidget {
               ),
               Expanded(
                 child: trashModel.trashedItems.isEmpty
-                    ? const Center(
-                  child: Text(
-                    'No items in trash',
-                    style: TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                )
-                    : ListView.builder(
-                  itemCount: trashModel.trashedItems.length,
-                  itemBuilder: (context, index) {
-                    final item = trashModel.trashedItems[index];
-                    return Dismissible(
-                      key: Key(item.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 16),
-                        child: const Icon(
-                          CupertinoIcons.delete,
-                          color: Colors.white,
-                        ),
-                      ),
-                      onDismissed: (direction) {
-                        trashModel.deletePermanently(item.id);
-                      },
-                      child: ListTile(
-                        title: Text(
-                          item.title.isEmpty ? 'No text' : item.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          'Deleted ${_formatDate(item.deletedAt)}',
+                    ? Center(
+                        child: Text(
+                          'No items in trash',
                           style: const TextStyle(
                             color: Colors.grey,
-                            fontSize: 12,
                           ),
                         ),
-                        trailing: PopupMenuButton(
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'restore',
-                              child: Text('Restore'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Text(
-                                'Delete permanently',
-                                style: TextStyle(color: Colors.red),
+                      )
+                    : ListView.builder(
+                        itemCount: trashModel.trashedItems.length,
+                        itemBuilder: (context, index) {
+                          final item = trashModel.trashedItems[index];
+                          return Dismissible(
+                            key: Key(item.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: Colors.red,
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 16),
+                              child: const Icon(
+                                CupertinoIcons.delete,
+                                color: Colors.white,
                               ),
                             ),
-                          ],
-                          onSelected: (value) {
-                            if (value == 'restore') {
-                              trashModel.restoreItem(item.id);
-                            } else if (value == 'delete') {
+                            onDismissed: (direction) {
                               trashModel.deletePermanently(item.id);
-                            }
-                          },
-                        ),
+                            },
+                            child: ListTile(
+                              title: Text(
+                                item.title.isEmpty ? l10n.noText : item.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitle: Text(
+                                'Deleted ${_formatDate(item.deletedAt)}',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              trailing: PopupMenuButton(
+                                itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                    value: 'restore',
+                                    child: Text(l10n.restore),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'delete',
+                                    child: Text(
+                                      l10n.deletePermanently,
+                                      style: const TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                                onSelected: (value) {
+                                  if (value == 'restore') {
+                                    trashModel.restoreItem(item.id);
+                                  } else if (value == 'delete') {
+                                    trashModel.deletePermanently(item.id);
+                                  }
+                                },
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ],
           ),
