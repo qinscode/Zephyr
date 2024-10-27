@@ -277,7 +277,7 @@ class NotesModel extends ChangeNotifier {
       await _storage.saveNotes(_notes);
     } catch (e) {
       _error = 'Failed to save notes: ${e.toString()}';
-      throw e;
+      rethrow;
     }
   }
 

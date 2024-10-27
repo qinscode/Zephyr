@@ -2,9 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/task.dart';
-import '../screens/settings_screen.dart';
 import '../models/tasks_model.dart';
-import 'base_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TasksView extends StatelessWidget {

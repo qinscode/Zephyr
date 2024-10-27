@@ -1,8 +1,6 @@
 // lib/services/search_service.dart
-import 'package:flutter/foundation.dart';
 import '../models/note.dart';
 import '../models/task.dart';
-import '../models/folder_model.dart';
 
 class SearchResult {
   final String id;

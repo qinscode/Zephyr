@@ -6,10 +6,7 @@ import '../models/note.dart';
 import '../models/notes_model.dart';
 import '../models/folder_model.dart';
 import '../models/trash_model.dart';
-import '../screens/folders_screen.dart';
 import '../screens/note_editor_screen.dart';
-import '../screens/settings_screen.dart';
-import 'base_view.dart';
 
 class NotesView extends StatelessWidget {
   const NotesView({super.key});
@@ -33,12 +30,12 @@ class NotesView extends StatelessWidget {
                   child: SearchBar(
                     hintText: 'Search notes',
                     leading: const Icon(CupertinoIcons.search),
-                    backgroundColor: MaterialStateProperty.all(Colors.grey[100]),
-                    elevation: MaterialStateProperty.all(0),
-                    padding: MaterialStateProperty.all(
+                    backgroundColor: WidgetStateProperty.all(Colors.grey[100]),
+                    elevation: WidgetStateProperty.all(0),
+                    padding: WidgetStateProperty.all(
                       const EdgeInsets.symmetric(horizontal: 16.0),
                     ),
-                    shape: MaterialStateProperty.all(
+                    shape: WidgetStateProperty.all(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: BorderSide.none,

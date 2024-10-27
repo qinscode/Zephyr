@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_app/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +15,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -268,7 +267,7 @@ class NotesContentView extends StatelessWidget {
                           visualDensity: VisualDensity.compact,
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),

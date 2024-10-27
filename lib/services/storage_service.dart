@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -43,7 +42,7 @@ class StorageService {
     final dbPath = path.join(appDir.path, 'notes.db');
 
     // 创建数据库工厂
-    final factory = await databaseFactoryIo;
+    final factory = databaseFactoryIo;
 
     // 打开数据库
     final db = await factory.openDatabase(

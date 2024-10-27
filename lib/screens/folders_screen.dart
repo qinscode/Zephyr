@@ -249,7 +249,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
                         Navigator.pop(context);
                       },
                     );
-                  }).toList(),
+                  }),
                   if (folderModel.folders.isEmpty)
                     Padding(
                       padding: const EdgeInsets.all(16),

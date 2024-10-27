@@ -32,8 +32,8 @@ class ReorderableFolderList extends StatelessWidget {
             child: child,
           );
         },
-        children: children,
         onReorder: onReorder,
+        children: children,
       ),
     );
   }

@@ -92,7 +92,6 @@ class MyApp extends StatelessWidget {
               
               // 颜色方案
               colorScheme: const ColorScheme.light(
-                background: Colors.white,
                 surface: Colors.white,
                 onSurface: Colors.black,
                 primary: Colors.blue,
@@ -140,8 +139,8 @@ class MyApp extends StatelessWidget {
               
               // 导航栏主题
               navigationBarTheme: NavigationBarThemeData(
-                labelTextStyle: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.selected)) {
+                labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
                     return const TextStyle(
                       color: Colors.blue,
                       fontSize: 12,  // 增加字体大小
@@ -156,8 +155,8 @@ class MyApp extends StatelessWidget {
                 }),
                 labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
                 height: 65,  // 设置导航栏高度
-                iconTheme: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.selected)) {
+                iconTheme: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
                     return const IconThemeData(
                       size: 25,  // 增加图标大小
                       color: Colors.blue,
@@ -178,7 +177,6 @@ class MyApp extends StatelessWidget {
               cardColor: Colors.white,
               
               colorScheme: const ColorScheme.light(
-                background: Colors.white,
                 surface: Colors.white,
                 onSurface: Colors.black,
                 primary: Colors.blue,

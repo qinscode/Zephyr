@@ -11,7 +11,7 @@ import '../../screens/task_editor_screen.dart';
 import 'filter_bottom_sheet.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  const SearchScreen({super.key});
 
   @override
   _SearchScreenState createState() => _SearchScreenState();

@@ -144,9 +144,9 @@ class _FoldersScreenState extends State<FoldersScreen> {
               onPressed: () => Navigator.pop(context),
             ),
             title: const Text('Folders'),
-            actions: [
+            actions: const [
               IconButton(
-                icon: const Icon(Icons.delete_outline),
+                icon: Icon(Icons.delete_outline),
                 onPressed: null,
               ),
             ],
@@ -209,7 +209,7 @@ class _FoldersScreenState extends State<FoldersScreen> {
                     Navigator.pop(context);
                   },
                 );
-              }).toList(),
+              }),
               ListTile(
                 leading: Container(
                   width: 24,
