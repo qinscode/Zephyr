@@ -52,9 +52,15 @@ class StorageService {
       onVersionChanged: (db, oldVersion, newVersion) async {
         // 处理数据库迁移
         if (oldVersion < 1) {
-          final batch = db.batch();
           // 创建所需的stores
-          await batch.commit();
+          final notesStore = stringMapStoreFactory.store(_notesStore);
+          final tasksStore = stringMapStoreFactory.store(_tasksStore);
+          final foldersStore = stringMapStoreFactory.store(_foldersStore);
+          final trashStore = stringMapStoreFactory.store(_trashStore);
+          final settingsStore = StoreRef<String, dynamic>(_settingsStore);
+
+          // 我们不需要显式创建这些store，因为它们会在首次使用时自动创建
+          // 但是我们可以在这里添加一些初始化数据如果需要的话
         }
       },
     );
@@ -265,8 +271,42 @@ class StorageService {
   }
 
   Future<void> vacuum() async {
+    // Sembast 不支持直接的 VACUUM 操作
+    // 我们可以通过重新写入所有数据来间接实现类似的效果
     await _db.transaction((txn) async {
-      await txn.execute('VACUUM');
+      // 读取所有数据
+      final notes = await _notes.find(txn);
+      final tasks = await _tasks.find(txn);
+      final folders = await _folders.find(txn);
+      final trash = await _trash.find(txn);
+      final settings = await _settings.record('settings').get(txn);
+
+      // 清除所有数据
+      await _notes.delete(txn);
+      await _tasks.delete(txn);
+      await _folders.delete(txn);
+      await _trash.delete(txn);
+      await _settings.delete(txn);
+
+      // 重新写入所有数据
+      for (var note in notes) {
+        await _notes.record(note.key).put(txn, note.value);
+      }
+      for (var task in tasks) {
+        await _tasks.record(task.key).put(txn, task.value);
+      }
+      for (var folder in folders) {
+        await _folders.record(folder.key).put(txn, folder.value);
+      }
+      for (var item in trash) {
+        await _trash.record(item.key).put(txn, item.value);
+      }
+      if (settings != null) {
+        await _settings.record('settings').put(txn, settings);
+      }
     });
+
+    // 压缩数据库文件
+    await _db.compact();
   }
 }
