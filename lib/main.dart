@@ -34,9 +34,9 @@ void main() async {
   // 设置系统UI样式
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
+      statusBarColor: Colors.white, // 修改为白色
       statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.white,
+      systemNavigationBarColor: Colors.white, // 已经是白色
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
@@ -82,8 +82,109 @@ class MyApp extends StatelessWidget {
         builder: (context, settings, _) {
           return MaterialApp(
             title: 'Notes App',
-            theme: ThemeData.light(),
-            darkTheme: ThemeData.dark(),
+            theme: ThemeData(
+              // 基础背景色设置
+              scaffoldBackgroundColor: Colors.white,
+              canvasColor: Colors.white,
+              dialogBackgroundColor: Colors.white,
+              cardColor: Colors.white,
+              
+              // 颜色方案
+              colorScheme: const ColorScheme.light(
+                background: Colors.white,
+                surface: Colors.white,
+                onSurface: Colors.black,
+                primary: Colors.blue,
+                onPrimary: Colors.white,
+              ),
+              
+              // AppBar 主题
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                iconTheme: IconThemeData(color: Colors.black),
+                titleTextStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              
+              // 底部导航栏主题
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Colors.white,
+                elevation: 0,
+              ),
+              
+              // 弹窗主题
+              dialogTheme: const DialogTheme(
+                backgroundColor: Colors.white,
+              ),
+              
+              // 卡片主题
+              cardTheme: const CardTheme(
+                color: Colors.white,
+                elevation: 1,
+              ),
+              
+              // 弹出菜单主题
+              popupMenuTheme: const PopupMenuThemeData(
+                color: Colors.white,
+              ),
+              
+              // 底部Sheet主题
+              bottomSheetTheme: const BottomSheetThemeData(
+                backgroundColor: Colors.white,
+              ),
+            ),
+            darkTheme: ThemeData(
+              // 复制上面相同的配置
+              scaffoldBackgroundColor: Colors.white,
+              canvasColor: Colors.white,
+              dialogBackgroundColor: Colors.white,
+              cardColor: Colors.white,
+              
+              colorScheme: const ColorScheme.light(
+                background: Colors.white,
+                surface: Colors.white,
+                onSurface: Colors.black,
+                primary: Colors.blue,
+                onPrimary: Colors.white,
+              ),
+              
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                iconTheme: IconThemeData(color: Colors.black),
+                titleTextStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Colors.white,
+                elevation: 0,
+              ),
+              
+              dialogTheme: const DialogTheme(
+                backgroundColor: Colors.white,
+              ),
+              
+              cardTheme: const CardTheme(
+                color: Colors.white,
+                elevation: 1,
+              ),
+              
+              popupMenuTheme: const PopupMenuThemeData(
+                color: Colors.white,
+              ),
+              
+              bottomSheetTheme: const BottomSheetThemeData(
+                backgroundColor: Colors.white,
+              ),
+            ),
             themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             debugShowCheckedModeBanner: false,
             home: const HomeScreen(),

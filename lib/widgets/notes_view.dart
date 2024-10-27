@@ -65,8 +65,16 @@ class NotesView extends StatelessWidget {
                   child: SearchBar(
                     hintText: 'Search notes',
                     leading: const Icon(CupertinoIcons.search),
+                    backgroundColor: MaterialStateProperty.all(Colors.grey[100]), // 改为更明显的灰色
+                    elevation: MaterialStateProperty.all(0), // 移除阴影
                     padding: MaterialStateProperty.all(
                       const EdgeInsets.symmetric(horizontal: 16.0),
+                    ),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide.none, // 移除边框
+                      ),
                     ),
                   ),
                 ),
