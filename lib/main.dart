@@ -21,6 +21,9 @@ import 'screens/home_screen.dart';
 // Theme
 import 'theme/app_theme.dart';
 
+
+// TODO: REFACTOR
+
 void main() async {
   // 确保Flutter绑定初始化
   WidgetsFlutterBinding.ensureInitialized();
