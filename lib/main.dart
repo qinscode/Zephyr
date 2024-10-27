@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +19,7 @@ import 'services/search_service.dart';
 import 'screens/home_screen.dart';
 
 // Theme
-import 'theme/app_theme.dart';
+// import 'theme/app_theme.dart';
 
 
 // TODO: REFACTOR
@@ -119,9 +120,9 @@ class BackButtonInterceptor extends StatelessWidget {
   final Widget child;
 
   const BackButtonInterceptor({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -166,9 +167,9 @@ class ErrorBoundary extends StatefulWidget {
   final Widget child;
 
   const ErrorBoundary({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<ErrorBoundary> createState() => _ErrorBoundaryState();

@@ -122,7 +122,7 @@ class _SearchScreenState extends State<SearchScreen> {
             hintText: 'Search notes and tasks',
             border: InputBorder.none,
             suffixIcon: IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(CupertinoIcons.clear),
               onPressed: () => _searchController.clear(),
             ),
           ),
@@ -130,7 +130,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.tune),
+            icon: const Icon(CupertinoIcons.slider_horizontal_3),
             onPressed: _showFilterBottomSheet,
           ),
         ],
@@ -156,7 +156,7 @@ class _SearchScreenState extends State<SearchScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
-              Icons.search,
+              CupertinoIcons.search,
               size: 48,
               color: Colors.grey,
             ),

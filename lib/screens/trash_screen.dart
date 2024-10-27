@@ -1,8 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../models/trash_model.dart';
-import '../models/note.dart';
 
 class TrashScreen extends StatelessWidget {
   const TrashScreen({super.key});
@@ -112,7 +112,7 @@ class TrashScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
-                          'Deleted ${_formatDate(item.deletedAt!)}',
+                          'Deleted ${_formatDate(item.deletedAt)}',
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 12,
