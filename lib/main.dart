@@ -93,7 +93,7 @@ class MyApp extends StatelessWidget {
               colorScheme: const ColorScheme.light(
                 surface: Colors.white,
                 onSurface: Colors.black,
-                primary: Colors.blue,
+                primary: Colors.orange,
                 onPrimary: Colors.white,
               ),
               
@@ -134,7 +134,7 @@ class MyApp extends StatelessWidget {
                 labelTextStyle: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.selected)) {
                     return const TextStyle(
-                      color: Colors.blue,
+                      color: Colors.orange,
                       fontSize: 12,  // 增加字体大小
                       fontWeight: FontWeight.w700,  // 加粗字体
                     );
@@ -151,7 +151,7 @@ class MyApp extends StatelessWidget {
                   if (states.contains(WidgetState.selected)) {
                     return const IconThemeData(
                       size: 25,  // 增加图标大小
-                      color: Colors.blue,
+                      color: Colors.orange,
                     );
                   }
                   return const IconThemeData(
