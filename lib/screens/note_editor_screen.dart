@@ -47,6 +47,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   NoteBackground? _currentBackground;
   Color _toolbarColor = Colors.white.withOpacity(0.9);
   final GlobalKey _shareKey = GlobalKey();
+  bool _showFormatToolbar = false;
 
   @override
   void initState() {
@@ -518,68 +519,153 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         color: _toolbarColor,
         border: Border(
           top: BorderSide(
-            color: Colors.grey[300]!,  // 修改为更浅的灰色
-            width: 0.5,  // 添加更细的边框
+            color: Colors.grey[300]!,
+            width: 0.5,
           ),
         ),
       ),
       child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Tooltip(
-              message: AppLocalizations.of(context).editor['list']!,
-              child: IconButton(
-                icon: const Icon(CupertinoIcons.list_bullet),
-                onPressed: () {
-                  // 实现列表格式化
-                },
-                color: Colors.grey[700],
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
               ),
-            ),
-            Tooltip(
-              message: AppLocalizations.of(context).editor['image']!,
-              child: IconButton(
-                icon: const Icon(CupertinoIcons.photo),
-                onPressed: () {
-                  // 实现图片插入
-                },
-                color: Colors.grey[700],
-              ),
-            ),
-            Tooltip(
-              message: AppLocalizations.of(context).editor['draw']!,
-              child: IconButton(
-                icon: const Icon(CupertinoIcons.pencil),
-                onPressed: () {
-                  // 实现绘画功能
-                },
-                color: Colors.grey[700],
-              ),
-            ),
-            Tooltip(
-              message: AppLocalizations.of(context).editor['checkList']!,
-              child: IconButton(
-                icon: const Icon(CupertinoIcons.checkmark_square),
-                onPressed: () {
-                  // 实现任务列表
-                },
-                color: Colors.grey[700],
-              ),
-            ),
-            Tooltip(
-              message: AppLocalizations.of(context).editor['format']!,
-              child: IconButton(
-                icon: const Icon(CupertinoIcons.textformat),
-                onPressed: () {
-                  // 实现文本格式化
-                },
-                color: Colors.grey[700],
-              ),
-            ),
-          ],
+            );
+          },
+          child: _showFormatToolbar ? _buildFormatToolbar() : _buildMainToolbar(),
         ),
       ),
+    );
+  }
+
+  // 添加主工具栏构建方法
+  Widget _buildMainToolbar() {
+    return Row(
+      key: const ValueKey<String>('mainToolbar'),
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Tooltip(
+          message: AppLocalizations.of(context).editor['list']!,
+          child: IconButton(
+            icon: const Icon(CupertinoIcons.list_bullet),
+            onPressed: () {
+              // 实现列表格式化
+            },
+            color: Colors.grey[700],
+          ),
+        ),
+        Tooltip(
+          message: AppLocalizations.of(context).editor['image']!,
+          child: IconButton(
+            icon: const Icon(CupertinoIcons.photo),
+            onPressed: () {
+              // 实现图片插入
+            },
+            color: Colors.grey[700],
+          ),
+        ),
+        Tooltip(
+          message: AppLocalizations.of(context).editor['draw']!,
+          child: IconButton(
+            icon: const Icon(CupertinoIcons.pencil),
+            onPressed: () {
+              // 实现绘画功能
+            },
+            color: Colors.grey[700],
+          ),
+        ),
+        Tooltip(
+          message: AppLocalizations.of(context).editor['checkList']!,
+          child: IconButton(
+            icon: const Icon(CupertinoIcons.checkmark_square),
+            onPressed: () {
+              // 实现任务列表
+            },
+            color: Colors.grey[700],
+          ),
+        ),
+        Tooltip(
+          message: AppLocalizations.of(context).editor['format']!,
+          child: IconButton(
+            icon: const Icon(CupertinoIcons.textformat),
+            onPressed: () {
+              setState(() {
+                _showFormatToolbar = true;
+              });
+            },
+            color: Colors.grey[700],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 添加格式化工具栏构建方法
+  Widget _buildFormatToolbar() {
+    return Row(
+      key: const ValueKey<String>('formatToolbar'),
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        IconButton(
+          icon: const Icon(FontAwesomeIcons.marker),
+          onPressed: () {
+            // 实现文本高亮功能
+          },
+          color: Colors.grey[700],
+        ),
+        TextButton(
+          onPressed: () {
+            // 实现 H1 标题
+          },
+          child: const Text('H1', style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          )),
+        ),
+        TextButton(
+          onPressed: () {
+            // 实现 H2 标题
+          },
+          child: const Text('H2', style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          )),
+        ),
+        TextButton(
+          onPressed: () {
+            // 实现 H3 标题
+          },
+          child: const Text('H3', style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          )),
+        ),
+        TextButton(
+          onPressed: () {
+            // 实现文本加粗
+          },
+          child: const Text('B', style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          )),
+        ),
+        IconButton(
+          icon: const Icon(CupertinoIcons.xmark),
+          onPressed: () {
+            setState(() {
+              _showFormatToolbar = false;
+            });
+          },
+          color: Colors.grey[700],
+        ),
+      ],
     );
   }
 
