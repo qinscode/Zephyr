@@ -142,5 +142,5 @@ const koKR = TranslationKeys(
     'daysAgo': '{}일 전',
     'inDays': '{}일 후',
     'charactersCount': '{}자',
-  },
+  }, dialog: {},
 );

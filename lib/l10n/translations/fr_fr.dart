@@ -142,5 +142,5 @@ const frFR = TranslationKeys(
     'daysAgo': 'il y a {} jours',
     'inDays': 'dans {} jours',
     'charactersCount': '{} caractères',
-  },
+  }, dialog: {},
 );

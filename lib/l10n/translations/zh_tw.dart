@@ -142,5 +142,5 @@ const zhTW = TranslationKeys(
     'daysAgo': '{}天前',
     'inDays': '{}天後',
     'charactersCount': '{}個字元',  // 字元計數格式
-  },
+  }, dialog: {},
 );

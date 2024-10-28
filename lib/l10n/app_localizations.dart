@@ -122,6 +122,12 @@ class AppLocalizations {
   String get deletePermanently => _translations.actions['deletePermanently']!;
   String get tryAgain => _translations.actions['tryAgain']!;
 
+  // Diaglogs
+  String get enterFolderName => _translations.actions['enterFolderName']!;
+  String get folderExists => _translations.actions['folderExists']!;
+
+
+
   // Static methods
   static bool isSupported(Locale locale) {
     return ['en', 'zh', 'es', 'ja', 'ko', 'th', 'fr', 'ru', 'pt'].contains(locale.languageCode);

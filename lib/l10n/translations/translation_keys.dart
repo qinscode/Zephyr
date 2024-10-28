@@ -10,6 +10,7 @@ class TranslationKeys {
   final Map<String, dynamic> share;
   final Map<String, dynamic> editor;
   final Map<String, dynamic> dateFormat;
+  final Map<String, dynamic> dialog;
 
   const TranslationKeys({
     required this.notes,
@@ -23,6 +24,7 @@ class TranslationKeys {
     required this.share,
     required this.editor,
     required this.dateFormat,
+    required this.dialog
   });
 
   // 添加 toJson 方法

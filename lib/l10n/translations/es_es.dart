@@ -141,5 +141,5 @@ const esES = TranslationKeys(
     'daysAgo': 'hace {} días',
     'inDays': 'en {} días',
     'charactersCount': '{} caracteres',  // Formato de contador de caracteres
-  },
+  }, dialog: {},
 );

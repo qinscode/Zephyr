@@ -1,6 +1,10 @@
 import 'translation_keys.dart';
 
 const enUS = TranslationKeys(
+  dialog: {
+    'enterFolderName':'enterFolderName',
+    'folderExists':'folderExists'
+  },
   notes: {
     'title': 'Notes',
     'noNotes': 'No notes yet',

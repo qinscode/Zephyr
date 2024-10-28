@@ -141,5 +141,5 @@ const ruRU = TranslationKeys(
     'daysAgo': '{} дней назад',
     'inDays': 'через {} дней',
     'charactersCount': '{} символов',  // Формат подсчёта символов
-  },
+  }, dialog: {},
 );

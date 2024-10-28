@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/folder_model.dart';
 import '../models/notes_model.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/custom_input_dialog.dart';
 import 'trash_screen.dart';
 
 class FoldersScreen extends StatefulWidget {
@@ -26,62 +27,41 @@ class _FoldersScreenState extends State<FoldersScreen> {
     final formKey = GlobalKey<FormState>();
     final l10n = AppLocalizations.of(context);
 
-    showDialog<void>(
+    CustomInputDialog.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.newFolder),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: _folderNameController,
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: l10n.folderName,
-              border: const OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return l10n.folderName;
-              }
-
-              final folderModel = Provider.of<FolderModel>(
-                context,
-                listen: false,
-              );
-              if (folderModel.folderExists(value.trim())) {
-                return 'A folder with this name already exists';
-              }
-              return null;
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _folderNameController.clear();
-            },
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() ?? false) {
-                final folderModel = Provider.of<FolderModel>(
-                  context,
-                  listen: false,
-                );
-                folderModel.createFolder(_folderNameController.text.trim());
-                Navigator.pop(context);
-                _folderNameController.clear();
-              }
-            },
-            child: Text(l10n.create),
-          ),
-        ],
-      ),
+      title: l10n.newFolder,
+      placeholder: 'Unnamed folder',
+      controller: _folderNameController,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return l10n.enterFolderName;
+        }
+        final folderModel = Provider.of<FolderModel>(
+          context,
+          listen: false,
+        );
+        if (folderModel.folderExists(value.trim())) {
+          return l10n.folderExists;
+        }
+        return null;
+      },
+      onCancel: () {
+        Navigator.pop(context);
+        _folderNameController.clear();
+      },
+      onConfirm: () {
+        if (formKey.currentState?.validate() ?? false) {
+          final folderModel = Provider.of<FolderModel>(
+            context,
+            listen: false,
+          );
+          folderModel.createFolder(_folderNameController.text.trim());
+          Navigator.pop(context);
+          _folderNameController.clear();
+        }
+      },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);

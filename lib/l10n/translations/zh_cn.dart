@@ -133,5 +133,5 @@ const zhCN = TranslationKeys(
     'daysAgo': '{}天前',
     'inDays': '{}天后',
     'charactersCount': '{}个字符',  // 字符计数格式
-  },
+  }, dialog: {},
 );

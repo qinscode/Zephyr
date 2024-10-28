@@ -141,5 +141,5 @@ const ptBR = TranslationKeys(
     'daysAgo': 'há {} dias',
     'inDays': 'em {} dias',
     'charactersCount': '{} caracteres',  // Formato de contador de caracteres
-  },
+  }, dialog: {},
 );

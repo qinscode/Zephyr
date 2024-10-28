@@ -141,5 +141,5 @@ const thTH = TranslationKeys(
     'daysAgo': '{} วันที่แล้ว',
     'inDays': 'ในอีก {} วัน',
     'charactersCount': '{} ตัวอักษร',  // รูปแบบการนับตัวอักษร
-  },
+  }, dialog: {},
 );

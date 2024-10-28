@@ -141,5 +141,5 @@ const jaJP = TranslationKeys(
     'daysAgo': '{}日前',
     'inDays': '{}日後',
     'charactersCount': '{}文字',
-  },
+  }, dialog: {},
 );
