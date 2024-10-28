@@ -4,11 +4,17 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/> <!-- Android 13+ -->
 
     <application
             android:label="swiftnote"
             android:icon="@mipmap/ic_launcher"
             android:requestLegacyExternalStorage="true">
+
+        <activity
+                android:name="com.yalantis.ucrop.UCropActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
         <activity
                 android:name=".MainActivity"
