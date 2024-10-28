@@ -310,12 +310,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     showFormatToolbar: _editorState.showFormatToolbar,
                     onFormatPressed: () => _editorState.toggleFormatToolbar(),
                     onCloseFormat: () => _editorState.toggleFormatToolbar(),
-                    onHighlight: () => _editorState.applyHighlight(Colors.yellow.withOpacity(0.5)),  // 修改这里
+                    onHighlight: () => _editorState.applyHighlight(Colors.yellow.withOpacity(0.5)),
                     onH1: () => _editorState.applyHeading(1),
                     onH2: () => _editorState.applyHeading(2),
                     onH3: () => _editorState.applyHeading(3),
                     onBold: () => _editorState.applyBold(),
                     onChecklist: () => _editorState.toggleChecklist(),
+                    onInsertImage: () => _editorState.insertImage(),  // 添加这行
                   ),
                 ],
               ),

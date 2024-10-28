@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:palette_generator/palette_generator.dart';
 import '../../models/note_background.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:convert' as convert;
 
 class EditorState extends ChangeNotifier {
   final QuillController titleController;
@@ -194,6 +197,40 @@ class EditorState extends ChangeNotifier {
       contentController.formatSelection(const ListAttribute('checked'));
     }
     notifyListeners();
+  }
+
+  Future<void> insertImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    
+    if (image != null) {
+      try {
+        // 读取图片文件
+        final file = File(image.path);
+        final bytes = await file.readAsBytes();
+        final base64Image = convert.base64Encode(bytes);
+        
+        // 创建图片嵌入块
+        final index = contentController.selection.baseOffset;
+        final length = contentController.selection.extentOffset - index;
+        
+        // 在当前光标位置插入换行
+        contentController.replaceText(index, length, '\n', null);
+        
+        // 插入图片
+        final imageEmbed = BlockEmbed.image('data:image/png;base64,$base64Image');
+        contentController.document.insert(contentController.selection.baseOffset, imageEmbed);
+        
+        // 在图片后插入换行
+        final nextIndex = contentController.selection.baseOffset;
+        contentController.replaceText(nextIndex, 0, '\n', null);
+        
+        isEdited = true;
+        notifyListeners();
+      } catch (e) {
+        debugPrint('Error inserting image: $e');
+      }
+    }
   }
 
   @override

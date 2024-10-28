@@ -13,6 +13,7 @@ class EditorToolbar extends StatelessWidget {
   final VoidCallback onH3;
   final VoidCallback onBold;
   final VoidCallback onChecklist;
+  final VoidCallback onInsertImage;
 
   const EditorToolbar({
     super.key,
@@ -26,6 +27,7 @@ class EditorToolbar extends StatelessWidget {
     required this.onH3,
     required this.onBold,
     required this.onChecklist,
+    required this.onInsertImage,
   });
 
   @override
@@ -67,13 +69,13 @@ class EditorToolbar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-          icon: const Icon(CupertinoIcons.checkmark_square),  // 修改这里，使用复选框图标
-          onPressed: onChecklist,  // 这个按钮用于 checklist
+          icon: const Icon(CupertinoIcons.checkmark_square),
+          onPressed: onChecklist,
           color: Colors.grey[700],
         ),
         IconButton(
           icon: const Icon(CupertinoIcons.photo),
-          onPressed: () {},
+          onPressed: onInsertImage,
           color: Colors.grey[700],
         ),
         IconButton(
