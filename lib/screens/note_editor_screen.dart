@@ -8,7 +8,6 @@ import '../models/note_background.dart';
 import '../models/notes_model.dart';
 import '../models/trash_model.dart';
 import '../services/share_service.dart';
-import '../services/text_formatter_service.dart';
 import '../widgets/editor/editor_app_bar.dart';
 import '../widgets/editor/editor_toolbar.dart';
 import '../widgets/editor/folder_indicator.dart';

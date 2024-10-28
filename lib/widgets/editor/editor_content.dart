@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:intl/intl.dart';
-import '../../l10n/app_localizations.dart';
 
 class EditorContent extends StatelessWidget {
   final QuillController titleController;
