@@ -29,6 +29,9 @@ dependencies:
   material_design_icons_flutter: ^6.0.0
   flutter_colorpicker: ^1.1.0
   image_picker: ^1.1.2
+  palette_generator: ^0.3.3
+  image_cropper: ^5.0.1
+  share_plus: ^7.2.1
 
 dev_dependencies:
   flutter_test:
@@ -40,6 +43,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/paper_texture.png
-    - assets/images/grid_pattern.png
-    - assets/images/lines_pattern.png
+    - assets/images/cloud_pattern.png
+    - assets/images/banana_pattern.png
+    - assets/images/snow_pattern.png

@@ -45,5 +45,21 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	
+	<!-- 添加相册访问权限描述 -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo library to select background images for notes</string>
+	
+	<!-- 添加相机访问权限描述 -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to camera to take photos for note backgrounds</string>
+	
+	<!-- 添加麦克风访问权限描述（如果需要录制视频） -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to microphone to record videos</string>
+	
+	<!-- 添加保存照片到相册的权限描述 -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs permission to save edited photos to your photo library</string>
 </dict>
 </plist>

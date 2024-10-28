@@ -174,6 +174,39 @@ class AppLocalizations {
   String getLayoutOption(String option) {
     return _translations.settings['layout']![option]?.toString() ?? '';
   }
+
+  // 在 _localizedValues 中添加主题相关的翻译
+  Map<String, dynamic> get _localizedValues => {
+    'en': {
+      // ... 其他翻译
+      'theme': {
+        'light': 'Light Theme',
+        'dark': 'Dark Theme',
+        'custom': 'Custom Theme',
+        'customTheme': 'Custom Theme',
+        'background': 'Background Color',
+        'text': 'Text Color',
+      },
+    },
+    'zh': {
+      // ... 其他翻译
+      'theme': {
+        'light': '浅色主题',
+        'dark': '深色主题',
+        'custom': '自定义主题',
+        'customTheme': '自定义主题',
+        'background': '背景颜色',
+        'text': '文字颜色',
+      },
+    },
+    // ... 其他语言
+  };
+
+
+  // 添加获取主题翻译的方法
+  String getThemeValue(String key) {
+    return "theme";
+  }
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
