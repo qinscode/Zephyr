@@ -95,16 +95,14 @@ class ShareService {
                   child: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: note.background!.type == BackgroundType.preset
-                            ? AssetImage(note.background!.assetPath!)
-                            : FileImage(File(note.background!.customImagePath!)) as ImageProvider,
+                        image: AssetImage(note.background!.assetPath!),
                         fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,
                         repeat: note.background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,
                         opacity: note.background!.opacity ?? 1.0,
                       ),
                     ),
                   ),
-                ),
+              ),
               
               // 内容层
               Padding(
@@ -112,13 +110,12 @@ class ShareService {
                   left: horizontalPadding,
                   right: horizontalPadding,
                   top: verticalPadding,
-                  bottom: bottomAreaHeight + bottomPadding, // 为底部区域预留空间
+                  bottom: bottomAreaHeight + bottomPadding,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // 标题
                     if (note.title.isNotEmpty) ...[
                       Text(
                         note.title,
@@ -131,7 +128,6 @@ class ShareService {
                       const SizedBox(height: titleBottomSpacing),
                     ],
                     
-                    // 内容
                     Text(
                       note.content,
                       style: const TextStyle(
@@ -144,7 +140,7 @@ class ShareService {
                 ),
               ),
               
-              // 底部区域（分割线和水印）
+              // 底部区域
               Positioned(
                 left: horizontalPadding,
                 right: horizontalPadding,
@@ -152,7 +148,6 @@ class ShareService {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // 分割线
                     Container(
                       height: dividerHeight,
                       color: Colors.grey.withOpacity(dividerOpacity),
@@ -160,7 +155,6 @@ class ShareService {
                     
                     const SizedBox(height: dividerBottomSpacing),
                     
-                    // 水印和时间
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
