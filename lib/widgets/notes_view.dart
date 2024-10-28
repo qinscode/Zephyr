@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/note.dart';
+import '../models/note_background.dart';
 import '../models/notes_model.dart';
 import '../models/folder_model.dart';
 import '../models/trash_model.dart';
@@ -149,47 +152,75 @@ class NotesView extends StatelessWidget {
     // 格式化时间
     String formattedTime = _formatDateTime(note.modifiedAt);
 
+    Widget buildBackgroundContainer(Widget child) {
+      if (note.background == null || note.background!.type == BackgroundType.none) {
+        return Container(
+          color: Colors.white,
+          child: child,
+        );
+      }
+
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          image: DecorationImage(
+            image: note.background!.type == BackgroundType.preset
+                ? AssetImage(note.background!.assetPath!)
+                : FileImage(File(note.background!.customImagePath!)) as ImageProvider,
+            fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,  // 根据是否可平铺选择适配方式
+            repeat: note.background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,  // 可平铺时启用重复
+            opacity: note.background!.opacity ?? 1.0,
+          ),
+        ),
+        child: child,
+      );
+    }
+
     return GestureDetector(
       onTap: () => _openNote(context, note),
       onLongPress: () => _showNoteOptions(context, note),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 标题
-              Text(
-                displayTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+      child: buildBackgroundContainer(
+        Card(
+          elevation: 0, // 移除卡片阴影
+          color: Colors.transparent, // 使卡片背景透明
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 标题
+                Text(
+                  displayTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              // 内容
-              Text(
-                displayContent,
-                maxLines: 8,
-                overflow: TextOverflow.fade,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[800],
+                const SizedBox(height: 8),
+                // 内容
+                Text(
+                  displayContent,
+                  maxLines: 8,
+                  overflow: TextOverflow.fade,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[800],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              // 时间
-              Text(
-                formattedTime,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
+                const SizedBox(height: 8),
+                // 时间
+                Text(
+                  formattedTime,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
