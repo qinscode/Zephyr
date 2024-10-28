@@ -298,9 +298,9 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
                   size: 48,
                 ),
                 const SizedBox(height: 16),
-                Text(
+                const Text(
                   'Oops! Something went wrong.',  // TODO: 添加本地化文本
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),

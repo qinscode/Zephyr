@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'note_background.dart';  // 确保导入 note_background.dart
 
 class Note {
