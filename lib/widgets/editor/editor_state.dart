@@ -25,6 +25,13 @@ class EditorState extends ChangeNotifier {
     titleController.addListener(_onTextChanged);
     contentController.addListener(_onTextChanged);
     _saveState();
+    
+    // 如果初始化时有背景，立即更新工具栏颜色
+    if (currentBackground != null && 
+        currentBackground!.type != BackgroundType.none && 
+        currentBackground!.assetPath != null) {
+      _updateToolbarColor();
+    }
   }
 
   void _onTextChanged() {
@@ -71,31 +78,36 @@ class EditorState extends ChangeNotifier {
     }
   }
 
+  // 添加私有方法来更新工具栏颜色
+  Future<void> _updateToolbarColor() async {
+    try {
+      final paletteGenerator = await PaletteGenerator.fromImageProvider(
+        AssetImage(currentBackground!.assetPath!),
+        size: const Size(100, 100),
+      );
+
+      toolbarColor = paletteGenerator.dominantColor?.color.withOpacity(0.9) ??
+                     paletteGenerator.lightVibrantColor?.color.withOpacity(0.9) ??
+                     Colors.white.withOpacity(0.9);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error generating palette: $e');
+      toolbarColor = Colors.white.withOpacity(0.9);
+      notifyListeners();
+    }
+  }
+
   Future<void> setBackground(NoteBackground background) async {
     currentBackground = background;
     isEdited = true;
     
     // 更新工具栏颜色
     if (background.type != BackgroundType.none && background.assetPath != null) {
-      try {
-        final paletteGenerator = await PaletteGenerator.fromImageProvider(
-          AssetImage(background.assetPath!),
-          size: const Size(100, 100), // 使用较小的图片尺寸以提高性能
-        );
-
-        final newColor = paletteGenerator.dominantColor?.color.withOpacity(0.9) ??
-                        paletteGenerator.lightVibrantColor?.color.withOpacity(0.9) ??
-                        Colors.white.withOpacity(0.9);
-        setToolbarColor(newColor);
-      } catch (e) {
-        debugPrint('Error generating palette: $e');
-        setToolbarColor(Colors.white.withOpacity(0.9));
-      }
+      await _updateToolbarColor();
     } else {
-      setToolbarColor(Colors.white.withOpacity(0.9));
+      toolbarColor = Colors.white.withOpacity(0.9);
+      notifyListeners();
     }
-    
-    notifyListeners();
   }
 
   void setToolbarColor(Color color) {
