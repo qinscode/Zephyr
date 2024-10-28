@@ -8,6 +8,35 @@ import '../models/note.dart';
 import '../models/note_background.dart';
 
 class ShareService {
+  // 图片尺寸
+  static const double shareImageWidth = 1200.0;
+  static const double shareImageMinHeight = 700.0;
+  
+  // 布局尺寸
+  static const double horizontalPadding = 80.0;
+  static const double verticalPadding = 150.0;
+  static const double borderRadius = 12.0;
+  
+  // 文字样式
+  static const double titleFontSize = 65.0;
+  static const double contentFontSize = 45.0;
+  static const double watermarkFontSize = 13.0;
+  static const double contentLineHeight = 1.6;
+  static const double watermarkLetterSpacing = 0.3;
+  
+  // 间距
+  static const double titleBottomSpacing = 50.0;
+  static const double contentBottomSpacing = 40.0;
+  static const double dividerBottomSpacing = 20.0;
+  
+  // 分割线
+  static const double dividerHeight = 0.5;
+  static const double dividerOpacity = 0.3;
+
+  // 底部区域
+  static const double bottomAreaHeight = 60.0;  // 底部区域高度
+  static const double bottomPadding = 120.0;     // 底部区域距离底部的距离
+
   // 将笔记转换为图片并分享
   static Future<void> shareNoteAsImage(
     Note note,
@@ -47,108 +76,118 @@ class ShareService {
 
   // 生成笔记预览Widget
   static Widget buildNotePreviewWidget(Note note) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Stack(
-        children: [
-          // 背景层
-          if (note.background != null && note.background!.type != BackgroundType.none)
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: note.background!.type == BackgroundType.preset
-                        ? AssetImage(note.background!.assetPath!)
-                        : FileImage(File(note.background!.customImagePath!)) as ImageProvider,
-                    fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,
-                    repeat: note.background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,
-                    opacity: note.background!.opacity ?? 1.0,
-                  ),
-                ),
-              ),
-            ),
-          
-          // 内容层
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 标题
-                if (note.title.isNotEmpty) ...[
-                  Text(
-                    note.title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+    return SizedBox(
+      width: shareImageWidth,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          minHeight: shareImageMinHeight,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+          child: Stack(
+            children: [
+              // 背景层
+              if (note.background != null && note.background!.type != BackgroundType.none)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: note.background!.type == BackgroundType.preset
+                            ? AssetImage(note.background!.assetPath!)
+                            : FileImage(File(note.background!.customImagePath!)) as ImageProvider,
+                        fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,
+                        repeat: note.background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,
+                        opacity: note.background!.opacity ?? 1.0,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                ],
-                
-                // 内容
-                Text(
-                  note.content,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
-                    height: 1.5,
-                  ),
                 ),
-                
-                const SizedBox(height: 20),
-                
-                // 底部信息
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              
+              // 内容层
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: horizontalPadding,
+                  right: horizontalPadding,
+                  top: verticalPadding,
+                  bottom: bottomAreaHeight + bottomPadding, // 为底部区域预留空间
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    // 标题
+                    if (note.title.isNotEmpty) ...[
+                      Text(
+                        note.title,
+                        style: const TextStyle(
+                          fontSize: titleFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: titleBottomSpacing),
+                    ],
+                    
+                    // 内容
                     Text(
-                      note.createdAt.toString().split('.')[0],
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.notes,
-                            size: 14,
-                            color: Colors.orange,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            'Notes App',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.orange,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                      note.content,
+                      style: const TextStyle(
+                        fontSize: contentFontSize,
+                        color: Colors.black87,
+                        height: contentLineHeight,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              
+              // 底部区域（分割线和水印）
+              Positioned(
+                left: horizontalPadding,
+                right: horizontalPadding,
+                bottom: bottomPadding,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 分割线
+                    Container(
+                      height: dividerHeight,
+                      color: Colors.grey.withOpacity(dividerOpacity),
+                    ),
+                    
+                    const SizedBox(height: dividerBottomSpacing),
+                    
+                    // 水印和时间
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Created by Swift Note',
+                          style: TextStyle(
+                            fontSize: watermarkFontSize,
+                            color: Colors.grey[400],
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: watermarkLetterSpacing,
+                          ),
+                        ),
+                        Text(
+                          note.createdAt.toString().split('.')[0],
+                          style: TextStyle(
+                            fontSize: watermarkFontSize,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
