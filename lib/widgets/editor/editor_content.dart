@@ -24,8 +24,6 @@ class EditorContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final theme = Theme.of(context);
-    
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -39,6 +37,20 @@ class EditorContent extends StatelessWidget {
             autoFocus: false,
             expands: false,
             padding: EdgeInsets.zero,
+            placeholder: 'Title',
+            enableInteractiveSelection: true,
+            enableSelectionToolbar: true,
+            detectWordBoundary: true,
+            showCursor: true,
+            // 修改触控处理函数签名
+            onTapUp: (details, getPosition) {
+              titleFocusNode.requestFocus();
+              return false;
+            },
+            onTapDown: (details, getPosition) {
+              titleFocusNode.requestFocus();
+              return false;
+            },
             customStyles: DefaultStyles(
               paragraph: DefaultTextBlockStyle(
                 TextStyle(
@@ -78,6 +90,20 @@ class EditorContent extends StatelessWidget {
             autoFocus: false,
             expands: false,
             padding: EdgeInsets.zero,
+            placeholder: 'Start typing...',
+            enableInteractiveSelection: true,
+            enableSelectionToolbar: true,
+            detectWordBoundary: true,
+            showCursor: true,
+            // 修改触控处理函数签名
+            onTapUp: (details, getPosition) {
+              contentFocusNode.requestFocus();
+              return false;
+            },
+            onTapDown: (details, getPosition) {
+              contentFocusNode.requestFocus();
+              return false;
+            },
             customStyles: DefaultStyles(
               paragraph: DefaultTextBlockStyle(
                 TextStyle(
@@ -128,6 +154,18 @@ class EditorContent extends StatelessWidget {
               ),
               bold: const TextStyle(
                 fontWeight: FontWeight.bold,
+              ),
+              lists: DefaultListBlockStyle(
+                TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: textColor,
+                ),
+                const HorizontalSpacing(0, 0),
+                const VerticalSpacing(0, 0),
+                const VerticalSpacing(0, 0),
+                const BoxDecoration(),
+                null,
               ),
             ),
           ),

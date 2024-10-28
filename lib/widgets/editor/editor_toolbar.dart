@@ -12,6 +12,7 @@ class EditorToolbar extends StatelessWidget {
   final VoidCallback onH2;
   final VoidCallback onH3;
   final VoidCallback onBold;
+  final VoidCallback onChecklist;
 
   const EditorToolbar({
     super.key,
@@ -24,6 +25,7 @@ class EditorToolbar extends StatelessWidget {
     required this.onH2,
     required this.onH3,
     required this.onBold,
+    required this.onChecklist,
   });
 
   @override
@@ -65,8 +67,8 @@ class EditorToolbar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-          icon: const Icon(CupertinoIcons.list_bullet),
-          onPressed: () {},
+          icon: const Icon(CupertinoIcons.checkmark_square),  // 修改这里，使用复选框图标
+          onPressed: onChecklist,  // 这个按钮用于 checklist
           color: Colors.grey[700],
         ),
         IconButton(
@@ -80,7 +82,7 @@ class EditorToolbar extends StatelessWidget {
           color: Colors.grey[700],
         ),
         IconButton(
-          icon: const Icon(CupertinoIcons.checkmark_square),
+          icon: const Icon(CupertinoIcons.list_bullet),  // 这个是无序列表的按钮，暂时不实现
           onPressed: () {},
           color: Colors.grey[700],
         ),

@@ -165,6 +165,23 @@ class EditorState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleChecklist() {
+    // 获取当前选中文本的样式
+    final formats = contentController.getSelectionStyle().attributes;
+    // 检查当前是否已经是 checklist
+    final isChecklist = formats[Attribute.list.key]?.value == 'checked';
+    
+    if (isChecklist) {
+      // 如果已经是 checklist，则移除
+      contentController.formatSelection(Attribute.clone(Attribute.list, null));
+    } else {
+      // 如果不是 checklist，则添加
+      // 使用静态方法创建 checked 属性
+      contentController.formatSelection(const ListAttribute('checked'));
+    }
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     titleController.removeListener(_onTextChanged);

@@ -314,6 +314,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     onH2: () => _editorState.applyHeading(2),
                     onH3: () => _editorState.applyHeading(3),
                     onBold: () => _editorState.applyBold(),
+                    onChecklist: () => _editorState.toggleChecklist(),  // 添加这行
                   ),
                 ],
               ),
