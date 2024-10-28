@@ -136,15 +136,14 @@ class NotesView extends StatelessWidget {
     
     if (note.title.isNotEmpty) {
       displayTitle = note.title;
-      displayContent = note.content.isNotEmpty ? note.content : l10n.noText;  // 使用本地化文本
-    } else if (note.content.isNotEmpty) {
-      // 如果没有标题，使用内容的第一行作为标题
-      final lines = note.content.split('\n');
+      displayContent = note.plainText.isNotEmpty ? note.plainText : l10n.noText;
+    } else if (note.plainText.isNotEmpty) {
+      final lines = note.plainText.split('\n');
       displayTitle = lines[0];
-      displayContent = lines.length > 1 ? lines.sublist(1).join('\n') : l10n.noText;  // 使用本地化文本
+      displayContent = lines.length > 1 ? lines.sublist(1).join('\n') : l10n.noText;
     } else {
-      displayTitle = l10n.untitled;  // 使用本地化文本
-      displayContent = l10n.noText;  // 使用本地化文本
+      displayTitle = l10n.untitled;
+      displayContent = l10n.noText;
     }
 
     // 格式化时间

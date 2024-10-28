@@ -1,9 +1,106 @@
+import 'package:flutter/material.dart';
 import 'note_background.dart';  // 确保导入 note_background.dart
+
+// 定义富文本样式类型
+enum TextStyleType {
+  normal,
+  h1,
+  h2,
+  h3,
+  bold,
+  highlight,
+}
+
+// 定义富文本段落类
+class RichParagraph {
+  final String text;
+  final TextStyleType styleType;
+  final Color? highlightColor;
+
+  const RichParagraph({
+    required this.text,
+    this.styleType = TextStyleType.normal,
+    this.highlightColor,
+  });
+
+  // 转换为 JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'text': text,
+      'styleType': styleType.name,
+      'highlightColor': highlightColor?.value,
+    };
+  }
+
+  // 从 JSON 创建
+  factory RichParagraph.fromJson(Map<String, dynamic> json) {
+    return RichParagraph(
+      text: json['text'] as String,
+      styleType: TextStyleType.values.firstWhere(
+        (e) => e.name == json['styleType'],
+        orElse: () => TextStyleType.normal,
+      ),
+      highlightColor: json['highlightColor'] != null
+          ? Color(json['highlightColor'] as int)
+          : null,
+    );
+  }
+
+  // 获取文本样式
+  TextStyle getStyle() {
+    switch (styleType) {
+      case TextStyleType.h1:
+        return const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          height: 1.5,
+        );
+      case TextStyleType.h2:
+        return const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          height: 1.5,
+        );
+      case TextStyleType.h3:
+        return const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          height: 1.5,
+        );
+      case TextStyleType.bold:
+        return const TextStyle(
+          fontWeight: FontWeight.bold,
+          height: 1.5,
+        );
+      case TextStyleType.highlight:
+        return TextStyle(
+          backgroundColor: highlightColor ?? Colors.yellow.withOpacity(0.3),
+          height: 1.5,
+        );
+      case TextStyleType.normal:
+      default:
+        return const TextStyle(height: 1.5);
+    }
+  }
+
+  // 复制并修改
+  RichParagraph copyWith({
+    String? text,
+    TextStyleType? styleType,
+    Color? highlightColor,
+  }) {
+    return RichParagraph(
+      text: text ?? this.text,
+      styleType: styleType ?? this.styleType,
+      highlightColor: highlightColor ?? this.highlightColor,
+    );
+  }
+}
 
 class Note {
   final String id;
   final String title;
-  final String content;
+  final List<RichParagraph> content;  // 修改为富文本内容
   final DateTime createdAt;
   final DateTime modifiedAt;
   final String? folderId;
@@ -15,7 +112,7 @@ class Note {
   final String? color;
   final NoteBackground? background;
 
-  Note({
+  const Note({
     required this.id,
     required this.title,
     required this.content,
@@ -31,18 +128,28 @@ class Note {
     this.background,
   });
 
-  // 从JSON创建Note实例
+  // 从纯文本创建富文本内容
+  static List<RichParagraph> textToRichParagraphs(String text) {
+    return text.split('\n').map((line) => RichParagraph(text: line)).toList();
+  }
+
+  // 将富文本内容转换为纯文本
+  String get plainText {
+    return content.map((p) => p.text).join('\n');
+  }
+
+  // 从 JSON 创建
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
       id: json['id'] as String,
       title: json['title'] as String,
-      content: json['content'] as String,
+      content: (json['content'] as List)
+          .map((p) => RichParagraph.fromJson(p as Map<String, dynamic>))
+          .toList(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       modifiedAt: DateTime.parse(json['modifiedAt'] as String),
       folderId: json['folderId'] as String?,
-      metadata: json['metadata'] != null
-          ? Map<String, dynamic>.from(json['metadata'] as Map)
-          : null,
+      metadata: json['metadata'] as Map<String, dynamic>?,
       deletedAt: json['deletedAt'] != null
           ? DateTime.parse(json['deletedAt'] as String)
           : null,
@@ -52,16 +159,16 @@ class Note {
       color: json['color'] as String?,
       background: json['background'] != null
           ? NoteBackground.fromJson(json['background'] as Map<String, dynamic>)
-          : null,  // 从JSON解析背景
+          : null,
     );
   }
 
-  // 将Note实例转换为JSON
+  // 转换为 JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
-      'content': content,
+      'content': content.map((p) => p.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
       'modifiedAt': modifiedAt.toIso8601String(),
       'folderId': folderId,
@@ -71,15 +178,15 @@ class Note {
       'isPinned': isPinned,
       'isLocked': isLocked,
       'color': color,
-      'background': background?.toJson(),  // 转换背景为JSON
+      'background': background?.toJson(),
     };
   }
 
-  // 创建Note的副本并修改指定字段
+  // 复制并修改
   Note copyWith({
     String? id,
     String? title,
-    String? content,
+    List<RichParagraph>? content,
     DateTime? createdAt,
     DateTime? modifiedAt,
     String? folderId,
@@ -104,13 +211,13 @@ class Note {
       isPinned: isPinned ?? this.isPinned,
       isLocked: isLocked ?? this.isLocked,
       color: color ?? this.color,
-      background: background ?? this.background,  // 复制背景
+      background: background ?? this.background,
     );
   }
 
   // 获取预览文本
   String get preview {
-    final cleanContent = content.replaceAll(RegExp(r'\s+'), ' ').trim();
+    final cleanContent = content.map((p) => p.text).join('\n').replaceAll(RegExp(r'\s+'), ' ').trim();
     if (cleanContent.isEmpty) return '';
     return cleanContent.length > 100
         ? '${cleanContent.substring(0, 100)}...'
@@ -119,18 +226,18 @@ class Note {
 
   // 获取字数统计
   int get wordCount {
-    final words = content.trim().split(RegExp(r'\s+'));
+    final words = content.map((p) => p.text).join('\n').trim().split(RegExp(r'\s+'));
     return words.where((word) => word.isNotEmpty).length;
   }
 
-  // 获取字符���统计（包括标题）
+  // 获取字符统计（包括标题）
   int get characterCount {
-    return title.length + content.length;
+    return title.length + content.map((p) => p.text).join('\n').length;
   }
 
   // 检查笔记是否为空
   bool get isEmpty {
-    return title.isEmpty && content.trim().isEmpty;
+    return title.isEmpty && content.map((p) => p.text).join('\n').trim().isEmpty;
   }
 
   // 检查笔记是否在垃圾箱中
@@ -211,7 +318,9 @@ class Note {
   }) {
     return copyWith(
       title: newTitle ?? title,
-      content: newContent ?? content,
+      content: newContent != null
+          ? textToRichParagraphs(newContent!)
+          : content,
       modifiedAt: DateTime.now(),
     );
   }
@@ -251,7 +360,7 @@ class Note {
     );
   }
 
-  // 更改背��
+  // 更改背
   Note changeBackground(NoteBackground? newBackground) {
     return copyWith(
       background: newBackground,

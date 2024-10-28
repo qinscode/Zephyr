@@ -7,7 +7,7 @@ import 'task.dart';
 class TrashItem {
   final String id;
   final String title;
-  final String? content;
+  final List<RichParagraph>? content;
   final DateTime deletedAt;
   final DateTime expiresAt;
   final ItemType type;
@@ -27,7 +27,7 @@ class TrashItem {
     return {
       'id': id,
       'title': title,
-      'content': content,
+      'content': content?.map((p) => p.toJson()).toList(),
       'deletedAt': deletedAt.toIso8601String(),
       'expiresAt': expiresAt.toIso8601String(),
       'type': type.toString(),
@@ -41,7 +41,11 @@ class TrashItem {
     return TrashItem(
       id: json['id'] as String,
       title: json['title'] as String,
-      content: json['content'] as String?,
+      content: json['content'] != null
+          ? (json['content'] as List)
+              .map((p) => RichParagraph.fromJson(p as Map<String, dynamic>))
+              .toList()
+          : null,
       deletedAt: DateTime.parse(json['deletedAt'] as String),
       expiresAt: DateTime.parse(json['expiresAt'] as String),
       type: ItemType.values.firstWhere(

@@ -45,7 +45,7 @@ class SearchService {
 
     for (final note in notes) {
       final titleTokens = _tokenize(note.title);
-      final contentTokens = _tokenize(note.content);
+      final contentTokens = _tokenize(note.plainText);
       final matchedTokens = <String>{};
       var relevanceScore = 0.0;
 
@@ -84,7 +84,7 @@ class SearchService {
 
       // 如果有匹配，创建搜索结果
       if (matchedTokens.isNotEmpty) {
-        final snippet = _createSnippet(note.content, queryTokens);
+        final snippet = _createSnippet(note.plainText, queryTokens);
         results.add(SearchResult(
           id: note.id,
           title: note.title,
@@ -260,15 +260,15 @@ class SearchService {
   }
 
   // 辅助方法：创建摘要
-  String _createSnippet(String content, List<String> queryTokens) {
-    if (content.isEmpty) return '';
+  String _createSnippet(String text, List<String> queryTokens) {
+    if (text.isEmpty) return '';
 
     // 找到第一个匹配的位置
     int matchStart = -1;
     String matchedToken = '';
 
     for (final token in queryTokens) {
-      final index = content.toLowerCase().indexOf(token);
+      final index = text.toLowerCase().indexOf(token);
       if (index != -1 && (matchStart == -1 || index < matchStart)) {
         matchStart = index;
         matchedToken = token;
@@ -277,21 +277,21 @@ class SearchService {
 
     if (matchStart == -1) {
       // 如果没有匹配，返回开头的一部分
-      return content.length > snippetLength
-          ? '${content.substring(0, snippetLength)}...'
-          : content;
+      return text.length > snippetLength
+          ? '${text.substring(0, snippetLength)}...'
+          : text;
     }
 
     // 计算摘要的起始和结束位置
-    final snippetStart = (matchStart - snippetLength ~/ 4).clamp(0, content.length);
+    final snippetStart = (matchStart - snippetLength ~/ 4).clamp(0, text.length);
     final snippetEnd = (matchStart + matchedToken.length + snippetLength ~/ 4)
-        .clamp(0, content.length);
+        .clamp(0, text.length);
 
-    String snippet = content.substring(snippetStart, snippetEnd);
+    String snippet = text.substring(snippetStart, snippetEnd);
 
     // 添加省略号
     if (snippetStart > 0) snippet = '...$snippet';
-    if (snippetEnd < content.length) snippet = '$snippet...';
+    if (snippetEnd < text.length) snippet = '$snippet...';
 
     return snippet;
   }

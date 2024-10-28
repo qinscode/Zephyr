@@ -198,8 +198,8 @@ class NotesModel extends ChangeNotifier {
     final lowercaseQuery = query.toLowerCase();
     return _notes.where((note) {
       return note.title.toLowerCase().contains(lowercaseQuery) ||
-          note.content.toLowerCase().contains(lowercaseQuery) ||
-          note.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery));
+             note.plainText.toLowerCase().contains(lowercaseQuery) ||
+             note.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery));
     }).toList();
   }
 

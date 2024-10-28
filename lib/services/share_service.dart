@@ -129,7 +129,7 @@ class ShareService {
                     ],
                     
                     Text(
-                      note.content,
+                      note.plainText,
                       style: const TextStyle(
                         fontSize: contentFontSize,
                         color: Colors.black87,

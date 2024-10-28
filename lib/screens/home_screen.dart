@@ -332,15 +332,15 @@ class NotesContentView extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 17,  // 增加字体大小
-                      fontWeight: FontWeight.w700,  // 加粗字体
-                      color: Colors.black,  // 确保标题颜色为黑色
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
                     ),
                   ),
                 ),
               Expanded(
                 child: Text(
-                  note.content,
+                  note.plainText,  // 使用 plainText getter
                   maxLines: 6,
                   overflow: TextOverflow.fade,
                   style: TextStyle(
@@ -432,3 +432,5 @@ class TasksContentView extends StatelessWidget {
     );
   }
 }
+
+

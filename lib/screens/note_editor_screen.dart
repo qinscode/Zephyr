@@ -46,7 +46,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     super.initState();
     _editorState = EditorState(
       titleController: TextEditingController(text: widget.note?.title ?? ''),
-      contentController: TextEditingController(text: widget.note?.content ?? ''),
+      contentController: TextEditingController(
+        text: widget.note?.plainText ?? '',
+      ),
       currentBackground: widget.note?.background,
     );
     _titleFocusNode = FocusNode();
@@ -84,19 +86,19 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       final newNote = Note(
         id: const Uuid().v4(),
         title: _editorState.titleController.text,
-        content: _editorState.contentController.text,
+        content: Note.textToRichParagraphs(_editorState.contentController.text),
         createdAt: now,
         modifiedAt: now,
-        folderId: _editorState.folderId,  // 使用 EditorState 中的文件夹ID
+        folderId: _editorState.folderId,
         background: _editorState.currentBackground,
       );
       await notesModel.addNote(newNote);
     } else {
       final updatedNote = widget.note!.copyWith(
         title: _editorState.titleController.text,
-        content: _editorState.contentController.text,
+        content: Note.textToRichParagraphs(_editorState.contentController.text),
         modifiedAt: now,
-        folderId: _editorState.folderId,  // 使用 EditorState 中的文件夹ID
+        folderId: _editorState.folderId,
         background: _editorState.currentBackground,
       );
       await notesModel.updateNote(updatedNote);
@@ -187,7 +189,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       final note = Note(
         id: widget.note?.id ?? const Uuid().v4(),
         title: _editorState.titleController.text,
-        content: _editorState.contentController.text,
+        content: Note.textToRichParagraphs(_editorState.contentController.text),
         createdAt: widget.note?.createdAt ?? DateTime.now(),
         modifiedAt: DateTime.now(),
         background: _editorState.currentBackground,
