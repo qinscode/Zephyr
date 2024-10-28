@@ -11,7 +11,7 @@ class NoteBackground {
   final String? assetPath;  // 预设背景的资源路径
   final String? customImagePath;  // 自定义背景图片路径
   final double? opacity;  // 背景透明度
-  final bool isTileable;  // 添加是否可平铺的属性
+  final bool isTileable;  // 添加是否可平铺属性
 
   const NoteBackground({
     required this.type,
@@ -24,7 +24,7 @@ class NoteBackground {
   factory NoteBackground.fromJson(Map<String, dynamic> json) {
     return NoteBackground(
       type: BackgroundType.values.firstWhere(
-        (e) => e.toString() == 'BackgroundType.${json['type']}',
+            (e) => e.toString() == 'BackgroundType.${json['type']}',
       ),
       assetPath: json['assetPath'] as String?,
       customImagePath: json['customImagePath'] as String?,
@@ -51,25 +51,26 @@ class NoteBackground {
   static const NoteBackground cloudBackground = NoteBackground(
     type: BackgroundType.preset,
     assetPath: 'assets/images/cloud_pattern.png',
-    isTileable: true,  // 可平铺
+    isTileable: true,
   );
 
   static const NoteBackground snowBackground = NoteBackground(
     type: BackgroundType.preset,
     assetPath: 'assets/images/snow_pattern.png',
-    isTileable: true,  // 可平铺
+    isTileable: true,
   );
 
   static const NoteBackground bananaBackground = NoteBackground(
     type: BackgroundType.preset,
     assetPath: 'assets/images/banana_pattern.png',
-    isTileable: true,  // 可平铺
+    isTileable: true,
   );
 
   // 创建自定义背景
-  static NoteBackground custom(String imagePath) => NoteBackground(
+  static NoteBackground custom(String imagePath, {bool isTileable = false}) => NoteBackground(
     type: BackgroundType.custom,
     customImagePath: imagePath,
+    isTileable: isTileable,
   );
 
   // 复制并修改背景属性
