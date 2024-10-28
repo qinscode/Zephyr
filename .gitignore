@@ -128,3 +128,4 @@ linux/flutter/ephemeral/
 
 macos/Flutter/GeneratedPluginRegistrant.swift
 /devtools_options.yaml
+/pubspec.lock
