@@ -20,7 +20,7 @@ class ShareService {
   // 文字样式
   static const double titleFontSize = 65.0;
   static const double contentFontSize = 45.0;
-  static const double watermarkFontSize = 13.0;
+  static const double watermarkFontSize = 30.0;
   static const double contentLineHeight = 1.6;
   static const double watermarkLetterSpacing = 0.3;
   
