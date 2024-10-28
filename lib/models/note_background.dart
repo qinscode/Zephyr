@@ -1,24 +1,26 @@
 // 背景类型枚举
+
+import 'package:flutter/material.dart';
+
 enum BackgroundType {
   none,      // 无背景
   preset,    // 预设背景
-  custom,    // 自定义背景
 }
 
 // 背景类
 class NoteBackground {
   final BackgroundType type;
   final String? assetPath;  // 预设背景的资源路径
-  final String? customImagePath;  // 自定义背景图片路径
-  final double? opacity;  // 背景透明度
-  final bool isTileable;  // 添加是否可平铺属性
+  final double? opacity;    // 背景透明度
+  final bool isTileable;    // 是否可平铺
+  final Color textColor;    // 添加字体颜色属性
 
   const NoteBackground({
     required this.type,
     this.assetPath,
-    this.customImagePath,
     this.opacity = 1.0,
-    this.isTileable = false,  // 默认为不可平铺
+    this.isTileable = false,
+    this.textColor = Colors.black,  // 默认黑色
   });
 
   factory NoteBackground.fromJson(Map<String, dynamic> json) {
@@ -27,9 +29,9 @@ class NoteBackground {
             (e) => e.toString() == 'BackgroundType.${json['type']}',
       ),
       assetPath: json['assetPath'] as String?,
-      customImagePath: json['customImagePath'] as String?,
       opacity: json['opacity'] as double?,
       isTileable: json['isTileable'] as bool? ?? false,
+      textColor: Color(json['textColor'] as int? ?? 0xFF000000),
     );
   }
 
@@ -37,56 +39,53 @@ class NoteBackground {
     return {
       'type': type.name,
       'assetPath': assetPath,
-      'customImagePath': customImagePath,
       'opacity': opacity,
       'isTileable': isTileable,
+      'textColor': textColor.value,
     };
   }
 
   // 预设背景
   static const NoteBackground defaultBackground = NoteBackground(
     type: BackgroundType.none,
+    textColor: Colors.black,
   );
 
   static const NoteBackground cloudBackground = NoteBackground(
     type: BackgroundType.preset,
     assetPath: 'assets/images/cloud_pattern.png',
     isTileable: true,
+    textColor: Color(0xFF2F4F4F),  // Dark Slate Gray
   );
 
   static const NoteBackground snowBackground = NoteBackground(
     type: BackgroundType.preset,
     assetPath: 'assets/images/snow_pattern.png',
     isTileable: true,
+    textColor: Color(0xFF1C3D73),  // 更新为指定的深蓝色
   );
 
   static const NoteBackground bananaBackground = NoteBackground(
     type: BackgroundType.preset,
     assetPath: 'assets/images/banana_pattern.png',
     isTileable: true,
-  );
-
-  // 创建自定义背景
-  static NoteBackground custom(String imagePath, {bool isTileable = false}) => NoteBackground(
-    type: BackgroundType.custom,
-    customImagePath: imagePath,
-    isTileable: isTileable,
+    textColor: Color(0xFF629970),  // 更新为指定的绿色
   );
 
   // 复制并修改背景属性
   NoteBackground copyWith({
     BackgroundType? type,
     String? assetPath,
-    String? customImagePath,
     double? opacity,
     bool? isTileable,
+    Color? textColor,
   }) {
     return NoteBackground(
       type: type ?? this.type,
       assetPath: assetPath ?? this.assetPath,
-      customImagePath: customImagePath ?? this.customImagePath,
       opacity: opacity ?? this.opacity,
       isTileable: isTileable ?? this.isTileable,
+      textColor: textColor ?? this.textColor,
     );
   }
 
@@ -96,11 +95,17 @@ class NoteBackground {
     return other is NoteBackground &&
         other.type == type &&
         other.assetPath == assetPath &&
-        other.customImagePath == customImagePath &&
         other.opacity == opacity &&
-        other.isTileable == isTileable;
+        other.isTileable == isTileable &&
+        other.textColor == textColor;
   }
 
   @override
-  int get hashCode => Object.hash(type, assetPath, customImagePath, opacity, isTileable);
+  int get hashCode => Object.hash(
+        type,
+        assetPath,
+        opacity,
+        isTileable,
+        textColor,
+      );
 }
