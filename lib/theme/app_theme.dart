@@ -5,7 +5,7 @@ class AppTheme {
   static const Color backgroundColor = Color(0xFFF7F7F7);  // 浅灰色背景
   static const Color surfaceColor = Color(0xFFF7F7F7);    // 与背景相同的颜色
   static const Color searchBarColor = Color(0xFFEEEEEE);  // 添加搜索框背景色，更深的灰色
-  static const Color primaryColor = Colors.blue;
+  static const Color primaryColor = Colors.orange;
   static const Color textColor = Colors.black;
   static const Color secondaryTextColor = Colors.grey;
 
