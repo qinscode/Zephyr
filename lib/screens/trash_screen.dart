@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../models/trash_model.dart';
@@ -11,6 +11,7 @@ class TrashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+
     return Consumer<TrashModel>(
       builder: (context, trashModel, child) {
         return Scaffold(
@@ -18,132 +19,128 @@ class TrashScreen extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
+            centerTitle: true,
             leading: IconButton(
-              icon: const Icon(CupertinoIcons.back),
+              icon: const Icon(CupertinoIcons.back, color: Colors.black),
               onPressed: () => Navigator.pop(context),
             ),
-            title: Text(l10n.moveToTrash),
-            actions: [
-              if (trashModel.trashedItems.isNotEmpty)
-                TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(l10n.moveToTrash),
-                        content: Text(l10n.emptyTrashConfirm),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(l10n.cancel),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              trashModel.emptyTrash();
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              l10n.delete,
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  child: Text(
-                    l10n.delete,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-            ],
+            title: const Text(
+              'Trash',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           body: Column(
             children: [
+              // Warning banner
               Container(
-                padding: const EdgeInsets.all(16),
-                color: const Color(0xFFFFF9E6),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Items in the trash are kept for 30 days before being permanently deleted',
-                        style: const TextStyle(
-                          color: Colors.orange,
-                        ),
-                      ),
-                    ),
-                  ],
+                width: double.infinity,
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF9E6),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Items are kept in the trash for 30 days before being permanently deleted',
+                  style: TextStyle(
+                    color: Colors.orange[700],
+                    fontSize: 14,
+                  ),
                 ),
               ),
+
+              // Trash items list
               Expanded(
                 child: trashModel.trashedItems.isEmpty
                     ? Center(
-                        child: Text(
-                          'No items in trash',
+                  child: Text(
+                    l10n.alerts['noItemsInTrash']!,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+                    : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: trashModel.trashedItems.length,
+                  itemBuilder: (context, index) {
+                    final item = trashModel.trashedItems[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        title: Text(
+                          item.title.isEmpty ? 'ejernmtmmtmmttm' : item.title,
                           style: const TextStyle(
-                            color: Colors.grey,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: trashModel.trashedItems.length,
-                        itemBuilder: (context, index) {
-                          final item = trashModel.trashedItems[index];
-                          return Dismissible(
-                            key: Key(item.id),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              color: Colors.red,
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.only(right: 16),
-                              child: const Icon(
-                                CupertinoIcons.delete,
-                                color: Colors.white,
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'No text',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
                               ),
                             ),
-                            onDismissed: (direction) {
-                              trashModel.deletePermanently(item.id);
-                            },
-                            child: ListTile(
-                              title: Text(
-                                item.title.isEmpty ? l10n.noText : item.title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Text(
-                                'Deleted ${_formatDate(item.deletedAt)}',
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              trailing: PopupMenuButton(
-                                itemBuilder: (context) => [
-                                  PopupMenuItem(
-                                    value: 'restore',
-                                    child: Text(l10n.restore),
-                                  ),
-                                  PopupMenuItem(
-                                    value: 'delete',
-                                    child: Text(
-                                      l10n.deletePermanently,
-                                      style: const TextStyle(color: Colors.red),
-                                    ),
-                                  ),
-                                ],
-                                onSelected: (value) {
-                                  if (value == 'restore') {
-                                    trashModel.restoreItem(item.id);
-                                  } else if (value == 'delete') {
-                                    trashModel.deletePermanently(item.id);
-                                  }
-                                },
+                            const SizedBox(height: 4),
+                            Text(
+                              _formatDate(item.deletedAt),
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
                               ),
                             ),
-                          );
-                        },
+                          ],
+                        ),
+                        trailing: PopupMenuButton(
+                          icon: const Icon(
+                            CupertinoIcons.ellipsis_circle,
+                            color: Colors.grey,
+                          ),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              child: Text(l10n.restore),
+                              onTap: () => trashModel.restoreItem(item.id),
+                            ),
+                            PopupMenuItem(
+                              child: Text(
+                                l10n.deletePermanently,
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                              onTap: () => trashModel.deletePermanently(item.id),
+                            ),
+                          ],
+                        ),
                       ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
