@@ -2,16 +2,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:palette_generator/palette_generator.dart';
-import 'package:image_cropper/image_cropper.dart';
 import '../services/share_service.dart';
 
 import '../models/note.dart';
@@ -61,7 +57,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _contentFocusNode = FocusNode();
     _currentFolderId = widget.note?.folderId ?? widget.initialFolderId;
     _lastModified = widget.note?.modifiedAt ?? DateTime.now();
-    _currentBackground = widget.note?.background; // 初始化背景
+    _currentBackground = widget.note?.background;
 
     // 添加文本变化监听
     _titleController.addListener(_onTextChanged);
@@ -75,23 +71,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
     // 如果有背景，初始化工具栏颜色
     if (widget.note?.background != null && widget.note!.background!.type != BackgroundType.none) {
-      ImageProvider imageProvider;
-      if (widget.note!.background!.type == BackgroundType.preset) {
-        imageProvider = AssetImage(widget.note!.background!.assetPath!);
-      } else {
-        imageProvider = FileImage(File(widget.note!.background!.customImagePath!));
-      }
+      final imageProvider = AssetImage(widget.note!.background!.assetPath!);
       _updateToolbarColor(imageProvider);
     }
   }
 
   @override
   void dispose() {
-    // 在销毁时清理未使用的背景图片
-    _cleanupUnusedBackgrounds();
     _titleController.dispose();
-    _contentController.dispose();
-    _titleFocusNode.dispose();
     _contentFocusNode.dispose();
     super.dispose();
   }
@@ -267,7 +254,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               },
             ),
             ListTile(
-              title: Text(l10n.getShareValue('exportAsMarkdown')),  // 使辅助方法
+              title: Text(l10n.getShareValue('exportAsMarkdown')),  // 使助方法
               onTap: () {
                 Navigator.pop(context);
                 // 实现 Markdown 导出功能
@@ -316,7 +303,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   void _showThemeOptions() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => StatefulBuilder( // 使用 StatefulBuilder 以支持透明度调节
+      builder: (context) => StatefulBuilder(
         builder: (context, setState) {
           final currentBackground = widget.note?.background ?? _currentBackground;
           final opacity = currentBackground?.opacity ?? 1.0;
@@ -359,7 +346,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       ),
                       // Cloud
                       _buildThemeOption(
-                        label: 'Cloud',  // 改为 Cloud
+                        label: 'Cloud',
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.grey[50],
@@ -377,7 +364,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       ),
                       // Snow
                       _buildThemeOption(
-                        label: 'Snow',  // 改为 Snow
+                        label: 'Snow',
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -395,7 +382,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       ),
                       // Banana
                       _buildThemeOption(
-                        label: 'Banana',  // 改为 Banana
+                        label: 'Banana',
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -409,25 +396,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                         onTap: () {
                           _applyBackground(NoteBackground.bananaBackground);
                           Navigator.pop(context);
-                        },
-                      ),
-                      // Custom image option
-                      _buildThemeOption(
-                        label: 'Custom',
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            CupertinoIcons.photo,
-                            size: 30,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        onTap: () {
-                          Navigator.pop(context);
-                          _pickCustomBackground();
                         },
                       ),
                     ],
@@ -461,7 +429,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                                       NoteBackground(
                                         type: currentBackground.type,
                                         assetPath: currentBackground.assetPath,
-                                        customImagePath: currentBackground.customImagePath,
                                         opacity: value,
                                       ),
                                     );
@@ -525,155 +492,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     );
   }
 
-  Future<void> _pickCustomBackground() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1920,  // 限制最大宽度
-      maxHeight: 1920, // 限制最大高度
-    );
-    
-    if (image != null && mounted) {
-      // 裁剪图片
-      final CroppedFile? croppedFile = await ImageCropper().cropImage(
-        sourcePath: image.path,
-        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1), // 可选的宽高比
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarTitle: 'Edit Background',
-            toolbarColor: Colors.orange,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false,
-            hideBottomControls: false,
-          ),
-          IOSUiSettings(
-            title: 'Edit Background',
-            doneButtonTitle: 'Done',
-            cancelButtonTitle: 'Cancel',
-            rotateButtonsHidden: false,
-            rotateClockwiseButtonHidden: false,
-            aspectRatioLockEnabled: false,
-          ),
-        ],
-      );
-
-      if (croppedFile != null && mounted) {
-        bool isTileable = false;  // 将变量移到外部作用域
-        
-        // 显示背景设置对话框
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Background Settings'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 预览
-                Container(
-                  width: double.infinity,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(
-                      image: FileImage(File(croppedFile.path)),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // 平铺选项
-                StatefulBuilder(
-                  builder: (context, setState) {
-                    return CheckboxListTile(
-                      title: const Text('Tile Background'),
-                      subtitle: const Text('Repeat the image to fill the screen'),
-                      value: isTileable,
-                      onChanged: (value) {
-                        setState(() {
-                          isTileable = value ?? false;
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                    );
-                  },
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  
-                  // 保存图片到应用目录
-                  final directory = await getApplicationDocumentsDirectory();
-                  final String imagePath = '${directory.path}/backgrounds/${DateTime.now().millisecondsSinceEpoch}.jpg';
-                  
-                  // 确保目录存在
-                  await Directory('${directory.path}/backgrounds').create(recursive: true);
-                  
-                  // 复制图片到应用目录
-                  await File(croppedFile.path).copy(imagePath);
-                  
-                  // 应用自定义背景
-                  if (mounted) {
-                    _applyBackground(
-                      NoteBackground(
-                        type: BackgroundType.custom,
-                        customImagePath: imagePath,
-                        isTileable: isTileable,  // 现在可以访问这个变量了
-                      ),
-                    );
-                  }
-                },
-                child: const Text('Apply'),
-              ),
-            ],
-          ),
-        );
-      }
-    }
-  }
-
-  void _applyBackground(NoteBackground background) async {
-    setState(() {
-      _currentBackground = background;
-      _isEdited = true;
-    });
-
-    // 提取背景颜色
-    if (background.type != BackgroundType.none) {
-      ImageProvider imageProvider;
-      if (background.type == BackgroundType.preset) {
-        imageProvider = AssetImage(background.assetPath!);
-      } else {
-        imageProvider = FileImage(File(background.customImagePath!));
-      }
-      await _updateToolbarColor(imageProvider);
-    } else {
-      setState(() {
-        _toolbarColor = Colors.white.withOpacity(0.9);
-      });
-    }
-    
-    // 如果是已有笔记，立即更新
-    if (widget.note != null && mounted) {
-      final notesModel = Provider.of<NotesModel>(context, listen: false);
-      final updatedNote = widget.note!.copyWith(
-        background: background,
-        modifiedAt: DateTime.now(),
-      );
-      notesModel.updateNote(updatedNote);
-    }
-  }
-
-  // 添加从图片提取颜色的方法
   Future<void> _updateToolbarColor(ImageProvider imageProvider) async {
     try {
       final PaletteGenerator paletteGenerator = await PaletteGenerator.fromImageProvider(
@@ -765,31 +583,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     );
   }
 
-  // 添加图片清理方法
-  Future<void> _cleanupUnusedBackgrounds() async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final backgroundsDir = Directory('${directory.path}/backgrounds');
-      
-      if (await backgroundsDir.exists()) {
-        final files = await backgroundsDir.list().toList();
-        final notesModel = Provider.of<NotesModel>(context, listen: false);
-        final usedBackgrounds = notesModel.notes
-            .where((note) => note.background?.customImagePath != null)
-            .map((note) => note.background!.customImagePath!)
-            .toSet();
-
-        for (var file in files) {
-          if (file is File && !usedBackgrounds.contains(file.path)) {
-            await file.delete();
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Error cleaning up backgrounds: $e');
-    }
-  }
-
   Future<void> _shareAsImage() async {
     // 创建一个临时的 Overlay Entry 来显示加载指示器
     final overlayState = Overlay.of(context);
@@ -864,9 +657,38 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     }
   }
 
+  // 添加 _applyBackground 方法
+  void _applyBackground(NoteBackground background) async {
+    setState(() {
+      _currentBackground = background;
+      _isEdited = true;
+    });
+
+    // 提取背景颜色
+    if (background.type != BackgroundType.none) {
+      final imageProvider = AssetImage(background.assetPath!);
+      await _updateToolbarColor(imageProvider);
+    } else {
+      setState(() {
+        _toolbarColor = Colors.white.withOpacity(0.9);
+      });
+    }
+    
+    // 如果是已有笔记，立即更新
+    if (widget.note != null && mounted) {
+      final notesModel = Provider.of<NotesModel>(context, listen: false);
+      final updatedNote = widget.note!.copyWith(
+        background: background,
+        modifiedAt: DateTime.now(),
+      );
+      notesModel.updateNote(updatedNote);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final background = _currentBackground ?? widget.note?.background;
+    final textColor = background?.textColor ?? Colors.black;
     
     Widget buildBackgroundContainer(Widget child) {
       if (background == null || background.type == BackgroundType.none) {
@@ -880,11 +702,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           image: DecorationImage(
-            image: background.type == BackgroundType.preset
-                ? AssetImage(background.assetPath!)
-                : FileImage(File(background.customImagePath!)) as ImageProvider,
-            fit: background.isTileable ? BoxFit.none : BoxFit.cover,  // 根据是否可平铺选择适配方式
-            repeat: background.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,  // 可平铺时启用重复
+            image: AssetImage(background.assetPath!),
+            fit: background.isTileable ? BoxFit.none : BoxFit.cover,
+            repeat: background.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,
             opacity: background.opacity ?? 1.0,
           ),
         ),
@@ -945,6 +765,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 onPressed: _showOptionsMenu,
               ),
             ],
+            iconTheme: IconThemeData(color: textColor),
           ),
           body: Column(
             children: [
@@ -988,16 +809,17 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     TextField(
                       controller: _titleController,
                       focusNode: _titleFocusNode,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
+                        color: textColor,
                       ),
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context).title,
                         hintStyle: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w500,
-                          color: Colors.grey[400],
+                          color: textColor.withOpacity(0.4),
                         ),
                         border: InputBorder.none,
                       ),
@@ -1015,7 +837,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                         DateFormat(AppLocalizations.of(context).dateFormat['fullDateTime']!)
                             .format(_lastModified),
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: textColor.withOpacity(0.6),
                           fontSize: 12,
                         ),
                       ),
@@ -1024,16 +846,17 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       controller: _contentController,
                       focusNode: _contentFocusNode,
                       maxLines: null,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         height: 1.5,
+                        color: textColor,
                       ),
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context).inputStartTyping,
                         hintStyle: TextStyle(
                           fontSize: 16,
                           height: 1.5,
-                          color: Colors.grey[400],
+                          color: textColor.withOpacity(0.4),
                         ),
                         border: InputBorder.none,
                       ),
