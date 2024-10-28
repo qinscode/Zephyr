@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'note_background.dart';  // 确保导入 note_background.dart
 
 class Note {
   final String id;
@@ -12,6 +14,7 @@ class Note {
   final bool isPinned;
   final bool isLocked;
   final String? color;
+  final NoteBackground? background;
 
   Note({
     required this.id,
@@ -26,6 +29,7 @@ class Note {
     this.isPinned = false,
     this.isLocked = false,
     this.color,
+    this.background,
   });
 
   // 从JSON创建Note实例
@@ -47,6 +51,9 @@ class Note {
       isPinned: json['isPinned'] as bool? ?? false,
       isLocked: json['isLocked'] as bool? ?? false,
       color: json['color'] as String?,
+      background: json['background'] != null
+          ? NoteBackground.fromJson(json['background'] as Map<String, dynamic>)
+          : null,  // 从JSON解析背景
     );
   }
 
@@ -65,6 +72,7 @@ class Note {
       'isPinned': isPinned,
       'isLocked': isLocked,
       'color': color,
+      'background': background?.toJson(),  // 转换背景为JSON
     };
   }
 
@@ -82,6 +90,7 @@ class Note {
     bool? isPinned,
     bool? isLocked,
     String? color,
+    NoteBackground? background,
   }) {
     return Note(
       id: id ?? this.id,
@@ -96,6 +105,7 @@ class Note {
       isPinned: isPinned ?? this.isPinned,
       isLocked: isLocked ?? this.isLocked,
       color: color ?? this.color,
+      background: background ?? this.background,  // 复制背景
     );
   }
 
@@ -114,7 +124,7 @@ class Note {
     return words.where((word) => word.isNotEmpty).length;
   }
 
-  // 获取字符数统计（包括标题）
+  // 获取字符���统计（包括标题）
   int get characterCount {
     return title.length + content.length;
   }
@@ -239,6 +249,14 @@ class Note {
       isLocked,
       color,
       Object.hashAll(tags),
+    );
+  }
+
+  // 更改背��
+  Note changeBackground(NoteBackground? newBackground) {
+    return copyWith(
+      background: newBackground,
+      modifiedAt: DateTime.now(),
     );
   }
 }
