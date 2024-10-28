@@ -14,6 +14,7 @@ class EditorToolbar extends StatelessWidget {
   final VoidCallback onBold;
   final VoidCallback onChecklist;
   final VoidCallback onInsertImage;
+  final VoidCallback onOrderedList;
 
   const EditorToolbar({
     super.key,
@@ -28,6 +29,7 @@ class EditorToolbar extends StatelessWidget {
     required this.onBold,
     required this.onChecklist,
     required this.onInsertImage,
+    required this.onOrderedList,
   });
 
   @override
@@ -83,9 +85,10 @@ class EditorToolbar extends StatelessWidget {
           onPressed: () {},
           color: Colors.grey[700],
         ),
+        // 修改这个按钮为有序列表
         IconButton(
-          icon: const Icon(CupertinoIcons.list_bullet),  // 这个是无序列表的按钮，暂时不实现
-          onPressed: () {},
+          icon: const Icon(CupertinoIcons.list_number),  // 修改图标为有序列表
+          onPressed: onOrderedList,  // 添加回调函数
           color: Colors.grey[700],
         ),
         IconButton(

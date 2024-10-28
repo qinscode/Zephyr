@@ -233,6 +233,23 @@ class EditorState extends ChangeNotifier {
     }
   }
 
+  // 添加切换有序列表的方法
+  void toggleOrderedList() {
+    // 获取当前选中文本的样式
+    final formats = contentController.getSelectionStyle().attributes;
+    // 检查当前是否已经是有序列表
+    final isOrderedList = formats[Attribute.list.key]?.value == 'ordered';
+    
+    if (isOrderedList) {
+      // 如果已经是有序列表，则移除
+      contentController.formatSelection(Attribute.clone(Attribute.list, null));
+    } else {
+      // 如果不是有序列表，则添加
+      contentController.formatSelection(const ListAttribute('ordered'));
+    }
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     titleController.removeListener(_onTextChanged);
