@@ -286,6 +286,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 onMore: _showMoreOptions,
                 canUndo: _editorState.undoHistory.length > 1,
                 canRedo: _editorState.redoHistory.isNotEmpty,
+                iconColor: _editorState.currentBackground?.textColor,  // 只传递图标颜色
               ),
               body: Column(
                 children: [

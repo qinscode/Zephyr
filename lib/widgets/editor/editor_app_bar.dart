@@ -12,6 +12,7 @@ class EditorAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMore;
   final bool canUndo;
   final bool canRedo;
+  final Color? iconColor;       // 只保留图标颜色属性
 
   const EditorAppBar({
     super.key,
@@ -24,39 +25,42 @@ class EditorAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onMore,
     this.canUndo = false,
     this.canRedo = false,
+    this.iconColor,       // 只保留这个参数
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveIconColor = iconColor ?? Colors.black;  // 默认使用黑色
+    
     return AppBar(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent,  // 始终使用透明背景
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(CupertinoIcons.back),
+        icon: Icon(CupertinoIcons.back, color: effectiveIconColor),
         onPressed: onBack,
       ),
       actions: [
         if (canUndo)
           IconButton(
-            icon: const Icon(CupertinoIcons.arrow_counterclockwise),
+            icon: Icon(CupertinoIcons.arrow_counterclockwise, color: effectiveIconColor),
             onPressed: onUndo,
           ),
         if (canRedo)
           IconButton(
-            icon: const Icon(CupertinoIcons.arrow_clockwise),
+            icon: Icon(CupertinoIcons.arrow_clockwise, color: effectiveIconColor),
             onPressed: onRedo,
           ),
         IconButton(
-          icon: const Icon(FontAwesomeIcons.shirt),
+          icon: Icon(FontAwesomeIcons.shirt, color: effectiveIconColor),
           onPressed: onTheme,
         ),
         IconButton(
-          icon: const Icon(CupertinoIcons.share),
+          icon: Icon(CupertinoIcons.share, color: effectiveIconColor),
           onPressed: onShare,
         ),
         IconButton(
-          icon: const Icon(CupertinoIcons.ellipsis_vertical),
+          icon: Icon(CupertinoIcons.ellipsis_vertical, color: effectiveIconColor),
           onPressed: onMore,
         ),
       ],
