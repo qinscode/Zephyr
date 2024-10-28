@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -154,7 +153,17 @@ class NotesView extends StatelessWidget {
     Widget buildBackgroundContainer(Widget child) {
       if (note.background == null || note.background!.type == BackgroundType.none) {
         return Container(
-          color: Colors.white,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16), // 增加圆角
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
           child: child,
         );
       }
@@ -162,6 +171,14 @@ class NotesView extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           color: Colors.white,
+          borderRadius: BorderRadius.circular(16), // 增加圆角
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
           image: DecorationImage(
             image: AssetImage(note.background!.assetPath!),
             fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,
@@ -182,8 +199,11 @@ class NotesView extends StatelessWidget {
         Card(
           elevation: 0, // 移除卡片阴影
           color: Colors.transparent, // 使卡片背景透明
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // 增加圆角
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(16.0), // 增加内边距
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
