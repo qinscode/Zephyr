@@ -6,6 +6,7 @@ import 'package:palette_generator/palette_generator.dart';
 import '../../models/note_background.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert' as convert;
+import 'package:image/image.dart' as img;
 
 class EditorState extends ChangeNotifier {
   final QuillController titleController;
@@ -201,32 +202,59 @@ class EditorState extends ChangeNotifier {
 
   Future<void> insertImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1200,  // 限制最大宽度
+      maxHeight: 1200, // 限制最大高度
+      imageQuality: 85, // 设置压缩质量
+    );
     
     if (image != null) {
       try {
-        // 读取图片文件
+        debugPrint('Reading image file...');
         final file = File(image.path);
         final bytes = await file.readAsBytes();
-        final base64Image = convert.base64Encode(bytes);
         
-        // 创建图片嵌入块
-        final index = contentController.selection.baseOffset;
-        final length = contentController.selection.extentOffset - index;
-        
-        // 在当前光标位置插入换行
-        contentController.replaceText(index, length, '\n', null);
-        
-        // 插入图片
-        final imageEmbed = BlockEmbed.image('data:image/png;base64,$base64Image');
-        contentController.document.insert(contentController.selection.baseOffset, imageEmbed);
-        
-        // 在图片后插入换行
-        final nextIndex = contentController.selection.baseOffset;
-        contentController.replaceText(nextIndex, 0, '\n', null);
-        
-        isEdited = true;
-        notifyListeners();
+        // 使用 image 包进行额外的压缩
+        final decodedImage = img.decodeImage(bytes);
+        if (decodedImage != null) {
+          debugPrint('Original image size: ${bytes.length}');
+          
+          // 调整图片大小
+          var resizedImage = decodedImage;
+          if (decodedImage.width > 1200 || decodedImage.height > 1200) {
+            resizedImage = img.copyResize(
+              decodedImage,
+              width: decodedImage.width > decodedImage.height ? 1200 : null,
+              height: decodedImage.height > decodedImage.width ? 1200 : null,
+              interpolation: img.Interpolation.linear,
+            );
+          }
+          
+          // 压缩图片
+          final compressedBytes = img.encodeJpg(resizedImage, quality: 85);
+          debugPrint('Compressed image size: ${compressedBytes.length}');
+          
+          final base64Image = convert.base64Encode(compressedBytes);
+          
+          // 创建图片嵌入块
+          final index = contentController.selection.baseOffset;
+          final length = contentController.selection.extentOffset - index;
+          
+          // 在当前光标位置插入换行
+          contentController.replaceText(index, length, '\n', null);
+          
+          // 插入图片
+          final imageEmbed = BlockEmbed.image('data:image/jpeg;base64,$base64Image');
+          contentController.document.insert(contentController.selection.baseOffset, imageEmbed);
+          
+          // 在图片后插入换行
+          final nextIndex = contentController.selection.baseOffset;
+          contentController.replaceText(nextIndex, 0, '\n', null);
+          
+          isEdited = true;
+          notifyListeners();
+        }
       } catch (e) {
         debugPrint('Error inserting image: $e');
       }

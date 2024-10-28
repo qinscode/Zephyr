@@ -1,4 +1,3 @@
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -25,26 +24,30 @@ class CustomImageEmbedBuilder extends EmbedBuilder {
         _imageCache[cacheKey] = convert.base64Decode(base64Data);
       }
       
-      // 使用缓存的图片数据
+      // 使用 ClipRRect 添加圆角
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Image.memory(
-          _imageCache[cacheKey]!,
-          fit: BoxFit.contain,
-          // 添加缓存配置
-          cacheWidth: 1200,  // 限制缓存大小
-          gaplessPlayback: true,  // 防止图片重载时闪烁
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),  // 添加 8.0 的圆角
+          child: Image.memory(
+            _imageCache[cacheKey]!,
+            fit: BoxFit.contain,
+            cacheWidth: 1200,
+            gaplessPlayback: true,
+          ),
         ),
       );
     } else {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.contain,
-          // 添加缓存配置
-          cacheWidth: 1200,
-          gaplessPlayback: true,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),  // 添加 8.0 的圆角
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.contain,
+            cacheWidth: 1200,
+            gaplessPlayback: true,
+          ),
         ),
       );
     }
@@ -230,11 +233,17 @@ class _EditorContentState extends State<EditorContent> {
                   fontSize: 16,
                   height: 1.5,
                   color: widget.textColor,
+                  leadingDistribution: TextLeadingDistribution.even,
+                  textBaseline: TextBaseline.alphabetic,  // 添加基线对齐
                 ),
-                const HorizontalSpacing(0, 0),
+                const HorizontalSpacing(24, 40),
+                const VerticalSpacing(6, 0),
                 const VerticalSpacing(0, 0),
-                const VerticalSpacing(0, 0),
-                const BoxDecoration(),
+                BoxDecoration(
+                  border: Border.all(
+                    color: Colors.transparent,
+                  ),
+                ),
                 null,
               ),
             ),

@@ -228,17 +228,62 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     overlayState.insert(overlayEntry);
 
     try {
-      final tempKey = GlobalKey();
+      final previewKey = GlobalKey();
+      final previewWidget = RepaintBoundary(
+        key: previewKey,
+        child: Material(
+          color: Colors.white,
+          child: ShareService.buildNotePreviewWidget(
+            Note(
+              id: widget.note?.id ?? const Uuid().v4(),
+              title: _editorState.titleController.document.toPlainText(),
+              content: [
+                RichParagraph(
+                  text: _editorState.contentController.document.toPlainText(),
+                  deltaJson: _editorState.contentController.document.toDelta().toJson(),
+                )
+              ],
+              createdAt: widget.note?.createdAt ?? DateTime.now(),
+              modifiedAt: DateTime.now(),
+              background: _editorState.currentBackground,
+              titleDeltaJson: _editorState.titleController.document.toDelta().toJson(),  // 添加这一行
+            ),
+          ),
+        ),
+      );
+
+      // 将预览 widget 插入到 overlay 中
+      final previewOverlay = OverlayEntry(
+        builder: (context) => Positioned(
+          left: -9999, // 放在屏幕外
+          child: previewWidget,
+        ),
+      );
+      overlayState.insert(previewOverlay);
+
+      // 等待下一帧确保 widget 已经渲染
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // 生成图片
       final note = Note(
         id: widget.note?.id ?? const Uuid().v4(),
         title: _editorState.titleController.document.toPlainText(),
-        content: [RichParagraph(text: _editorState.contentController.document.toPlainText())],
+        content: [
+          RichParagraph(
+            text: _editorState.contentController.document.toPlainText(),
+            deltaJson: _editorState.contentController.document.toDelta().toJson(),
+          )
+        ],
         createdAt: widget.note?.createdAt ?? DateTime.now(),
         modifiedAt: DateTime.now(),
         background: _editorState.currentBackground,
+        titleDeltaJson: _editorState.titleController.document.toDelta().toJson(),  // 添加这一行
       );
 
-      await ShareService.shareNoteAsImage(note, tempKey, context);
+      await ShareService.shareNoteAsImage(note, previewKey, context);
+      
+      // 移除预览 widget
+      previewOverlay.remove();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
