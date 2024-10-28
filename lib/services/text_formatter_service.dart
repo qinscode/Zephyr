@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 class TextFormatterService {
-  static void applyHighlight(TextEditingController controller, Color color) {
-    final selection = controller.selection;
-    if (!selection.isValid || selection.isCollapsed) return;
-
-    final selectedText = controller.text.substring(selection.start, selection.end);
-    // 实现高亮逻辑
+  static void applyHighlight(QuillController controller, Color color) {
+    controller.formatSelection(const BackgroundAttribute('#FFFF00'));
   }
 
-  static void applyHeading(TextEditingController controller, int level) {
-    final selection = controller.selection;
-    if (!selection.isValid || selection.isCollapsed) return;
-
-    final selectedText = controller.text.substring(selection.start, selection.end);
-    // 实现标题逻辑
+  static void applyHeading(QuillController controller, int level) {
+    controller.formatSelection(HeaderAttribute(level: level));
   }
 
-  static void applyBold(TextEditingController controller) {
-    final selection = controller.selection;
-    if (!selection.isValid || selection.isCollapsed) return;
-
-    final selectedText = controller.text.substring(selection.start, selection.end);
-    // 实现加粗逻辑
+  static void applyBold(QuillController controller) {
+    controller.formatSelection(Attribute.bold);
   }
 }

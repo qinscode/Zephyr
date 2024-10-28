@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:palette_generator/palette_generator.dart';
 import '../../models/note_background.dart';
 
 class EditorState extends ChangeNotifier {
-  final TextEditingController titleController;
-  final TextEditingController contentController;
+  final QuillController titleController;
+  final QuillController contentController;
   final List<String> undoHistory = [];
   final List<String> redoHistory = [];
   bool isEdited = false;
@@ -26,7 +27,6 @@ class EditorState extends ChangeNotifier {
     contentController.addListener(_onTextChanged);
     _saveState();
     
-    // 如果初始化时有背景，立即更新工具栏颜色
     if (currentBackground != null && 
         currentBackground!.type != BackgroundType.none && 
         currentBackground!.assetPath != null) {
@@ -44,8 +44,8 @@ class EditorState extends ChangeNotifier {
 
   void _saveState() {
     final currentState = json.encode({
-      'title': titleController.text,
-      'content': contentController.text,
+      'title': titleController.document.toDelta().toJson(),
+      'content': contentController.document.toDelta().toJson(),
     });
 
     if (undoHistory.isEmpty || undoHistory.last != currentState) {
@@ -61,8 +61,8 @@ class EditorState extends ChangeNotifier {
       redoHistory.add(currentState);
       final previousState = json.decode(undoHistory.last);
 
-      titleController.text = previousState['title'];
-      contentController.text = previousState['content'];
+      titleController.document = Document.fromJson(previousState['title']);
+      contentController.document = Document.fromJson(previousState['content']);
       notifyListeners();
     }
   }
@@ -72,13 +72,12 @@ class EditorState extends ChangeNotifier {
       final nextState = json.decode(redoHistory.removeLast());
       _saveState();
 
-      titleController.text = nextState['title'];
-      contentController.text = nextState['content'];
+      titleController.document = Document.fromJson(nextState['title']);
+      contentController.document = Document.fromJson(nextState['content']);
       notifyListeners();
     }
   }
 
-  // 添加私有方法来更新工具栏颜色
   Future<void> _updateToolbarColor() async {
     try {
       final paletteGenerator = await PaletteGenerator.fromImageProvider(
@@ -101,7 +100,6 @@ class EditorState extends ChangeNotifier {
     currentBackground = background;
     isEdited = true;
     
-    // 更新工具栏颜色
     if (background.type != BackgroundType.none && background.assetPath != null) {
       await _updateToolbarColor();
     } else {
@@ -110,13 +108,8 @@ class EditorState extends ChangeNotifier {
     }
   }
 
-  void setToolbarColor(Color color) {
-    toolbarColor = color;
-    notifyListeners();
-  }
-
-  void toggleFormatToolbar() {
-    showFormatToolbar = !showFormatToolbar;
+  void toggleBold() {
+    contentController.formatSelection(Attribute.bold);
     notifyListeners();
   }
 
@@ -128,10 +121,30 @@ class EditorState extends ChangeNotifier {
     }
   }
 
+  void toggleFormatToolbar() {
+    showFormatToolbar = !showFormatToolbar;
+    notifyListeners();
+  }
+
+  // 修改格式化方法
+  void applyHighlight(Color color) {
+    contentController.formatSelection(const BackgroundAttribute('#FFFF00'));
+  }
+
+  void applyHeading(int level) {
+    contentController.formatSelection(HeaderAttribute(level: level));
+  }
+
+  void applyBold() {
+    contentController.formatSelection(Attribute.bold);
+  }
+
   @override
   void dispose() {
     titleController.removeListener(_onTextChanged);
     contentController.removeListener(_onTextChanged);
+    titleController.dispose();
+    contentController.dispose();
     super.dispose();
   }
 }

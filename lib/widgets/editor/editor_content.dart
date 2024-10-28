@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:intl/intl.dart';
 import '../../l10n/app_localizations.dart';
 
 class EditorContent extends StatelessWidget {
-  final TextEditingController titleController;
-  final TextEditingController contentController;
+  final QuillController titleController;
+  final QuillController contentController;
   final FocusNode titleFocusNode;
   final FocusNode contentFocusNode;
   final Color textColor;
@@ -27,27 +28,33 @@ class EditorContent extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        TextField(
+        // 标题编辑器
+        QuillEditor(
           controller: titleController,
+          scrollController: ScrollController(),
           focusNode: titleFocusNode,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w500,
-            color: textColor,
-          ),
-          decoration: InputDecoration(
-            hintText: AppLocalizations.of(context).title,
-            hintStyle: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
-              color: textColor.withOpacity(0.4),
+          configurations: QuillEditorConfigurations(
+            scrollable: false,
+            autoFocus: false,
+            expands: false,
+            padding: EdgeInsets.zero,
+            customStyles: DefaultStyles(
+              paragraph: DefaultTextBlockStyle(
+                const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                  height: 1.5,
+                ),
+                const HorizontalSpacing(0, 0),  // 左右边距
+                const VerticalSpacing(0, 0),    // 上下边距
+                const VerticalSpacing(0, 0),    // 行间距
+                const BoxDecoration(),          // 背景装饰
+              ),
             ),
-            border: InputBorder.none,
           ),
-          onSubmitted: (_) {
-            contentFocusNode.requestFocus();
-          },
         ),
+        
+        // 字数统计和时间
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
@@ -58,23 +65,30 @@ class EditorContent extends StatelessWidget {
             ),
           ),
         ),
-        TextField(
+
+        // 内容编辑器
+        QuillEditor(
           controller: contentController,
+          scrollController: ScrollController(),
           focusNode: contentFocusNode,
-          maxLines: null,
-          style: TextStyle(
-            fontSize: 16,
-            height: 1.5,
-            color: textColor,
-          ),
-          decoration: InputDecoration(
-            hintText: AppLocalizations.of(context).inputStartTyping,
-            hintStyle: TextStyle(
-              fontSize: 16,
-              height: 1.5,
-              color: textColor.withOpacity(0.4),
+          configurations: QuillEditorConfigurations(
+            scrollable: true,
+            autoFocus: false,
+            expands: false,
+            padding: EdgeInsets.zero,
+            customStyles: DefaultStyles(
+              paragraph: DefaultTextBlockStyle(
+                TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: textColor,
+                ),
+                const HorizontalSpacing(0, 0),  // 左右边距
+                const VerticalSpacing(0, 0),    // 上下边距
+                const VerticalSpacing(0, 0),    // 行间距
+                const BoxDecoration(),          // 背景装饰
+              ),
             ),
-            border: InputBorder.none,
           ),
         ),
       ],

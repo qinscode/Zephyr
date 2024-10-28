@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide EditorState;
 import '../models/note.dart';
 import '../models/note_background.dart';
 import '../models/notes_model.dart';
@@ -44,17 +45,34 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // 修改初始化方式
+    final titleDoc = Document()
+      ..insert(0, widget.note?.title ?? '');
+    
+    final contentDoc = Document()
+      ..insert(0, widget.note?.plainText ?? '');
+
     _editorState = EditorState(
-      titleController: TextEditingController(text: widget.note?.title ?? ''),
-      contentController: TextEditingController(
-        text: widget.note?.plainText ?? '',
+      titleController: QuillController(
+        document: titleDoc,
+        selection: const TextSelection.collapsed(offset: 0),
+      ),
+      contentController: QuillController(
+        document: contentDoc,
+        selection: const TextSelection.collapsed(offset: 0),
       ),
       currentBackground: widget.note?.background,
     );
+    
     _titleFocusNode = FocusNode();
     _contentFocusNode = FocusNode();
     _lastModified = widget.note?.modifiedAt ?? DateTime.now();
     _updateCharacterCount();
+
+    // 添加监听器以更新字符计数
+    _editorState.titleController.addListener(_updateCharacterCount);
+    _editorState.contentController.addListener(_updateCharacterCount);
   }
 
   @override
@@ -67,14 +85,15 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   void _updateCharacterCount() {
     setState(() {
-      _characterCount = _editorState.titleController.text.length +
-          _editorState.contentController.text.length;
+      _characterCount = _editorState.titleController.document.length +
+          _editorState.contentController.document.length;
     });
   }
 
+  // 修改保存笔记的方法
   Future<void> _saveNote() async {
-    if (_editorState.titleController.text.isEmpty && 
-        _editorState.contentController.text.isEmpty) {
+    if (_editorState.titleController.document.length == 0 && 
+        _editorState.contentController.document.length == 0) {
       Navigator.pop(context);
       return;
     }
@@ -85,8 +104,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     if (widget.note == null) {
       final newNote = Note(
         id: const Uuid().v4(),
-        title: _editorState.titleController.text,
-        content: Note.textToRichParagraphs(_editorState.contentController.text),
+        title: _editorState.titleController.document.toPlainText(),
+        content: [RichParagraph(text: _editorState.contentController.document.toPlainText())],
         createdAt: now,
         modifiedAt: now,
         folderId: _editorState.folderId,
@@ -95,8 +114,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       await notesModel.addNote(newNote);
     } else {
       final updatedNote = widget.note!.copyWith(
-        title: _editorState.titleController.text,
-        content: Note.textToRichParagraphs(_editorState.contentController.text),
+        title: _editorState.titleController.document.toPlainText(),
+        content: [RichParagraph(text: _editorState.contentController.document.toPlainText())],
         modifiedAt: now,
         folderId: _editorState.folderId,
         background: _editorState.currentBackground,
@@ -188,8 +207,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       final tempKey = GlobalKey();
       final note = Note(
         id: widget.note?.id ?? const Uuid().v4(),
-        title: _editorState.titleController.text,
-        content: Note.textToRichParagraphs(_editorState.contentController.text),
+        title: _editorState.titleController.document.toPlainText(),
+        content: [RichParagraph(text: _editorState.contentController.document.toPlainText())],
         createdAt: widget.note?.createdAt ?? DateTime.now(),
         modifiedAt: DateTime.now(),
         background: _editorState.currentBackground,
@@ -266,25 +285,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     showFormatToolbar: _editorState.showFormatToolbar,
                     onFormatPressed: () => _editorState.toggleFormatToolbar(),
                     onCloseFormat: () => _editorState.toggleFormatToolbar(),
-                    onHighlight: () => TextFormatterService.applyHighlight(
-                      _editorState.contentController,
-                      Colors.yellow,
-                    ),
-                    onH1: () => TextFormatterService.applyHeading(
-                      _editorState.contentController,
-                      1,
-                    ),
-                    onH2: () => TextFormatterService.applyHeading(
-                      _editorState.contentController,
-                      2,
-                    ),
-                    onH3: () => TextFormatterService.applyHeading(
-                      _editorState.contentController,
-                      3,
-                    ),
-                    onBold: () => TextFormatterService.applyBold(
-                      _editorState.contentController,
-                    ),
+                    onHighlight: () => _editorState.applyHighlight(Colors.yellow),
+                    onH1: () => _editorState.applyHeading(1),
+                    onH2: () => _editorState.applyHeading(2),
+                    onH3: () => _editorState.applyHeading(3),
+                    onBold: () => _editorState.applyBold(),
                   ),
                 ],
               ),
