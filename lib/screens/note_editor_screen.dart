@@ -1,5 +1,6 @@
 // lib/screens/note_editor_screen.dart
 import 'package:flutter/material.dart';
+import 'package:notes_app/services/share_service/index.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide EditorState;
@@ -7,7 +8,7 @@ import '../models/note.dart';
 import '../models/note_background.dart';
 import '../models/notes_model.dart';
 import '../models/trash_model.dart';
-import '../services/share_service.dart';
+
 import '../widgets/editor/editor_app_bar.dart';
 import '../widgets/editor/editor_toolbar.dart';
 import '../widgets/editor/folder_indicator.dart';
@@ -228,43 +229,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     overlayState.insert(overlayEntry);
 
     try {
-      final previewKey = GlobalKey();
-      final previewWidget = RepaintBoundary(
-        key: previewKey,
-        child: Material(
-          color: Colors.white,
-          child: ShareService.buildNotePreviewWidget(
-            Note(
-              id: widget.note?.id ?? const Uuid().v4(),
-              title: _editorState.titleController.document.toPlainText(),
-              content: [
-                RichParagraph(
-                  text: _editorState.contentController.document.toPlainText(),
-                  deltaJson: _editorState.contentController.document.toDelta().toJson(),
-                )
-              ],
-              createdAt: widget.note?.createdAt ?? DateTime.now(),
-              modifiedAt: DateTime.now(),
-              background: _editorState.currentBackground,
-              titleDeltaJson: _editorState.titleController.document.toDelta().toJson(),  // 添加这一行
-            ),
-          ),
-        ),
-      );
-
-      // 将预览 widget 插入到 overlay 中
-      final previewOverlay = OverlayEntry(
-        builder: (context) => Positioned(
-          left: -9999, // 放在屏幕外
-          child: previewWidget,
-        ),
-      );
-      overlayState.insert(previewOverlay);
-
-      // 等待下一帧确保 widget 已经渲染
-      await Future.delayed(const Duration(milliseconds: 100));
-
-      // 生成图片
       final note = Note(
         id: widget.note?.id ?? const Uuid().v4(),
         title: _editorState.titleController.document.toPlainText(),
@@ -277,13 +241,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         createdAt: widget.note?.createdAt ?? DateTime.now(),
         modifiedAt: DateTime.now(),
         background: _editorState.currentBackground,
-        titleDeltaJson: _editorState.titleController.document.toDelta().toJson(),  // 添加这一行
+        titleDeltaJson: _editorState.titleController.document.toDelta().toJson(),
       );
 
-      await ShareService.shareNoteAsImage(note, previewKey, context);
-      
-      // 移除预览 widget
-      previewOverlay.remove();
+      // 只传入 note 和 context
+      await ShareService.shareNoteAsImage(note, context);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
