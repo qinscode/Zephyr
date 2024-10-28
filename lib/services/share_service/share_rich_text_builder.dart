@@ -19,59 +19,60 @@ class ShareRichTextBuilder {
     try {
       final doc = Document.fromJson(deltaJson);
       final delta = doc.toDelta();
-      final widgets = <Widget>[];
-      TextStyle currentStyle = baseStyle;
-      StringBuffer currentText = StringBuffer();
-
-      void addCurrentText() {
-        if (currentText.isNotEmpty) {
-          widgets.add(Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              currentText.toString(),
-              style: currentStyle,
-            ),
-          ));
-          currentText.clear();
-        }
-      }
-
+      final spans = <InlineSpan>[];
+      
       for (final op in delta.toList()) {
         if (op.data is String) {
-          final attributes = op.attributes;
-          if (attributes != null) {
-            addCurrentText();
-            currentStyle = baseStyle.merge(TextStyle(
-              fontWeight: attributes.containsKey(Attribute.bold.key) ? FontWeight.bold : null,
-              fontSize: _getFontSize(attributes, baseStyle.fontSize ?? ShareConstants.contentFontSize),
-              backgroundColor: _getHighlightColor(attributes),
-              color: textColor,
-            ));
-          }
-          currentText.write(op.data as String);
+          final attributes = op.attributes ?? const {};
+          final style = _getTextStyle(attributes, baseStyle, textColor);
+          
+          spans.add(TextSpan(
+            text: op.data as String,
+            style: style,
+          ));
         } else if (op.data is Map<String, dynamic>) {
-          addCurrentText();
           final dataMap = op.data as Map<String, dynamic>;
           if (dataMap.containsKey('image')) {
-            final imageWidget = _buildImageWidget(dataMap['image'] as String);
-            if (imageWidget != null) {
-              widgets.add(imageWidget);
-            }
+            spans.add(WidgetSpan(
+              child: _buildImageWidget(dataMap['image'] as String) ?? 
+                     const SizedBox.shrink(),
+            ));
           }
         }
       }
 
-      addCurrentText();
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: widgets,
+      return RichText(
+        text: TextSpan(
+          children: spans,
+          style: baseStyle,
+        ),
       );
     } catch (e, stack) {
       debugPrint('Error building rich text: $e');
       debugPrint('Stack trace: $stack');
       return Text(plainText, style: baseStyle);
     }
+  }
+
+  static TextStyle _getTextStyle(
+    Map<String, dynamic> attributes, 
+    TextStyle baseStyle,
+    Color textColor,
+  ) {
+    return baseStyle.copyWith(
+      fontWeight: attributes.containsKey(Attribute.bold.key) ? 
+                 FontWeight.bold : baseStyle.fontWeight,
+      fontSize: _getFontSize(attributes, baseStyle.fontSize ?? 
+                 ShareConstants.contentFontSize),
+      backgroundColor: _getHighlightColor(attributes),
+      color: textColor,
+      decoration: attributes.containsKey(Attribute.strikeThrough.key) ? 
+                 TextDecoration.lineThrough : null,
+      fontStyle: attributes.containsKey(Attribute.italic.key) ? 
+                 FontStyle.italic : null,
+      decorationColor: textColor,
+      height: attributes.containsKey(Attribute.header.key) ? 1.2 : 1.5,
+    );
   }
 
   static Widget? _buildImageWidget(String imageUrl) {
