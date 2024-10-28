@@ -791,58 +791,77 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   Future<void> _shareAsImage() async {
-    // 显示预览对话框
-    await showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: RepaintBoundary(
-                key: _shareKey,
-                child: ShareService.buildNotePreviewWidget(
-                  Note(
-                    id: widget.note?.id ?? const Uuid().v4(),
-                    title: _titleController.text,
-                    content: _contentController.text,
-                    createdAt: widget.note?.createdAt ?? DateTime.now(),
-                    modifiedAt: DateTime.now(),
-                    background: _currentBackground,
-                  ),
-                ),
-              ),
-            ),
-            ButtonBar(
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context).cancel),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ShareService.shareNoteAsImage(
-                      Note(
-                        id: widget.note?.id ?? const Uuid().v4(),
-                        title: _titleController.text,
-                        content: _contentController.text,
-                        createdAt: widget.note?.createdAt ?? DateTime.now(),
-                        modifiedAt: DateTime.now(),
-                      ),
-                      _shareKey,
-                      context,
-                    );
-                  },
-                  child: Text(AppLocalizations.of(context).share),
-                ),
-              ],
-            ),
-          ],
+    // 创建一个临时的 Overlay Entry 来显示加载指示器
+    final overlayState = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Container(
+        color: Colors.black26,
+        child: const Center(
+          child: CircularProgressIndicator(),
         ),
       ),
     );
+
+    // 显示加载指示器
+    overlayState.insert(overlayEntry);
+
+    try {
+      // 创建一个临时的 RepaintBoundary
+      final tempKey = GlobalKey();
+      final tempWidget = RepaintBoundary(
+        key: tempKey,
+        child: Material(
+          child: ShareService.buildNotePreviewWidget(
+            Note(
+              id: widget.note?.id ?? const Uuid().v4(),
+              title: _titleController.text,
+              content: _contentController.text,
+              createdAt: widget.note?.createdAt ?? DateTime.now(),
+              modifiedAt: DateTime.now(),
+              background: _currentBackground,
+            ),
+          ),
+        ),
+      );
+
+      // 将临时 widget 插入到 Overlay 中（不可见）
+      final tempOverlayEntry = OverlayEntry(
+        builder: (context) => Positioned(
+          left: -99999, // 放在屏幕外
+          child: tempWidget,
+        ),
+      );
+      overlayState.insert(tempOverlayEntry);
+
+      // 等待下一帧以确保 widget 已经完全渲染
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // 生成并分享图片
+      await ShareService.shareNoteAsImage(
+        Note(
+          id: widget.note?.id ?? const Uuid().v4(),
+          title: _titleController.text,
+          content: _contentController.text,
+          createdAt: widget.note?.createdAt ?? DateTime.now(),
+          modifiedAt: DateTime.now(),
+          background: _currentBackground,
+        ),
+        tempKey,
+        context,
+      );
+
+      // 移除临时 widget
+      tempOverlayEntry.remove();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to share note as image: $e')),
+        );
+      }
+    } finally {
+      // 移除加载指示器
+      overlayEntry.remove();
+    }
   }
 
   @override
