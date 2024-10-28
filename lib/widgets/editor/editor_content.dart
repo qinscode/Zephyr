@@ -24,6 +24,8 @@ class EditorContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
+    
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -39,15 +41,16 @@ class EditorContent extends StatelessWidget {
             padding: EdgeInsets.zero,
             customStyles: DefaultStyles(
               paragraph: DefaultTextBlockStyle(
-                const TextStyle(
+                TextStyle(
                   fontSize: 24,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.bold,
                   height: 1.5,
+                  color: textColor,
                 ),
-                const HorizontalSpacing(0, 0),  // 左右边距
-                const VerticalSpacing(0, 0),    // 上下边距
-                const VerticalSpacing(0, 0),    // 行间距
-                const BoxDecoration(),          // 背景装饰
+                const HorizontalSpacing(0, 0),
+                const VerticalSpacing(0, 0),
+                const VerticalSpacing(0, 0),
+                const BoxDecoration(),
               ),
             ),
           ),
@@ -82,10 +85,49 @@ class EditorContent extends StatelessWidget {
                   height: 1.5,
                   color: textColor,
                 ),
-                const HorizontalSpacing(0, 0),  // 左右边距
-                const VerticalSpacing(0, 0),    // 上下边距
-                const VerticalSpacing(0, 0),    // 行间距
-                const BoxDecoration(),          // 背景装饰
+                const HorizontalSpacing(0, 0),
+                const VerticalSpacing(0, 0),
+                const VerticalSpacing(0, 0),
+                const BoxDecoration(),
+              ),
+              h1: DefaultTextBlockStyle(
+                TextStyle(
+                  fontSize: 32,
+                  height: 1.5,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+                const HorizontalSpacing(0, 0),
+                const VerticalSpacing(16, 8),
+                const VerticalSpacing(0, 0),
+                const BoxDecoration(),
+              ),
+              h2: DefaultTextBlockStyle(
+                TextStyle(
+                  fontSize: 24,
+                  height: 1.5,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+                const HorizontalSpacing(0, 0),
+                const VerticalSpacing(12, 8),
+                const VerticalSpacing(0, 0),
+                const BoxDecoration(),
+              ),
+              h3: DefaultTextBlockStyle(
+                TextStyle(
+                  fontSize: 20,
+                  height: 1.5,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+                const HorizontalSpacing(0, 0),
+                const VerticalSpacing(8, 8),
+                const VerticalSpacing(0, 0),
+                const BoxDecoration(),
+              ),
+              bold: const TextStyle(
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

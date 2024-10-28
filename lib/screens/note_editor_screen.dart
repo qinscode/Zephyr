@@ -45,12 +45,21 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   void initState() {
     super.initState();
     
-    // 修改初始化方式
-    final titleDoc = Document()
-      ..insert(0, widget.note?.title ?? '');
+    // 从保存的 Delta JSON 创建文档
+    Document titleDoc;
+    if (widget.note?.titleDeltaJson != null) {
+      titleDoc = Document.fromJson(widget.note!.titleDeltaJson!);
+    } else {
+      titleDoc = Document()..insert(0, widget.note?.title ?? '');
+    }
     
-    final contentDoc = Document()
-      ..insert(0, widget.note?.plainText ?? '');
+    Document contentDoc;
+    if (widget.note?.content.isNotEmpty == true && 
+        widget.note!.content.first.deltaJson != null) {
+      contentDoc = Document.fromJson(widget.note!.content.first.deltaJson!);
+    } else {
+      contentDoc = Document()..insert(0, widget.note?.plainText ?? '');
+    }
 
     _editorState = EditorState(
       titleController: QuillController(
@@ -100,24 +109,40 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     final notesModel = Provider.of<NotesModel>(context, listen: false);
     final now = DateTime.now();
 
+    // 将 Delta 转换为 JSON
+    final titleDelta = _editorState.titleController.document.toDelta().toJson();
+    final contentDelta = _editorState.contentController.document.toDelta().toJson();
+
     if (widget.note == null) {
       final newNote = Note(
         id: const Uuid().v4(),
-        title: _editorState.titleController.document.toPlainText(),
-        content: [RichParagraph(text: _editorState.contentController.document.toPlainText())],
+        title: _editorState.titleController.document.toPlainText().trim(),
+        content: [
+          RichParagraph(
+            text: _editorState.contentController.document.toPlainText(),
+            deltaJson: contentDelta,
+          )
+        ],
         createdAt: now,
         modifiedAt: now,
         folderId: _editorState.folderId,
         background: _editorState.currentBackground,
+        titleDeltaJson: titleDelta,
       );
       await notesModel.addNote(newNote);
     } else {
       final updatedNote = widget.note!.copyWith(
-        title: _editorState.titleController.document.toPlainText(),
-        content: [RichParagraph(text: _editorState.contentController.document.toPlainText())],
+        title: _editorState.titleController.document.toPlainText().trim(),
+        content: [
+          RichParagraph(
+            text: _editorState.contentController.document.toPlainText(),
+            deltaJson: contentDelta,
+          )
+        ],
         modifiedAt: now,
         folderId: _editorState.folderId,
         background: _editorState.currentBackground,
+        titleDeltaJson: titleDelta,
       );
       await notesModel.updateNote(updatedNote);
     }

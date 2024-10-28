@@ -33,6 +33,7 @@ dependencies:
   image_cropper: ^5.0.1
   share_plus: ^7.2.1
 
+  flutter_quill: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

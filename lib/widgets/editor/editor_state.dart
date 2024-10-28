@@ -132,11 +132,37 @@ class EditorState extends ChangeNotifier {
   }
 
   void applyHeading(int level) {
-    contentController.formatSelection(HeaderAttribute(level: level));
+    // 获取当前选中文本的样式
+    final formats = contentController.getSelectionStyle().attributes;
+    // 检查当前的标题级别
+    final currentLevel = formats[Attribute.header.key]?.value;
+    
+    // 切换标题状态
+    if (currentLevel == level) {
+      // 如果当前已经是这个级别的标题，则移除标题格式
+      contentController.formatSelection(Attribute.clone(Attribute.header, null));
+    } else {
+      // 如果是其他级别或没有标题，则设置为指定级别的标题
+      contentController.formatSelection(HeaderAttribute(level: level));
+    }
+    notifyListeners();
   }
 
   void applyBold() {
-    contentController.formatSelection(Attribute.bold);
+    // 获取当前选中文本的样式
+    final formats = contentController.getSelectionStyle().attributes;
+    // 检查是否已经加粗
+    final isBold = formats[Attribute.bold.key] == Attribute.bold;
+    
+    // 切换加粗状态
+    if (isBold) {
+      // 如果已经加粗，则移除加粗
+      contentController.formatSelection(Attribute.clone(Attribute.bold, null));
+    } else {
+      // 如果未加粗，则添加加粗
+      contentController.formatSelection(Attribute.bold);
+    }
+    notifyListeners();
   }
 
   @override

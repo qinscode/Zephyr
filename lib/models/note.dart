@@ -16,11 +16,13 @@ class RichParagraph {
   final String text;
   final TextStyleType styleType;
   final Color? highlightColor;
+  final List<dynamic>? deltaJson;  // 添加这个属性
 
   const RichParagraph({
     required this.text,
     this.styleType = TextStyleType.normal,
     this.highlightColor,
+    this.deltaJson,  // 添加这个参数
   });
 
   // 转换为 JSON
@@ -29,6 +31,7 @@ class RichParagraph {
       'text': text,
       'styleType': styleType.name,
       'highlightColor': highlightColor?.value,
+      'deltaJson': deltaJson,  // 添加这个字段
     };
   }
 
@@ -43,6 +46,7 @@ class RichParagraph {
       highlightColor: json['highlightColor'] != null
           ? Color(json['highlightColor'] as int)
           : null,
+      deltaJson: json['deltaJson'] as List<dynamic>?,  // 添加这个字段
     );
   }
 
@@ -88,11 +92,13 @@ class RichParagraph {
     String? text,
     TextStyleType? styleType,
     Color? highlightColor,
+    List<dynamic>? deltaJson,
   }) {
     return RichParagraph(
       text: text ?? this.text,
       styleType: styleType ?? this.styleType,
       highlightColor: highlightColor ?? this.highlightColor,
+      deltaJson: deltaJson ?? this.deltaJson,
     );
   }
 }
@@ -111,6 +117,7 @@ class Note {
   final bool isLocked;
   final String? color;
   final NoteBackground? background;
+  final List<dynamic>? titleDeltaJson;  // 添加这个属性
 
   const Note({
     required this.id,
@@ -126,6 +133,7 @@ class Note {
     this.isLocked = false,
     this.color,
     this.background,
+    this.titleDeltaJson,  // 添加这个参数
   });
 
   // 从纯文本创建富文本内容
@@ -160,6 +168,7 @@ class Note {
       background: json['background'] != null
           ? NoteBackground.fromJson(json['background'] as Map<String, dynamic>)
           : null,
+      titleDeltaJson: json['titleDeltaJson'] as List<dynamic>?,  // 添加这个字段
     );
   }
 
@@ -179,6 +188,7 @@ class Note {
       'isLocked': isLocked,
       'color': color,
       'background': background?.toJson(),
+      'titleDeltaJson': titleDeltaJson,  // 添加这个字段
     };
   }
 
@@ -197,6 +207,7 @@ class Note {
     bool? isLocked,
     String? color,
     NoteBackground? background,
+    List<dynamic>? titleDeltaJson,
   }) {
     return Note(
       id: id ?? this.id,
@@ -212,6 +223,7 @@ class Note {
       isLocked: isLocked ?? this.isLocked,
       color: color ?? this.color,
       background: background ?? this.background,
+      titleDeltaJson: titleDeltaJson ?? this.titleDeltaJson,
     );
   }
 
@@ -319,7 +331,7 @@ class Note {
     return copyWith(
       title: newTitle ?? title,
       content: newContent != null
-          ? textToRichParagraphs(newContent!)
+          ? textToRichParagraphs(newContent)
           : content,
       modifiedAt: DateTime.now(),
     );

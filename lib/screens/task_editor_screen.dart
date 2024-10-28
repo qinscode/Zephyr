@@ -48,7 +48,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
   }
 
   void _saveTask() {
-    final l10n = AppLocalizations.of(context);  // 获取本地化实例
+    // final l10n = AppLocalizations.of(context);  // 获取本地化实例
     if (_titleController.text.isEmpty) {
       Navigator.pop(context);
       return;

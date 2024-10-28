@@ -184,12 +184,10 @@ class NotesContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    // final l10n = AppLocalizations.of(context);
     return Consumer2<NotesModel, FolderModel>(
       builder: (context, notesModel, folderModel, child) {
         final selectedFolderId = folderModel.selectedFolderId;
-        print('Current selectedFolderId: $selectedFolderId');
-        print('Has folders: ${folderModel.folders.isNotEmpty}');
 
         // 修改这里的逻辑：当 selectedFolderId 为 'hide' 或 null 时显示所有笔记
         final notes = (selectedFolderId == null || selectedFolderId == 'hide')
@@ -218,7 +216,6 @@ class NotesContentView extends StatelessWidget {
                         ),
                         selected: selectedFolderId == null,
                         onSelected: (selected) {
-                          print('All chip selected: $selected');
                           if (selectedFolderId == null && !selected) {
                             // 当前是 All 且是反选操作，隐藏标签栏
                             folderModel.selectFolder('hide');
@@ -226,7 +223,6 @@ class NotesContentView extends StatelessWidget {
                             // 其他情况，正常切换到 All
                             folderModel.selectFolder(null);
                           }
-                          print('After selecting All, selectedFolderId: ${folderModel.selectedFolderId}');
                         },
                         labelStyle: TextStyle(
                           color: selectedFolderId == null ? Colors.white : Colors.grey[800],
@@ -251,13 +247,11 @@ class NotesContentView extends StatelessWidget {
                           ),
                           selected: isSelected,
                           onSelected: (selected) {
-                            print('Folder ${folder.name} selected: $selected');
                             if (selected) {
                               folderModel.selectFolder(folder.id);
                             } else {
                               folderModel.selectFolder(null);  // 取消选择时设置为 null
                             }
-                            print('After selecting folder, selectedFolderId: ${folderModel.selectedFolderId}');
                           },
                           labelStyle: TextStyle(
                             color: isSelected ? Colors.white : Colors.grey[800],
@@ -371,7 +365,7 @@ class TasksContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    // final l10n = AppLocalizations.of(context);
     return Consumer<TasksModel>(
       builder: (context, tasksModel, child) {
         final tasks = tasksModel.tasks;

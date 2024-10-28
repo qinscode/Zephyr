@@ -48,20 +48,20 @@ class StorageService {
     final db = await factory.openDatabase(
       dbPath,
       version: 1,
-      onVersionChanged: (db, oldVersion, newVersion) async {
-        // 处理数据库迁移
-        if (oldVersion < 1) {
-          // 创建所需的stores
-          final notesStore = stringMapStoreFactory.store(_notesStore);
-          final tasksStore = stringMapStoreFactory.store(_tasksStore);
-          final foldersStore = stringMapStoreFactory.store(_foldersStore);
-          final trashStore = stringMapStoreFactory.store(_trashStore);
-          final settingsStore = StoreRef<String, dynamic>(_settingsStore);
-
-          // 我们不需要显式创建这些store，因为它们会在首次使用时自动创建
-          // 但是我们可以在这里添加一些初始化数据如果需要的话
-        }
-      },
+      // onVersionChanged: (db, oldVersion, newVersion) async {
+      //   // 处理数据库迁移
+      //   if (oldVersion < 1) {
+      //     // 创建所需的stores
+      //     final notesStore = stringMapStoreFactory.store(_notesStore);
+      //     final tasksStore = stringMapStoreFactory.store(_tasksStore);
+      //     final foldersStore = stringMapStoreFactory.store(_foldersStore);
+      //     final trashStore = stringMapStoreFactory.store(_trashStore);
+      //     final settingsStore = StoreRef<String, dynamic>(_settingsStore);
+      //
+      //     // 我们不需要显式创建这些store，因为它们会在首次使用时自动创建
+      //     // 但是我们可以在这里添加一些初始化数据如果需要的话
+      //   }
+      // },
     );
 
     final instance = StorageService._create(db);
