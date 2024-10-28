@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -164,17 +163,17 @@ class NotesView extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           image: DecorationImage(
-            image: note.background!.type == BackgroundType.preset
-                ? AssetImage(note.background!.assetPath!)
-                : FileImage(File(note.background!.customImagePath!)) as ImageProvider,
-            fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,  // 根据是否可平铺选择适配方式
-            repeat: note.background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,  // 可平铺时启用重复
+            image: AssetImage(note.background!.assetPath!),
+            fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,
+            repeat: note.background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,
             opacity: note.background!.opacity ?? 1.0,
           ),
         ),
         child: child,
       );
     }
+
+    final textColor = note.background?.textColor ?? Colors.black;
 
     return GestureDetector(
       onTap: () => _openNote(context, note),
@@ -194,9 +193,10 @@ class NotesView extends StatelessWidget {
                   displayTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -207,7 +207,7 @@ class NotesView extends StatelessWidget {
                   overflow: TextOverflow.fade,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[800],
+                    color: textColor.withOpacity(0.8),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -216,7 +216,7 @@ class NotesView extends StatelessWidget {
                   formattedTime,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: textColor.withOpacity(0.6),
                   ),
                 ),
               ],
