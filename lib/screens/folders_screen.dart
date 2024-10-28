@@ -1,9 +1,10 @@
-// lib/screens/folders_screen.dart
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../models/folder_model.dart';
+import '../models/notes_model.dart';
 import '../l10n/app_localizations.dart';
+import 'trash_screen.dart';
 
 class FoldersScreen extends StatefulWidget {
   const FoldersScreen({super.key});
@@ -81,99 +82,6 @@ class _FoldersScreenState extends State<FoldersScreen> {
     );
   }
 
-  void _showDeleteFolderDialog(Folder folder) {
-    final l10n = AppLocalizations.of(context);
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.deleteFolder),
-        content: Text(l10n.deleteFolderConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              final folderModel = Provider.of<FolderModel>(
-                context,
-                listen: false,
-              );
-              folderModel.deleteFolder(folder.id);
-              Navigator.pop(context);
-            },
-            child: Text(
-              l10n.delete,
-              style: const TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showRenameFolderDialog(Folder folder) {
-    final l10n = AppLocalizations.of(context);
-    _folderNameController.text = folder.name;
-    final formKey = GlobalKey<FormState>();
-
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.renameFolder),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: _folderNameController,
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: l10n.folderName,
-              border: const OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return l10n.folderName;
-              }
-
-              final folderModel = Provider.of<FolderModel>(
-                context,
-                listen: false,
-              );
-              final newName = value.trim();
-              if (newName != folder.name && folderModel.folderExists(newName)) {
-                return 'A folder with this name already exists';
-              }
-              return null;
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _folderNameController.clear();
-            },
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() ?? false) {
-                final folderModel = Provider.of<FolderModel>(
-                  context,
-                  listen: false,
-                );
-                folderModel.renameFolder(folder.id, _folderNameController.text.trim());
-                Navigator.pop(context);
-                _folderNameController.clear();
-              }
-            },
-            child: Text(l10n.rename),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -189,90 +97,148 @@ class _FoldersScreenState extends State<FoldersScreen> {
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(l10n.folders),
-          ),
-          body: Stack(
-            children: [
-              ListView(
-                children: [
-                  ListTile(
-                    leading: const Icon(CupertinoIcons.folder, color: Colors.orange),
-                    title: Text(l10n.all),
-                    trailing: Text(
-                      folderModel.totalNoteCount.toString(),
-                      style: TextStyle(color: Colors.grey[600]),
+            actions: [
+              IconButton(
+                icon: const Icon(CupertinoIcons.trash),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TrashScreen(),
                     ),
-                    selected: folderModel.selectedFolderId == null,
-                    onTap: () {
-                      folderModel.selectFolder(null);
-                      Navigator.pop(context);
-                    },
-                  ),
-                  if (folderModel.folders.isNotEmpty) const Divider(height: 1),
-                  ...folderModel.folders.map((folder) {
-                    return ListTile(
-                      leading: const Icon(CupertinoIcons.folder),
-                      title: Text(folder.name),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            folder.noteCount.toString(),
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                          const SizedBox(width: 8),
-                          PopupMenuButton<String>(
-                            icon: const Icon(CupertinoIcons.ellipsis_vertical),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                value: 'rename',
-                                child: Text(l10n.rename),
-                              ),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Text(
-                                  l10n.delete,
-                                  style: const TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
-                            onSelected: (value) {
-                              if (value == 'rename') {
-                                _showRenameFolderDialog(folder);
-                              } else if (value == 'delete') {
-                                _showDeleteFolderDialog(folder);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      selected: folderModel.selectedFolderId == folder.id,
-                      onTap: () {
-                        folderModel.selectFolder(folder.id);
-                        Navigator.pop(context);
-                      },
-                    );
-                  }),
-                  if (folderModel.folders.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Center(
-                        child: Text(
-                          'No folders yet',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ),
-                    ),
-                ],
+                  );
+                },
               ),
-              if (folderModel.isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
             ],
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: _showCreateFolderDialog,
-            child: const Icon(CupertinoIcons.add),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // All folder item
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 0,
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      leading: const Icon(
+                        CupertinoIcons.checkmark_circle_fill,
+                        color: Colors.orange,
+                      ),
+                      title: Text(
+                        l10n.all,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: Consumer<NotesModel>(
+                        builder: (context, notesModel, child) {
+                          // 对于 All 选项，显示所有笔记的数量
+                          return Text(
+                            notesModel.notes.length.toString(),
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                            ),
+                          );
+                        },
+                      ),
+                      onTap: () {
+                        folderModel.selectFolder(null);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+
+                  // Other folders list
+                  if (folderModel.folders.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    ...folderModel.folders.map((folder) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              spreadRadius: 0,
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            folder.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          trailing: Consumer<NotesModel>(
+                            builder: (context, notesModel, child) {
+                              final count = notesModel.getNotesByFolder(folder.id).length;
+                              return Text(
+                                count.toString(),
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 16,
+                                ),
+                              );
+                            },
+                          ),
+                          onTap: () {
+                            folderModel.selectFolder(folder.id);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      );
+                    }),
+                  ],
+
+                  // New folder button
+                  const SizedBox(height: 32),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: const BoxDecoration(
+                          color: Colors.orange,
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(CupertinoIcons.plus),
+                          color: Colors.white,
+                          onPressed: _showCreateFolderDialog,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.newFolder,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
