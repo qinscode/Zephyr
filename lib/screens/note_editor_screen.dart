@@ -169,27 +169,12 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   void _showThemeOptions() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ThemeSelector(
-            currentBackground: _editorState.currentBackground,
-            onBackgroundChanged: (background) async {
-              Navigator.pop(context);
-              await _editorState.setBackground(background);
-            },
-          ),
-          if (_editorState.currentBackground != null && 
-              _editorState.currentBackground!.type != BackgroundType.none)
-            OpacitySlider(
-              opacity: _editorState.currentBackground!.opacity ?? 1.0,
-              onChanged: (value) async {
-                await _editorState.setBackground(
-                  _editorState.currentBackground!.copyWith(opacity: value),
-                );
-              },
-            ),
-        ],
+      builder: (context) => ThemeSelector(
+        currentBackground: _editorState.currentBackground,
+        onBackgroundChanged: (background) async {
+          Navigator.pop(context);
+          await _editorState.setBackground(background);
+        },
       ),
     );
   }

@@ -38,7 +38,6 @@ class PreviewBuilder {
               image: AssetImage(note.background!.assetPath!),
               fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,
               repeat: note.background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,
-              opacity: note.background!.opacity ?? 1.0,
             ),
           ),
         ),

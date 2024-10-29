@@ -27,7 +27,6 @@ class BackgroundContainer extends StatelessWidget {
           image: AssetImage(background!.assetPath!),
           fit: background!.isTileable ? BoxFit.none : BoxFit.cover,
           repeat: background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,
-          opacity: background!.opacity ?? 1.0,
         ),
       ),
       child: child,

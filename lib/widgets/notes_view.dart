@@ -154,7 +154,7 @@ class NotesView extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16), // 增加圆角
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -170,7 +170,7 @@ class NotesView extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16), // 增加圆角
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -182,7 +182,6 @@ class NotesView extends StatelessWidget {
             image: AssetImage(note.background!.assetPath!),
             fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,
             repeat: note.background!.isTileable ? ImageRepeat.repeat : ImageRepeat.noRepeat,
-            opacity: note.background!.opacity ?? 1.0,
           ),
         ),
         child: child,
