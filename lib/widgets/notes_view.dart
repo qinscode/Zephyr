@@ -14,8 +14,37 @@ import '../l10n/app_localizations.dart';
 class NotesView extends StatelessWidget {
   const NotesView({super.key});
 
+  // 添加一个防抖标志
+  static bool _isNavigating = false;
+
+  Future<void> _openNote(BuildContext context, Note note) async {
+    // 如果正在导航，直接返回
+    if (_isNavigating) {
+      print('NotesView - 导航正在进行中，忽略点击');
+      return;
+    }
+
+    print('NotesView - Note item clicked');
+    _isNavigating = true;  // 设置导航标志
+
+    try {
+      print('NotesView - 创建 NoteEditorScreen');
+      await Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => NoteEditorScreen(note: note),
+        ),
+      );
+      print('NotesView - 从 NoteEditorScreen 返回');
+    } finally {
+      _isNavigating = false;  // 直接重置导航标志
+      print('NotesView - 重置导航状态');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('NotesView - build');
     final l10n = AppLocalizations.of(context);  // 获取本地化实例
     return Consumer2<NotesModel, FolderModel>(
       builder: (context, notesModel, folderModel, child) {
@@ -348,17 +377,6 @@ class NotesView extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  void _openNote(BuildContext context, Note note) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => NoteEditorScreen(
-          note: note,
-        ),
-      ),
     );
   }
 

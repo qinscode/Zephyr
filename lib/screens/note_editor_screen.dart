@@ -17,8 +17,31 @@ import '../widgets/editor/background_container.dart';
 import '../widgets/editor/theme_selector.dart';
 import '../widgets/editor/share_options.dart';
 import '../widgets/editor/more_options.dart';
-import '../widgets/editor/opacity_slider.dart';
 import '../widgets/folder_selector.dart';
+import 'package:flutter/foundation.dart';
+
+// 修改 SaveNoteData 类的类型定义
+class SaveNoteData {
+  final List<dynamic> titleDeltaJson;
+  final List<dynamic> contentDeltaJson;
+  final String titleText;
+  final String contentText;
+  final String? folderId;
+  final NoteBackground? background;
+  final String? noteId;
+  final DateTime? createdAt;
+
+  SaveNoteData({
+    required this.titleDeltaJson,
+    required this.contentDeltaJson,
+    required this.titleText,
+    required this.contentText,
+    this.folderId,
+    this.background,
+    this.noteId,
+    this.createdAt,
+  });
+}
 
 class NoteEditorScreen extends StatefulWidget {
   final Note? note;
@@ -44,6 +67,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   @override
   void initState() {
     super.initState();
+    print('NoteEditorScreen - initState');
     
     // 从保存的 Delta JSON 创建文档
     Document titleDoc;
@@ -85,6 +109,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   @override
   void dispose() {
+    print('NoteEditorScreen - dispose');
+    // 如果有未保存的编辑，在页面销毁前保存
+    if (_editorState.isEdited) {
+      _saveNote();
+    }
     _editorState.dispose();
     _titleFocusNode.dispose();
     _contentFocusNode.dispose();
@@ -98,52 +127,77 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     });
   }
 
-  // 修改保存笔记的方法
-  Future<void> _saveNote() async {
-    if (_editorState.titleController.document.length == 0 && 
-        _editorState.contentController.document.length == 0) {
-      return;
-    }
-
-    final notesModel = Provider.of<NotesModel>(context, listen: false);
+  // 修改后台处理函数
+  Note _processSaveNote(SaveNoteData data) {
     final now = DateTime.now();
 
-    // 将 Delta 转换为 JSON
-    final titleDelta = _editorState.titleController.document.toDelta().toJson();
-    final contentDelta = _editorState.contentController.document.toDelta().toJson();
+    return Note(
+      id: data.noteId ?? const Uuid().v4(),
+      title: data.titleText.trim(),
+      content: [
+        RichParagraph(
+          text: data.contentText,
+          deltaJson: data.contentDeltaJson,
+        )
+      ],
+      createdAt: data.createdAt ?? now,
+      modifiedAt: now,
+      folderId: data.folderId,
+      background: data.background,
+      titleDeltaJson: data.titleDeltaJson,
+    );
+  }
 
-    if (widget.note == null) {
-      final newNote = Note(
-        id: const Uuid().v4(),
-        title: _editorState.titleController.document.toPlainText().trim(),
-        content: [
-          RichParagraph(
-            text: _editorState.contentController.document.toPlainText(),
-            deltaJson: contentDelta,
-          )
-        ],
-        createdAt: now,
-        modifiedAt: now,
+  // 修改保存笔记的方法
+  Future<bool> _saveNote() async {
+    print('NoteEditorScreen - _saveNote - 开始');
+    print('开始保存笔记...');
+    if (_editorState.titleController.document.length == 0 && 
+        _editorState.contentController.document.length == 0) {
+      print('笔记内容为空，直接返回');
+      return true;
+    }
+
+    try {
+      print('准备保存数据...');
+      final notesModel = Provider.of<NotesModel>(context, listen: false);
+
+      // 准备可序列化的数据，直接使用 toDelta().toJson()
+      final saveData = SaveNoteData(
+        titleDeltaJson: _editorState.titleController.document.toDelta().toJson(),
+        contentDeltaJson: _editorState.contentController.document.toDelta().toJson(),
+        titleText: _editorState.titleController.document.toPlainText(),
+        contentText: _editorState.contentController.document.toPlainText(),
         folderId: _editorState.folderId,
         background: _editorState.currentBackground,
-        titleDeltaJson: titleDelta,
+        noteId: widget.note?.id,
+        createdAt: widget.note?.createdAt,
       );
-      await notesModel.addNote(newNote);
-    } else {
-      final updatedNote = widget.note!.copyWith(
-        title: _editorState.titleController.document.toPlainText().trim(),
-        content: [
-          RichParagraph(
-            text: _editorState.contentController.document.toPlainText(),
-            deltaJson: contentDelta,
-          )
-        ],
-        modifiedAt: now,
-        folderId: _editorState.folderId,
-        background: _editorState.currentBackground,
-        titleDeltaJson: titleDelta,
-      );
-      await notesModel.updateNote(updatedNote);
+
+      print('开始后台处理数据...');
+      final note = await compute(_processSaveNote, saveData);
+      print('后台处理完成');
+
+      print('开始保存到数据库...');
+      if (widget.note == null) {
+        await notesModel.addNote(note);
+        print('新笔记保存完成');
+      } else {
+        await notesModel.updateNote(note);
+        print('笔记更新完成');
+      }
+      
+      print('保存成功');
+      return true;
+    } catch (e, stackTrace) {
+      print('保存失败: $e');
+      print('错误堆栈: $stackTrace');  // 添加堆栈跟踪
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save note: $e')),
+        );
+      }
+      return false;
     }
   }
 
@@ -282,78 +336,74 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('NoteEditorScreen - build');
     return ListenableBuilder(
       listenable: _editorState,
       builder: (context, child) {
-        return PopScope(
-          canPop: true,
-          onPopInvoked: (didPop) async {
-            // 如果有编辑，先保存
-            if (_editorState.isEdited) {
-              await _saveNote();
-            }
-            
-            // 如果 didPop 为 false，需要手动触发返回
-            if (!didPop && mounted) {
-              Navigator.pop(context);
-            }
-          },
-          child: BackgroundContainer(
-            background: _editorState.currentBackground,
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: EditorAppBar(
-                isEdited: _editorState.isEdited,
-                onBack: () async {
-                  if (_editorState.isEdited) {
-                    await _saveNote();
+        print('NoteEditorScreen - ListenableBuilder rebuild');
+        return BackgroundContainer(
+          background: _editorState.currentBackground,
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: EditorAppBar(
+              isEdited: _editorState.isEdited,
+              onBack: () async {
+                print('点击返回按钮');
+                if (_editorState.isEdited) {
+                  print('笔记已编辑，准备保存');
+                  final saved = await _saveNote();
+                  print('保存结果: $saved');
+                  if (!saved) {
+                    print('保存失败，取消返回');
+                    return;
                   }
-                  if (mounted) {
-                    Navigator.pop(context);
-                  }
-                },
-                onUndo: _editorState.undoHistory.length > 1 ? _editorState.undo : () {},
-                onRedo: _editorState.redoHistory.isNotEmpty ? _editorState.redo : () {},
-                onTheme: _showThemeOptions,
-                onShare: _showShareOptions,
-                onMore: _showMoreOptions,
-                canUndo: _editorState.undoHistory.length > 1,
-                canRedo: _editorState.redoHistory.isNotEmpty,
-                iconColor: _editorState.currentBackground?.textColor,  // 只传递图标颜色
-              ),
-              body: Column(
-                children: [
-                  FolderIndicator(
-                    folderId: _editorState.folderId,  // 使用 EditorState 中的文件夹ID
-                    onTap: _showFolderSelector,
+                }
+                if (mounted) {
+                  print('执行返回操作');
+                  Navigator.pop(context);
+                }
+              },
+              onUndo: _editorState.undoHistory.length > 1 ? _editorState.undo : () {},
+              onRedo: _editorState.redoHistory.isNotEmpty ? _editorState.redo : () {},
+              onTheme: _showThemeOptions,
+              onShare: _showShareOptions,
+              onMore: _showMoreOptions,
+              canUndo: _editorState.undoHistory.length > 1,
+              canRedo: _editorState.redoHistory.isNotEmpty,
+              iconColor: _editorState.currentBackground?.textColor,  // 只传递图标颜色
+            ),
+            body: Column(
+              children: [
+                FolderIndicator(
+                  folderId: _editorState.folderId,  // 使用 EditorState 中的文件夹ID
+                  onTap: _showFolderSelector,
+                ),
+                Expanded(
+                  child: EditorContent(
+                    titleController: _editorState.titleController,
+                    contentController: _editorState.contentController,
+                    titleFocusNode: _titleFocusNode,
+                    contentFocusNode: _contentFocusNode,
+                    textColor: _editorState.currentBackground?.textColor ?? Colors.black,
+                    characterCount: _characterCount,
+                    lastModified: _lastModified,
                   ),
-                  Expanded(
-                    child: EditorContent(
-                      titleController: _editorState.titleController,
-                      contentController: _editorState.contentController,
-                      titleFocusNode: _titleFocusNode,
-                      contentFocusNode: _contentFocusNode,
-                      textColor: _editorState.currentBackground?.textColor ?? Colors.black,
-                      characterCount: _characterCount,
-                      lastModified: _lastModified,
-                    ),
-                  ),
-                  EditorToolbar(
-                    backgroundColor: _editorState.toolbarColor,
-                    showFormatToolbar: _editorState.showFormatToolbar,
-                    onFormatPressed: () => _editorState.toggleFormatToolbar(),
-                    onCloseFormat: () => _editorState.toggleFormatToolbar(),
-                    onHighlight: () => _editorState.applyHighlight(Colors.yellow.withOpacity(0.5)),
-                    onH1: () => _editorState.applyHeading(1),
-                    onH2: () => _editorState.applyHeading(2),
-                    onH3: () => _editorState.applyHeading(3),
-                    onBold: () => _editorState.applyBold(),
-                    onChecklist: () => _editorState.toggleChecklist(),
-                    onInsertImage: () => _editorState.insertImage(),  // 添加这行
-                    onOrderedList: () => _editorState.toggleOrderedList(),  // 添加这一行
-                  ),
-                ],
-              ),
+                ),
+                EditorToolbar(
+                  backgroundColor: _editorState.toolbarColor,
+                  showFormatToolbar: _editorState.showFormatToolbar,
+                  onFormatPressed: () => _editorState.toggleFormatToolbar(),
+                  onCloseFormat: () => _editorState.toggleFormatToolbar(),
+                  onHighlight: () => _editorState.applyHighlight(Colors.yellow.withOpacity(0.5)),
+                  onH1: () => _editorState.applyHeading(1),
+                  onH2: () => _editorState.applyHeading(2),
+                  onH3: () => _editorState.applyHeading(3),
+                  onBold: () => _editorState.applyBold(),
+                  onChecklist: () => _editorState.toggleChecklist(),
+                  onInsertImage: () => _editorState.insertImage(),  // 添加这行
+                  onOrderedList: () => _editorState.toggleOrderedList(),  // 添加这一行
+                ),
+              ],
             ),
           ),
         );
