@@ -102,7 +102,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   Future<void> _saveNote() async {
     if (_editorState.titleController.document.length == 0 && 
         _editorState.contentController.document.length == 0) {
-      Navigator.pop(context);
       return;
     }
 
@@ -145,10 +144,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         titleDeltaJson: titleDelta,
       );
       await notesModel.updateNote(updatedNote);
-    }
-
-    if (mounted) {
-      Navigator.pop(context);
     }
   }
 
@@ -291,9 +286,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       listenable: _editorState,
       builder: (context, child) {
         return PopScope(
-          canPop: false,
+          canPop: true,
           onPopInvoked: (didPop) async {
-            if (didPop) return;
             if (_editorState.isEdited) {
               await _saveNote();
             }
@@ -307,10 +301,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               backgroundColor: Colors.transparent,
               appBar: EditorAppBar(
                 isEdited: _editorState.isEdited,
-                onBack: () {
+                onBack: () async {
                   if (_editorState.isEdited) {
-                    _saveNote();
-                  } else {
+                    await _saveNote();
+                  }
+                  if (mounted) {
                     Navigator.pop(context);
                   }
                 },
