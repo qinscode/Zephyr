@@ -13,55 +13,66 @@ class ThemeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            'Choose Background',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 32,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-        ),
-        SizedBox(
-          height: 120,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _buildThemeOption(
-                label: 'Default',
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(12),
+            const Text(
+              'Choose Background',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 120,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _buildThemeOption(
+                    label: 'Default',
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onTap: () => onBackgroundChanged(NoteBackground.defaultBackground),
                   ),
-                ),
-                onTap: () => onBackgroundChanged(NoteBackground.defaultBackground),
+                  _buildThemeOption(
+                    label: 'Cloud',
+                    child: _buildBackgroundPreview('assets/images/cloud_pattern.png'),
+                    onTap: () => onBackgroundChanged(NoteBackground.cloudBackground),
+                  ),
+                  _buildThemeOption(
+                    label: 'Snow',
+                    child: _buildBackgroundPreview('assets/images/snow_pattern.png'),
+                    onTap: () => onBackgroundChanged(NoteBackground.snowBackground),
+                  ),
+                  _buildThemeOption(
+                    label: 'Banana',
+                    child: _buildBackgroundPreview('assets/images/banana_pattern.png'),
+                    onTap: () => onBackgroundChanged(NoteBackground.bananaBackground),
+                  ),
+                ],
               ),
-              _buildThemeOption(
-                label: 'Cloud',
-                child: _buildBackgroundPreview('assets/images/cloud_pattern.png'),
-                onTap: () => onBackgroundChanged(NoteBackground.cloudBackground),
-              ),
-              _buildThemeOption(
-                label: 'Snow',
-                child: _buildBackgroundPreview('assets/images/snow_pattern.png'),
-                onTap: () => onBackgroundChanged(NoteBackground.snowBackground),
-              ),
-              _buildThemeOption(
-                label: 'Banana',
-                child: _buildBackgroundPreview('assets/images/banana_pattern.png'),
-                onTap: () => onBackgroundChanged(NoteBackground.bananaBackground),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 

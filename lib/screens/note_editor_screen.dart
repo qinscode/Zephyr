@@ -169,6 +169,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   void _showThemeOptions() {
     showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(16),
+        ),
+      ),
       builder: (context) => ThemeSelector(
         currentBackground: _editorState.currentBackground,
         onBackgroundChanged: (background) async {
