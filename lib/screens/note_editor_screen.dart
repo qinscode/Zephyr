@@ -288,10 +288,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         return PopScope(
           canPop: true,
           onPopInvoked: (didPop) async {
+            // 如果有编辑，先保存
             if (_editorState.isEdited) {
               await _saveNote();
             }
-            if (mounted) {
+            
+            // 如果 didPop 为 false，需要手动触发返回
+            if (!didPop && mounted) {
               Navigator.pop(context);
             }
           },
