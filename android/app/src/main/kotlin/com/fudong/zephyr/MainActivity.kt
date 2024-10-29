@@ -1,4 +1,4 @@
-package com.fudong.swiftnote
+package com.fudong.zephyr
 
 import io.flutter.embedding.android.FlutterActivity
 

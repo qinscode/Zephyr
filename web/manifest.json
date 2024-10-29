@@ -1,6 +1,6 @@
 {
-    "name": "swiftnote",
-    "short_name": "swiftnote",
+    "name": "zephyr",
+    "short_name": "zephyr",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

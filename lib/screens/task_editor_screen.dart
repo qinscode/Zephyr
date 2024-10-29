@@ -1,9 +1,11 @@
+// lib/screens/task_editor_screen.dart
+
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../models/task.dart';
 import '../models/tasks_model.dart';
-import 'package:flutter/cupertino.dart';
 import '../l10n/app_localizations.dart';
 
 class TaskEditorScreen extends StatefulWidget {
@@ -32,7 +34,6 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
     _isCompleted = widget.task?.isCompleted ?? false;
     _subtasks = widget.task?.subtasks.toList() ?? [];
 
-    // Auto focus on the title field when creating a new task
     if (widget.task == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _titleFocusNode.requestFocus();
@@ -48,7 +49,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
   }
 
   void _saveTask() {
-    // final l10n = AppLocalizations.of(context);  // 获取本地化实例
+    final l10n = AppLocalizations.of(context);
     if (_titleController.text.isEmpty) {
       Navigator.pop(context);
       return;
@@ -81,204 +82,132 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
   }
 
   void _addSubtask(String title) {
-    setState(() {
-      _subtasks.add(SubTask(
-        id: const Uuid().v4(),
-        title: title,
-        isCompleted: false,
-      ));
-    });
+    if (title.isNotEmpty) {
+      setState(() {
+        _subtasks.add(SubTask(
+          id: const Uuid().v4(),
+          title: title,
+          isCompleted: false,
+        ));
+      });
+      _titleController.clear();
+    }
   }
 
-  void _toggleSubtask(String id) {
-    setState(() {
-      final index = _subtasks.indexWhere((subtask) => subtask.id == id);
-      if (index != -1) {
-        _subtasks[index] = _subtasks[index].copyWith(
-          isCompleted: !_subtasks[index].isCompleted,
-        );
-      }
-    });
-  }
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
 
-  void _removeSubtask(String id) {
-    setState(() {
-      _subtasks.removeWhere((subtask) => subtask.id == id);
-    });
-  }
-
-  void _showSetReminderSheet() {
-    final l10n = AppLocalizations.of(context);  // 获取本地化实例
-    showModalBottomSheet(
-      context: context,
+    return Scaffold(
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-      ),
-      builder: (context) => SafeArea(
+      body: Container(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              height: 4,
-              width: 32,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+            TextField(
+              controller: _titleController,
+              focusNode: _titleFocusNode,
+              style: const TextStyle(fontSize: 17),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: l10n.addSubtask,
+                hintStyle: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 17,
+                ),
+                prefixIcon: Transform.scale(
+                  scale: 1.1,
+                  child: Checkbox(
+                    value: _isCompleted,
+                    onChanged: (value) {
+                      setState(() {
+                        _isCompleted = value ?? false;
+                      });
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    side: BorderSide(
+                      color: Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
               ),
+              onSubmitted: _addSubtask,
             ),
+            if (_subtasks.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              for (var subtask in _subtasks)
+                Padding(
+                  padding: const EdgeInsets.only(left: 36),
+                  child: Row(
+                    children: [
+                      Transform.scale(
+                        scale: 1.1,
+                        child: Checkbox(
+                          value: subtask.isCompleted,
+                          onChanged: (value) {
+                            setState(() {
+                              final index = _subtasks.indexWhere(
+                                      (st) => st.id == subtask.id);
+                              if (index != -1) {
+                                _subtasks[index] = subtask.copyWith(
+                                  isCompleted: value ?? false,
+                                );
+                              }
+                            });
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          side: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          subtask.title,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: subtask.isCompleted ? Colors.grey : Colors.black,
+                            decoration: subtask.isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          CupertinoIcons.xmark,
+                          size: 16,
+                          color: Colors.grey[400],
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _subtasks.removeWhere((st) => st.id == subtask.id);
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+            const Divider(height: 32),
             ListTile(
               leading: const Icon(CupertinoIcons.time),
-              title: Text(l10n.setReminder),  // 使用本地化文本
-              onTap: () async {
-                Navigator.pop(context);
-                final time = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),
-                );
-                if (time != null && mounted) {
-                  // Handle reminder time
-                }
+              title: Text(l10n.setReminder),
+              onTap: () {
+                // TODO: 实现提醒功能
               },
             ),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);  // 获取本地化实例
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(CupertinoIcons.xmark),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          TextButton(
-            onPressed: _saveTask,
-            child: Text(
-              l10n.done,  // 使用本地化文本
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Checkbox(
-                          value: _isCompleted,
-                          onChanged: (value) {
-                            setState(() {
-                              _isCompleted = value ?? false;
-                            });
-                          },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: _titleController,
-                          focusNode: _titleFocusNode,
-                          style: const TextStyle(fontSize: 16),
-                          decoration: InputDecoration(
-                            hintText: l10n.addSubtask,  // 使用本地化文本
-                            hintStyle: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 16,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          onSubmitted: (value) {
-                            if (value.isNotEmpty) {
-                              _addSubtask(value);
-                              _titleController.clear();
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ..._buildSubtasks(),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(CupertinoIcons.time),
-                  title: Text(l10n.setReminder),  // 使用本地化文本
-                  onTap: _showSetReminderSheet,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _buildSubtasks() {
-    return List.generate(_subtasks.length, (index) {
-      final subtask = _subtasks[index];
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Row(
-          children: [
-            const SizedBox(width: 36),
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: Checkbox(
-                value: subtask.isCompleted,
-                onChanged: (value) => _toggleSubtask(subtask.id),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                subtask.title,
-                style: TextStyle(
-                  decoration: subtask.isCompleted
-                      ? TextDecoration.lineThrough
-                      : null,
-                  color: subtask.isCompleted
-                      ? Colors.grey
-                      : Colors.black,
-                ),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(CupertinoIcons.xmark, size: 16),
-              onPressed: () => _removeSubtask(subtask.id),
-              color: Colors.grey,
-            ),
-          ],
-        ),
-      );
-    });
   }
 }

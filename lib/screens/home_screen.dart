@@ -1,16 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:notes_app/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
+import './settings_screen.dart';
 import '../models/folder_model.dart';
 import '../models/note.dart';
 import '../models/notes_model.dart';
 import '../models/task.dart';
 import '../models/tasks_model.dart';
 import '../widgets/notes_view.dart';
+import '../widgets/task_editor.dart';
 import '../widgets/tasks_view.dart';
 import '../screens/note_editor_screen.dart';
-import '../screens/task_editor_screen.dart';
 import '../screens/folders_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../l10n/app_localizations.dart';  // 添加这行
@@ -157,42 +157,19 @@ class _HomeScreenState extends State<HomeScreen> {
           child: FloatingActionButton(
             heroTag: 'home_fab',
             shape: const CircleBorder(), // 添加这一行，使按钮变成圆形
-            onPressed: () async {
-              if (_isNavigating) {
-                print('HomeScreen - 导航正在进行中，忽略点击');
-                return;
-              }
-
-              print('HomeScreen - FAB clicked');
-              _isNavigating = true;
-
-              try {
-                if (_selectedIndex == 0) {
-                  print('HomeScreen - 准备导航到 NoteEditorScreen');
-                  await Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (context) {
-                        print('HomeScreen - 创建 NoteEditorScreen');
-                        return const NoteEditorScreen();
-                      },
-                    ),
-                  );
-                } else {
-                  print('HomeScreen - 准备导航到 TaskEditorScreen');
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TaskEditorScreen(),
-                    ),
-                  );
-                }
-              } finally {
-                _isNavigating = false;
-                print('HomeScreen - 重置导航状态');
+            onPressed: () {
+              if (_selectedIndex == 1) {
+                TaskEditor.show(context);
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NoteEditorScreen(),
+                  ),
+                );
               }
             },
-            child: const FaIcon(FontAwesomeIcons.plus),
+            child: const Icon(Icons.add, color: Colors.white),
           ),
         ),
       ),

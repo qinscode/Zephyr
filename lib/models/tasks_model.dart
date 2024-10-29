@@ -36,6 +36,25 @@ class TasksModel extends ChangeNotifier {
     }
   }
 
+  // 添加切换任务展开状态的方法
+
+  Future<void> toggleTaskExpanded(String id) async {
+    final index = _tasks.indexWhere((task) => task.id == id);
+    if (index != -1) {
+      final oldTask = _tasks[index];
+      try {
+        _tasks[index] = oldTask.copyWith(
+          expanded: !oldTask.expanded,
+        );
+        await _saveTasks();
+        notifyListeners();
+      } catch (e) {
+        _tasks[index] = oldTask;
+        rethrow;
+      }
+    }
+  }
+
   // 保存任务
   Future<void> _saveTasks() async {
     try {
@@ -91,6 +110,41 @@ class TasksModel extends ChangeNotifier {
     }
   }
 
+
+// 添加重新排序方法
+  Future<void> reorderTask(int oldIndex, int newIndex) async {
+    final task = _tasks.removeAt(oldIndex);
+    _tasks.insert(newIndex, task);
+    await _saveTasks();
+    notifyListeners();
+  }
+
+// 添加批量删除方法
+  Future<void> deleteMultipleTasks(List<String> taskIds) async {
+    final deletedTasks = <int, Task>{};
+
+    for (final id in taskIds) {
+      final index = _tasks.indexWhere((task) => task.id == id);
+      if (index != -1) {
+        deletedTasks[index] = _tasks[index];
+        _tasks.removeAt(index);
+      }
+    }
+
+    if (deletedTasks.isNotEmpty) {
+      try {
+        await _saveTasks();
+        notifyListeners();
+      } catch (e) {
+        // 恢复删除的任务
+        deletedTasks.forEach((index, task) {
+          _tasks.insert(index, task);
+        });
+        rethrow;
+      }
+    }
+  }
+
   // 切换任务完成状态
   Future<void> toggleTask(String id) async {
     final index = _tasks.indexWhere((task) => task.id == id);
@@ -104,6 +158,37 @@ class TasksModel extends ChangeNotifier {
         notifyListeners();
       } catch (e) {
         _tasks[index] = oldTask;
+        rethrow;
+      }
+    }
+  }
+
+  Future<void> toggleSubtask(String taskId, String subtaskId) async {
+    final taskIndex = _tasks.indexWhere((task) => task.id == taskId);
+    if (taskIndex != -1) {
+      final oldTask = _tasks[taskIndex];
+      try {
+        final newSubtasks = List<SubTask>.from(oldTask.subtasks);
+        final subtaskIndex = newSubtasks.indexWhere((st) => st.id == subtaskId);
+
+        if (subtaskIndex != -1) {
+          newSubtasks[subtaskIndex] = newSubtasks[subtaskIndex].copyWith(
+            isCompleted: !newSubtasks[subtaskIndex].isCompleted,
+          );
+
+          // 检查是否所有子任务都完成
+          final allSubtasksCompleted = newSubtasks.every((st) => st.isCompleted);
+
+          _tasks[taskIndex] = oldTask.copyWith(
+            subtasks: newSubtasks,
+            isCompleted: allSubtasksCompleted,
+          );
+
+          await _saveTasks();
+          notifyListeners();
+        }
+      } catch (e) {
+        _tasks[taskIndex] = oldTask;
         rethrow;
       }
     }
@@ -206,30 +291,6 @@ class TasksModel extends ChangeNotifier {
         _tasks[index] = task;
       });
       rethrow;
-    }
-  }
-
-  Future<void> deleteMultipleTasks(List<String> ids) async {
-    final deletedTasks = <int, Task>{};
-    for (final id in ids) {
-      final index = _tasks.indexWhere((task) => task.id == id);
-      if (index != -1) {
-        deletedTasks[index] = _tasks[index];
-        _tasks.removeAt(index);
-      }
-    }
-
-    if (deletedTasks.isNotEmpty) {
-      try {
-        await _saveTasks();
-        notifyListeners();
-      } catch (e) {
-        // 恢复原始状态
-        deletedTasks.forEach((index, task) {
-          _tasks.insert(index, task);
-        });
-        rethrow;
-      }
     }
   }
 

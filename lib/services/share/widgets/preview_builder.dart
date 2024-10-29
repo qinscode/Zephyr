@@ -105,7 +105,7 @@ class PreviewBuilder {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Created with Notes App',
+                'Created By Swift App',
                 style: TextStyle(
                   fontSize: ShareConstants.typography.watermarkFontSize,
                   color: Colors.grey[400],
