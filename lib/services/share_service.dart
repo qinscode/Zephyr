@@ -9,38 +9,27 @@ import '../models/note_background.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:image/image.dart' as image;
 
 class ShareService {
-  // 图片尺寸
   static const double shareImageWidth = 1200.0;
   static const double shareImageMinHeight = 700.0;
-
-  // 布局尺寸
   static const double horizontalPadding = 80.0;
   static const double verticalPadding = 80.0;
   static const double borderRadius = 12.0;
-
-  // 文字样式
   static const double titleFontSize = 48.0;
   static const double contentFontSize = 32.0;
   static const double watermarkFontSize = 24.0;
   static const double contentLineHeight = 1.6;
   static const double watermarkLetterSpacing = 0.3;
-
-  // 间距
   static const double titleBottomSpacing = 40.0;
   static const double contentBottomSpacing = 40.0;
   static const double dividerBottomSpacing = 20.0;
-
-  // 分割线
   static const double dividerHeight = 0.5;
   static const double dividerOpacity = 0.3;
-
-  // 底部区域
   static const double bottomAreaHeight = 60.0;
   static const double bottomPadding = 60.0;
 
-  // 将笔记转换为图片并分享
   static Future<void> shareNoteAsImage(
       Note note,
       GlobalKey repaintBoundaryKey,
@@ -63,24 +52,24 @@ class ShareService {
 
       debugPrint('Converting to Uint8List...');
       final bytes = byteData.buffer.asUint8List();
-      debugPrint('Bytes length: ${bytes.length}');
+      debugPrint('Original size: ${(bytes.length / 1024).toStringAsFixed(2)} KB');
+
+      // 压缩图片
+      final compressedBytes = await _compressImage(bytes);
+      debugPrint('Final size: ${(compressedBytes.length / 1024).toStringAsFixed(2)} KB');
 
       debugPrint('Getting temp directory...');
       final tempDir = await getTemporaryDirectory();
-      final filePath = '${tempDir.path}/note_${note.id}.png';
+      final filePath = '${tempDir.path}/note_${note.id}.jpg';
       debugPrint('Saving to file: $filePath');
       final file = File(filePath);
-      await file.writeAsBytes(bytes);
+      await file.writeAsBytes(compressedBytes);
 
       debugPrint('Sharing file...');
       await Share.shareXFiles(
         [XFile(file.path)],
         text: 'Note: ${note.title}',
-      ).then((_) {
-        debugPrint('Share.shareXFiles completed successfully');
-      }).catchError((error) {
-        debugPrint('Share.shareXFiles failed: $error');
-      });
+      );
 
       debugPrint('Deleting temp file...');
       await file.delete();
@@ -97,9 +86,38 @@ class ShareService {
     }
   }
 
-  // 生成笔记预览Widget
+  static Future<Uint8List> _compressImage(Uint8List bytes) async {
+    try {
+      debugPrint('Original size: ${(bytes.length / 1024).toStringAsFixed(2)} KB');
+
+      final decodedImage = image.decodeImage(bytes);
+      if (decodedImage == null) return bytes;
+
+      debugPrint('Original dimensions: ${decodedImage.width}x${decodedImage.height}');
+
+      if (bytes.length > 500 * 1024) {  // 如果大于 500KB
+        for (int quality = 80; quality >= 40; quality -= 10) {
+          final compressedBytes = image.encodeJpg(
+            decodedImage,
+            quality: quality,
+          );
+
+          debugPrint('Compressed size (quality $quality): ${(compressedBytes.length / 1024).toStringAsFixed(2)} KB');
+
+          if (compressedBytes.length < bytes.length * 0.5) {
+            return Uint8List.fromList(compressedBytes);
+          }
+        }
+      }
+
+      return bytes;
+    } catch (e) {
+      debugPrint('Error compressing image: $e');
+      return bytes;
+    }
+  }
+
   static Widget buildNotePreviewWidget(Note note) {
-    debugPrint('Building note preview widget...');
     return SingleChildScrollView(
       child: Container(
         width: shareImageWidth,
@@ -112,7 +130,6 @@ class ShareService {
         ),
         child: Stack(
           children: [
-            // 背景层
             if (note.background != null && note.background!.type != BackgroundType.none)
               Positioned.fill(
                 child: Container(
@@ -128,7 +145,6 @@ class ShareService {
                 ),
               ),
 
-            // 内容层
             Padding(
               padding: const EdgeInsets.only(
                 left: horizontalPadding,
@@ -141,7 +157,6 @@ class ShareService {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (note.title.isNotEmpty) ...[
-                    // 标题
                     _buildRichText(
                       note.titleDeltaJson,
                       note.title,
@@ -155,7 +170,6 @@ class ShareService {
                     const SizedBox(height: titleBottomSpacing),
                   ],
 
-                  // 内容
                   if (note.content.isNotEmpty)
                     Flexible(
                       child: _buildRichText(
@@ -172,7 +186,6 @@ class ShareService {
               ),
             ),
 
-            // 底部区域
             Positioned(
               left: horizontalPadding,
               right: horizontalPadding,
@@ -215,8 +228,6 @@ class ShareService {
     );
   }
 
-  // 构建富文本
-// 构建富文本
   static Widget _buildRichText(List<dynamic>? deltaJson, String plainText, TextStyle style) {
     if (deltaJson != null) {
       try {
@@ -227,7 +238,6 @@ class ShareService {
           selection: const TextSelection.collapsed(offset: 0),
         );
 
-        debugPrint('Creating QuillEditor...');
         return Container(
           constraints: BoxConstraints(
             maxWidth: shareImageWidth - (horizontalPadding * 2),
@@ -261,7 +271,6 @@ class ShareService {
       } catch (e, stackTrace) {
         debugPrint('Error rendering rich text: $e');
         debugPrint('Stack trace: $stackTrace');
-        debugPrint('Falling back to plain text');
       }
     }
 
@@ -269,7 +278,8 @@ class ShareService {
       plainText,
       style: style,
     );
-  }}
+  }
+}
 
 class ShareImageEmbedBuilder extends EmbedBuilder {
   @override
@@ -278,7 +288,6 @@ class ShareImageEmbedBuilder extends EmbedBuilder {
   @override
   Widget build(BuildContext context, QuillController controller, Embed node, bool readOnly, bool inline, TextStyle textStyle) {
     final imageUrl = node.value.data as String;
-    debugPrint('ShareImageEmbedBuilder.build called');
 
     if (imageUrl.startsWith('data:image')) {
       try {
@@ -297,7 +306,6 @@ class ShareImageEmbedBuilder extends EmbedBuilder {
             imageData,
             fit: BoxFit.fitWidth,
             width: ShareService.shareImageWidth - (ShareService.horizontalPadding * 2),
-            cacheWidth: 1200,
             gaplessPlayback: true,
           ),
         );
