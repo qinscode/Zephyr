@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:ui' as ui;
-import 'dart:math' as math;  // 添加这个导入
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
@@ -15,24 +14,24 @@ class ShareService {
   // 图片尺寸
   static const double shareImageWidth = 1200.0;
   static const double shareImageMinHeight = 700.0;
-  
+
   // 布局尺寸
   static const double horizontalPadding = 80.0;
   static const double verticalPadding = 80.0;
   static const double borderRadius = 12.0;
-  
+
   // 文字样式
   static const double titleFontSize = 48.0;
   static const double contentFontSize = 32.0;
   static const double watermarkFontSize = 24.0;
   static const double contentLineHeight = 1.6;
   static const double watermarkLetterSpacing = 0.3;
-  
+
   // 间距
   static const double titleBottomSpacing = 40.0;
   static const double contentBottomSpacing = 40.0;
   static const double dividerBottomSpacing = 20.0;
-  
+
   // 分割线
   static const double dividerHeight = 0.5;
   static const double dividerOpacity = 0.3;
@@ -43,25 +42,25 @@ class ShareService {
 
   // 将笔记转换为图片并分享
   static Future<void> shareNoteAsImage(
-    Note note,
-    GlobalKey repaintBoundaryKey,
-    BuildContext context,
-  ) async {
+      Note note,
+      GlobalKey repaintBoundaryKey,
+      BuildContext context,
+      ) async {
     debugPrint('Starting shareNoteAsImage...');
     try {
       debugPrint('Getting RenderRepaintBoundary...');
       final boundary = repaintBoundaryKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      
+
       debugPrint('Converting to image...');
       final image = await boundary.toImage(pixelRatio: 3.0);
       debugPrint('Getting byte data...');
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      
+
       if (byteData == null) {
         debugPrint('Error: byteData is null');
         throw Exception('Failed to generate image');
       }
-      
+
       debugPrint('Converting to Uint8List...');
       final bytes = byteData.buffer.asUint8List();
       debugPrint('Bytes length: ${bytes.length}');
@@ -101,26 +100,7 @@ class ShareService {
   // 生成笔记预览Widget
   static Widget buildNotePreviewWidget(Note note) {
     debugPrint('Building note preview widget...');
-    debugPrint('Note title: ${note.title}');
-    debugPrint('Note content length: ${note.content.length}');
-    if (note.content.isNotEmpty) {
-      debugPrint('First content block length: ${note.content.first.text.length}');
-      debugPrint('Has deltaJson: ${note.content.first.deltaJson != null}');
-      if (note.content.first.deltaJson != null) {
-        debugPrint('DeltaJson structure found');  // 不输出完整的 deltaJson
-        final deltaList = note.content.first.deltaJson as List;
-        for (var i = 0; i < deltaList.length; i++) {
-          final op = deltaList[i];
-          if (op['insert'] is Map && op['insert']['image'] != null) {
-            debugPrint('Found image at index $i');
-            debugPrint('Image data type: ${op['insert']['image'].runtimeType}');
-            debugPrint('Found base64 image data');  // 不输出图片内容
-          }
-        }
-      }
-    }
-    
-    return SingleChildScrollView(  // 添加 SingleChildScrollView
+    return SingleChildScrollView(
       child: Container(
         width: shareImageWidth,
         constraints: const BoxConstraints(
@@ -147,7 +127,7 @@ class ShareService {
                   ),
                 ),
               ),
-            
+
             // 内容层
             Padding(
               padding: const EdgeInsets.only(
@@ -174,10 +154,10 @@ class ShareService {
                     ),
                     const SizedBox(height: titleBottomSpacing),
                   ],
-                  
+
                   // 内容
                   if (note.content.isNotEmpty)
-                    Flexible(  // 添加 Flexible
+                    Flexible(
                       child: _buildRichText(
                         note.content.first.deltaJson,
                         note.content.first.text,
@@ -191,7 +171,7 @@ class ShareService {
                 ],
               ),
             ),
-            
+
             // 底部区域
             Positioned(
               left: horizontalPadding,
@@ -236,31 +216,17 @@ class ShareService {
   }
 
   // 构建富文本
+// 构建富文本
   static Widget _buildRichText(List<dynamic>? deltaJson, String plainText, TextStyle style) {
-    debugPrint('Building rich text...');
-    debugPrint('Has deltaJson: ${deltaJson != null}');
-    debugPrint('Text length: ${plainText.length}');
-    
     if (deltaJson != null) {
       try {
-        debugPrint('Creating Document from deltaJson...');
         final doc = Document.fromJson(deltaJson);
-        debugPrint('Document created successfully');
-        debugPrint('Document length: ${doc.length}');
-        
-        // 检查是否包含图片
-        final delta = doc.toDelta();
-        for (final op in delta.toList()) {
-          if (op.data is Map && (op.data as Map).containsKey('image')) {
-            debugPrint('Found image in delta');
-          }
-        }
-        
+
         final controller = QuillController(
           document: doc,
           selection: const TextSelection.collapsed(offset: 0),
         );
-        
+
         debugPrint('Creating QuillEditor...');
         return Container(
           constraints: BoxConstraints(
@@ -287,7 +253,7 @@ class ShareService {
                 ),
               ),
               embedBuilders: [
-                PreviewImageEmbedBuilder(),  // 使用专门的预览图片构建器
+                ShareImageEmbedBuilder(),
               ],
             ),
           ),
@@ -298,56 +264,41 @@ class ShareService {
         debugPrint('Falling back to plain text');
       }
     }
-    
+
     return Text(
       plainText,
       style: style,
     );
-  }
-}
+  }}
 
-// 添加自定义图片构建器
 class ShareImageEmbedBuilder extends EmbedBuilder {
   @override
-  String get key => 'image';  // 添加这一行
+  String get key => 'image';
 
   @override
   Widget build(BuildContext context, QuillController controller, Embed node, bool readOnly, bool inline, TextStyle textStyle) {
     final imageUrl = node.value.data as String;
     debugPrint('ShareImageEmbedBuilder.build called');
-    debugPrint('Processing image...');  // 不输出图片 URL
-    
+
     if (imageUrl.startsWith('data:image')) {
       try {
         final parts = imageUrl.split(',');
-        debugPrint('Image format: ${parts[0]}');  // 只输出格式信息
         final base64Data = parts[1];
         final imageData = base64Decode(base64Data);
-        debugPrint('Image data size: ${imageData.length} bytes');
-        
+
         return Container(
-          constraints: BoxConstraints(
-            maxWidth: ShareService.shareImageWidth - (ShareService.horizontalPadding * 2),
-            maxHeight: ShareService.shareImageWidth * 0.75, // 限制最大高度
+          width: ShareService.shareImageWidth - (ShareService.horizontalPadding * 2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0),
+            color: Colors.white,
           ),
-          child: Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.memory(
-                imageData,
-                fit: BoxFit.contain,
-                width: ShareService.shareImageWidth - (ShareService.horizontalPadding * 2),
-                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                  debugPrint('Image frame loaded: $frame');
-                  return child;
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  debugPrint('Error building image: $error');
-                  debugPrint('Stack trace: $stackTrace');
-                  return const SizedBox.shrink();
-                },
-              ),
-            ),
+          clipBehavior: Clip.antiAlias,
+          child: Image.memory(
+            imageData,
+            fit: BoxFit.fitWidth,
+            width: ShareService.shareImageWidth - (ShareService.horizontalPadding * 2),
+            cacheWidth: 1200,
+            gaplessPlayback: true,
           ),
         );
       } catch (e, stackTrace) {
@@ -359,76 +310,3 @@ class ShareImageEmbedBuilder extends EmbedBuilder {
     return const SizedBox.shrink();
   }
 }
-
-// 添加专门的预览图片构建器
-class PreviewImageEmbedBuilder extends EmbedBuilder {
-  @override
-  String get key => 'image';
-
-  @override
-  Widget build(BuildContext context, QuillController controller, Embed node, bool readOnly, bool inline, TextStyle textStyle) {
-    final imageUrl = node.value.data as String;
-    debugPrint('PreviewImageEmbedBuilder.build called');
-    debugPrint('Processing image...');
-    
-    if (imageUrl.startsWith('data:image')) {
-      try {
-        final parts = imageUrl.split(',');
-        debugPrint('Image format: ${parts[0]}');
-        final base64Data = parts[1];
-        final imageData = base64Decode(base64Data);
-        debugPrint('Original image data size: ${imageData.length} bytes');
-        
-        // 计算适当的显示尺寸
-        final maxWidth = ShareService.shareImageWidth - (ShareService.horizontalPadding * 2);
-        final maxHeight = maxWidth * 0.75;
-        
-        return Container(
-          margin: const EdgeInsets.symmetric(vertical: 16.0),
-          constraints: BoxConstraints(
-            maxWidth: maxWidth,
-            maxHeight: maxHeight,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Image.memory(
-              imageData,
-              fit: BoxFit.contain,
-              width: maxWidth,
-              height: maxHeight,
-              cacheWidth: 1200,  // 固定缓存宽度
-              gaplessPlayback: true,
-              errorBuilder: (context, error, stackTrace) {
-                debugPrint('Error building image: $error');
-                debugPrint('Stack trace: $stackTrace');
-                return Container(
-                  height: 200,
-                  color: Colors.grey[200],
-                  child: const Center(
-                    child: Icon(Icons.error_outline, size: 48, color: Colors.grey),
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      } catch (e, stackTrace) {
-        debugPrint('Error processing image: $e');
-        debugPrint('Stack trace: $stackTrace');
-        return Container(
-          height: 200,
-          color: Colors.grey[200],
-          child: const Center(
-            child: Icon(Icons.error_outline, size: 48, color: Colors.grey),
-          ),
-        );
-      }
-    }
-    return const SizedBox.shrink();
-  }
-}
-

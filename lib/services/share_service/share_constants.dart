@@ -29,6 +29,6 @@ class ShareConstants {
   static const double bottomPadding = 60.0;
 
   // 内嵌图片相关
-  static const int maxEmbeddedImageWidth = 1040;  // 1200 - (80 * 2)
-  static const int imageQuality = 80;
+  static const double maxEmbeddedImageWidth = shareImageWidth - (horizontalPadding * 2);
+  static const double imageCornerRadius = 8.0;
 }

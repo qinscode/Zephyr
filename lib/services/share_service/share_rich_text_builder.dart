@@ -83,43 +83,19 @@ class ShareRichTextBuilder {
       final base64Data = imageUrl.split(',')[1];
       final imageData = base64Decode(base64Data);
 
-      final decodedImage = image.decodeImage(imageData);
-      if (decodedImage == null) return null;
-
-      double aspectRatio = decodedImage.width / decodedImage.height;
-      int newWidth = decodedImage.width;
-      int newHeight = decodedImage.height;
-
-      if (newWidth > ShareConstants.maxEmbeddedImageWidth) {
-        newWidth = ShareConstants.maxEmbeddedImageWidth;
-        newHeight = (newWidth / aspectRatio).round();
-      }
-
-      debugPrint('Resizing image from ${decodedImage.width}x${decodedImage.height} to ${newWidth}x${newHeight}');
-
-      final resizedImage = image.copyResize(
-        decodedImage,
-        width: newWidth,
-        height: newHeight,
-        interpolation: image.Interpolation.linear,
-      );
-
-      final compressedData = image.encodeJpg(resizedImage, quality: ShareConstants.imageQuality);
-      debugPrint('Original size: ${imageData.length} bytes');
-      debugPrint('Compressed size: ${compressedData.length} bytes');
-
-      return Padding(
-        padding: const EdgeInsets.only(
-          top: ShareConstants.contentBottomSpacing / 2,
-          bottom: ShareConstants.contentBottomSpacing,
+      return Container(
+        width: ShareConstants.maxEmbeddedImageWidth.toDouble(),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          color: Colors.white,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(ShareConstants.borderRadius),
-          child: Image.memory(
-            Uint8List.fromList(compressedData),
-            fit: BoxFit.contain,
-            width: newWidth.toDouble(),
-          ),
+        clipBehavior: Clip.antiAlias,
+        child: Image.memory(
+          imageData,
+          fit: BoxFit.fitWidth,
+          width: ShareConstants.maxEmbeddedImageWidth.toDouble(),
+          cacheWidth: 1200,
+          gaplessPlayback: true,
         ),
       );
     } catch (e) {
