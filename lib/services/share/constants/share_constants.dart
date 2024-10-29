@@ -38,15 +38,23 @@ class Layout {
 /// 文字排版相关的配置
 class Typography {
   const Typography();
-  /// 标题文字大小，单位像素
-  double get titleFontSize => 48.0;
-  /// 内容文字大小，单位像素
+  /// 标题字体大小
+  double get titleFontSize => 64.0;
+  /// 正文字体大小
   double get contentFontSize => 32.0;
-  /// 水印文字大小，单位像素
+  /// H1 标题字体大小
+  double get h1FontSize => 64.0;
+  /// H2 标题字体大小
+  double get h2FontSize => 48.0;
+  /// H3 标题字体大小
+  double get h3FontSize => 40.0;
+  /// 列表字体大小
+  double get listFontSize => 32.0;
+  /// 水印字体大小
   double get watermarkFontSize => 24.0;
-  /// 内容文字的行高倍数
+  /// 行高倍数
   double get contentLineHeight => 1.6;
-  /// 水印文字的字间距
+  /// 水印字间距
   double get watermarkLetterSpacing => 0.3;
 }
 

@@ -66,9 +66,9 @@ class PreviewBuilder {
               TextStyle(
                 fontSize: ShareConstants.typography.titleFontSize,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
                 height: ShareConstants.typography.contentLineHeight,
               ),
+              background: note.background,
             ),
             SizedBox(height: ShareConstants.spacing.titleBottomSpacing),
           ],
@@ -79,9 +79,9 @@ class PreviewBuilder {
                 note.content.first.text,
                 TextStyle(
                   fontSize: ShareConstants.typography.contentFontSize,
-                  color: Colors.black87,
                   height: ShareConstants.typography.contentLineHeight,
                 ),
+                background: note.background,
               ),
             ),
         ],
