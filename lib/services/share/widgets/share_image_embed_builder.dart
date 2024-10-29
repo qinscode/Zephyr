@@ -19,7 +19,7 @@ class ShareImageEmbedBuilder extends EmbedBuilder {
         final imageData = base64Decode(base64Data);
 
         return Container(
-          width: ShareConstants.shareImageWidth - (ShareConstants.horizontalPadding * 2),
+          width: ShareConstants.dimensions.width - (ShareConstants.layout.horizontalPadding * 2),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
             color: Colors.white,
@@ -28,14 +28,14 @@ class ShareImageEmbedBuilder extends EmbedBuilder {
           child: Image.memory(
             imageData,
             fit: BoxFit.fitWidth,
-            width: ShareConstants.shareImageWidth - (ShareConstants.horizontalPadding * 2),
+            width: ShareConstants.dimensions.width - (ShareConstants.layout.horizontalPadding * 2),
             gaplessPlayback: true,
           ),
         );
       } catch (e, stackTrace) {
         debugPrint('Error processing image: $e');
         debugPrint('Stack trace: $stackTrace');
-            return const SizedBox.shrink();
+        return const SizedBox.shrink();
       }
     }
     return const SizedBox.shrink();

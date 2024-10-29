@@ -16,7 +16,7 @@ class RichTextRenderer {
 
         return Container(
           constraints: BoxConstraints(
-            maxWidth: ShareConstants.shareImageWidth - (ShareConstants.horizontalPadding * 2),
+            maxWidth: ShareConstants.dimensions.width - (ShareConstants.layout.horizontalPadding * 2),
           ),
           child: QuillEditor(
             controller: controller,

@@ -9,13 +9,13 @@ class PreviewBuilder {
   static Widget build(Note note) {
     return SingleChildScrollView(
       child: Container(
-        width: ShareConstants.shareImageWidth,
-        constraints: const BoxConstraints(
-          minHeight: ShareConstants.shareImageMinHeight,
+        width: ShareConstants.dimensions.width,
+        constraints: BoxConstraints(
+          minHeight: ShareConstants.dimensions.minHeight,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(ShareConstants.borderRadius),
+          borderRadius: BorderRadius.circular(ShareConstants.layout.borderRadius),
         ),
         child: Stack(
           children: [
@@ -33,7 +33,7 @@ class PreviewBuilder {
       return Positioned.fill(
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(ShareConstants.borderRadius),
+            borderRadius: BorderRadius.circular(ShareConstants.layout.borderRadius),
             image: DecorationImage(
               image: AssetImage(note.background!.assetPath!),
               fit: note.background!.isTileable ? BoxFit.none : BoxFit.cover,
@@ -49,11 +49,11 @@ class PreviewBuilder {
 
   static Widget _buildContent(Note note) {
     return Padding(
-      padding: const EdgeInsets.only(
-        left: ShareConstants.horizontalPadding,
-        right: ShareConstants.horizontalPadding,
-        top: ShareConstants.verticalPadding,
-        bottom: ShareConstants.bottomAreaHeight + ShareConstants.bottomPadding,
+      padding: EdgeInsets.only(
+        left: ShareConstants.layout.horizontalPadding,
+        right: ShareConstants.layout.horizontalPadding,
+        top: ShareConstants.layout.verticalPadding,
+        bottom: ShareConstants.bottomArea.height + ShareConstants.bottomArea.padding,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,24 +63,24 @@ class PreviewBuilder {
             RichTextRenderer.build(
               note.titleDeltaJson,
               note.title,
-              const TextStyle(
-                fontSize: ShareConstants.titleFontSize,
+              TextStyle(
+                fontSize: ShareConstants.typography.titleFontSize,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
-                height: ShareConstants.contentLineHeight,
+                height: ShareConstants.typography.contentLineHeight,
               ),
             ),
-            const SizedBox(height: ShareConstants.titleBottomSpacing),
+            SizedBox(height: ShareConstants.spacing.titleBottomSpacing),
           ],
           if (note.content.isNotEmpty)
             Flexible(
               child: RichTextRenderer.build(
                 note.content.first.deltaJson,
                 note.content.first.text,
-                const TextStyle(
-                  fontSize: ShareConstants.contentFontSize,
+                TextStyle(
+                  fontSize: ShareConstants.typography.contentFontSize,
                   color: Colors.black87,
-                  height: ShareConstants.contentLineHeight,
+                  height: ShareConstants.typography.contentLineHeight,
                 ),
               ),
             ),
@@ -91,33 +91,33 @@ class PreviewBuilder {
 
   static Widget _buildFooter(Note note) {
     return Positioned(
-      left: ShareConstants.horizontalPadding,
-      right: ShareConstants.horizontalPadding,
-      bottom: ShareConstants.bottomPadding,
+      left: ShareConstants.layout.horizontalPadding,
+      right: ShareConstants.layout.horizontalPadding,
+      bottom: ShareConstants.bottomArea.padding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            height: ShareConstants.dividerHeight,
-            color: Colors.grey.withOpacity(ShareConstants.dividerOpacity),
+            height: ShareConstants.divider.height,
+            color: Colors.grey.withOpacity(ShareConstants.divider.opacity),
           ),
-          const SizedBox(height: ShareConstants.dividerBottomSpacing),
+          SizedBox(height: ShareConstants.spacing.dividerBottomSpacing),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Created with Notes App',
                 style: TextStyle(
-                  fontSize: ShareConstants.watermarkFontSize,
+                  fontSize: ShareConstants.typography.watermarkFontSize,
                   color: Colors.grey[400],
                   fontWeight: FontWeight.w500,
-                  letterSpacing: ShareConstants.watermarkLetterSpacing,
+                  letterSpacing: ShareConstants.typography.watermarkLetterSpacing,
                 ),
               ),
               Text(
                 note.createdAt.toString().split('.')[0],
                 style: TextStyle(
-                  fontSize: ShareConstants.watermarkFontSize,
+                  fontSize: ShareConstants.typography.watermarkFontSize,
                   color: Colors.grey[400],
                 ),
               ),
