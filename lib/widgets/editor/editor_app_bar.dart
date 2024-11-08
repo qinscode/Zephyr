@@ -52,7 +52,7 @@ class EditorAppBar extends StatelessWidget implements PreferredSizeWidget {
             onPressed: onRedo,
           ),
         IconButton(
-          icon: Icon(FontAwesomeIcons.shirt, color: effectiveIconColor),
+          icon: Icon(Icons.color_lens, color: effectiveIconColor),
           onPressed: onTheme,
         ),
         IconButton(
