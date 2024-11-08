@@ -20,27 +20,56 @@ import '../widgets/editor/more_options.dart';
 import '../widgets/folder_selector.dart';
 import 'package:flutter/foundation.dart';
 
-// 修改 SaveNoteData 类的类型定义
 class SaveNoteData {
-  final List<dynamic> titleDeltaJson;
-  final List<dynamic> contentDeltaJson;
   final String titleText;
   final String contentText;
+  final List<dynamic> titleDeltaJson;
+  final List<dynamic> contentDeltaJson;
   final String? folderId;
   final NoteBackground? background;
   final String? noteId;
   final DateTime? createdAt;
 
   SaveNoteData({
-    required this.titleDeltaJson,
-    required this.contentDeltaJson,
     required this.titleText,
     required this.contentText,
+    required this.titleDeltaJson,
+    required this.contentDeltaJson,
     this.folderId,
     this.background,
     this.noteId,
     this.createdAt,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'titleText': titleText,
+      'contentText': contentText,
+      'titleDeltaJson': titleDeltaJson,
+      'contentDeltaJson': contentDeltaJson,
+      'folderId': folderId,
+      'background': background?.toJson(),
+      'noteId': noteId,
+      'createdAt': createdAt?.toIso8601String(),
+    };
+  }
+
+  static SaveNoteData fromJson(Map<String, dynamic> json) {
+    return SaveNoteData(
+      titleText: json['titleText'] as String,
+      contentText: json['contentText'] as String,
+      titleDeltaJson: json['titleDeltaJson'] as List<dynamic>,
+      contentDeltaJson: json['contentDeltaJson'] as List<dynamic>,
+      folderId: json['folderId'] as String?,
+      background: json['background'] != null 
+          ? NoteBackground.fromJson(json['background'] as Map<String, dynamic>)
+          : null,
+      noteId: json['noteId'] as String?,
+      createdAt: json['createdAt'] != null 
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+    );
+  }
 }
 
 class NoteEditorScreen extends StatefulWidget {
@@ -127,31 +156,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     });
   }
 
-  // 修改后台处理函数
-  Note _processSaveNote(SaveNoteData data) {
-    final now = DateTime.now();
-
-    return Note(
-      id: data.noteId ?? const Uuid().v4(),
-      title: data.titleText.trim(),
-      content: [
-        RichParagraph(
-          text: data.contentText,
-          deltaJson: data.contentDeltaJson,
-        )
-      ],
-      createdAt: data.createdAt ?? now,
-      modifiedAt: now,
-      folderId: data.folderId,
-      background: data.background,
-      titleDeltaJson: data.titleDeltaJson,
-    );
-  }
-
   // 修改保存笔记的方法
   Future<bool> _saveNote() async {
     print('NoteEditorScreen - _saveNote - 开始');
     print('开始保存笔记...');
+    
     if (_editorState.titleController.document.length == 0 && 
         _editorState.contentController.document.length == 0) {
       print('笔记内容为空，直接返回');
@@ -161,22 +170,24 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     try {
       print('准备保存数据...');
       final notesModel = Provider.of<NotesModel>(context, listen: false);
+      final now = DateTime.now();
 
-      // 准备可序列化的数据，直接使用 toDelta().toJson()
-      final saveData = SaveNoteData(
-        titleDeltaJson: _editorState.titleController.document.toDelta().toJson(),
-        contentDeltaJson: _editorState.contentController.document.toDelta().toJson(),
-        titleText: _editorState.titleController.document.toPlainText(),
-        contentText: _editorState.contentController.document.toPlainText(),
+      // 直接创建 Note 对象
+      final note = Note(
+        id: widget.note?.id ?? const Uuid().v4(),
+        title: _editorState.titleController.document.toPlainText().trim(),
+        content: [
+          RichParagraph(
+            text: _editorState.contentController.document.toPlainText(),
+            deltaJson: _editorState.contentController.document.toDelta().toJson(),
+          )
+        ],
+        createdAt: widget.note?.createdAt ?? now,
+        modifiedAt: now,
         folderId: _editorState.folderId,
         background: _editorState.currentBackground,
-        noteId: widget.note?.id,
-        createdAt: widget.note?.createdAt,
+        titleDeltaJson: _editorState.titleController.document.toDelta().toJson(),
       );
-
-      print('开始后台处理数据...');
-      final note = await compute(_processSaveNote, saveData);
-      print('后台处理完成');
 
       print('开始保存到数据库...');
       if (widget.note == null) {
@@ -191,7 +202,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       return true;
     } catch (e, stackTrace) {
       print('保存失败: $e');
-      print('错误堆栈: $stackTrace');  // 添加堆栈跟踪
+      print('错误堆栈: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to save note: $e')),
